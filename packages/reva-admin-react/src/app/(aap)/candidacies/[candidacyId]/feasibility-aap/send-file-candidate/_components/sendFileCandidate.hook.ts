@@ -25,6 +25,7 @@ const feasibilityWithDematerializedFeasibilityFileSendFileCandidateByCandidacyId
       feasibility_getActiveFeasibilityByCandidacyId(candidacyId: $candidacyId) {
         dematerializedFeasibilityFile {
           id
+          eligibilityCandidateSituation
           sentToCandidateAt
           aapDecision
           aapDecisionComment

@@ -31,6 +31,7 @@ const getActiveFeasibilitySendFileCertificationAuthorityByCandidacyId = graphql(
         decisionComment
         dematerializedFeasibilityFile {
           id
+          eligibilityCandidateSituation
           swornStatementFile {
             name
             previewUrl

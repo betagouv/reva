@@ -119,6 +119,7 @@ const getCandidacyById = graphql(`
         }
         dematerializedFeasibilityFile {
           id
+          eligibilityCandidateSituation
           swornStatementFile {
             name
             previewUrl

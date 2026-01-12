@@ -27,6 +27,7 @@ const feasibilityGetActiveFeasibilityByCandidacyId = graphql(`
       }
       dematerializedFeasibilityFile {
         id
+        eligibilityCandidateSituation
         swornStatementFile {
           name
           previewUrl
