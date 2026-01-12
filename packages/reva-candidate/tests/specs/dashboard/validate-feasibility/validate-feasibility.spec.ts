@@ -152,14 +152,14 @@ test.describe("Dematerialized feasibility résumé", () => {
 
     const acquisAccordion = dffSummary
       .locator("section.fr-accordion")
-      .filter({ hasText: "Acquis" });
+      .filter({ hasText: "Oui" });
     await expect(acquisAccordion.locator("li")).toContainText(
       "Justifier de 2 ans d'experience en logistique",
     );
 
     const enCoursAccordion = dffSummary
       .locator("section.fr-accordion")
-      .filter({ hasText: "En cours" });
+      .filter({ hasText: "Non" });
     await expect(enCoursAccordion.locator("li")).toContainText(
       "Avoir suivi une formation securite",
     );

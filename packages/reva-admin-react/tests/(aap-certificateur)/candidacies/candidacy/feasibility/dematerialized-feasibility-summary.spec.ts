@@ -687,14 +687,14 @@ scenarios.forEach(({ label, role, url, handlers, waitForQueries }) => {
 
       const acquisAccordion = dffSummary
         .locator("section.fr-accordion")
-        .filter({ hasText: "Acquis" });
+        .filter({ hasText: "Oui" });
       await expect(acquisAccordion.locator("li")).toContainText(
         "Justifier de 2 ans d'expérience en logistique",
       );
 
       const enCoursAccordion = dffSummary
         .locator("section.fr-accordion")
-        .filter({ hasText: "En cours" });
+        .filter({ hasText: "Non" });
       await expect(enCoursAccordion.locator("li")).toContainText(
         "Avoir suivi une formation sécurité",
       );
