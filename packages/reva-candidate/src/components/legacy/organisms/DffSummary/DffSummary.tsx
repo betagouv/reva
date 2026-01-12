@@ -10,6 +10,7 @@ import { PICTOGRAMS } from "@/components/pictograms/Pictograms";
 import {
   Candidate,
   DffAttachment,
+  DffEligibilityCandidateSituation,
   DffEligibilityRequirement,
   Prerequisite,
 } from "@/graphql/generated/graphql";
@@ -31,11 +32,32 @@ type DffSummaryProps = {
   setCandidateDecisionComment: (comment: string) => void;
 };
 
+const eligibilityCandidateSituationMap = {
+  PREMIERE_DEMANDE_RECEVABILITE: "Première demande de recevabilité",
+  DETENTEUR_RECEVABILITE: "Détenteur d'une recevabilité",
+  DETENTEUR_RECEVABILITE_AVEC_CHGT_CODE_RNCP_ET_REV_REFERENTIEL:
+    "Détenteur d'une recevabilité avec changement de code RNCP et révision du référentiel",
+  DETENTEUR_RECEVABILITE_AVEC_REV_SANS_CHGT_REFERENTIEL:
+    "Détenteur d'une recevabilité avec révision sans changement de référentiel",
+};
+
 const EligibiltyBadge = ({
   eligibilityRequirement,
+  eligibilityCandidateSituation,
 }: {
   eligibilityRequirement?: DffEligibilityRequirement | null;
+  eligibilityCandidateSituation?: DffEligibilityCandidateSituation | null;
 }) => {
+  if (
+    eligibilityCandidateSituation &&
+    eligibilityCandidateSituationMap[eligibilityCandidateSituation]
+  ) {
+    return (
+      <Badge severity="info">
+        {eligibilityCandidateSituationMap[eligibilityCandidateSituation]}
+      </Badge>
+    );
+  }
   if (eligibilityRequirement === "FULL_ELIGIBILITY_REQUIREMENT") {
     return (
       <Badge severity="info">Accès au dossier de faisabilité intégral</Badge>
@@ -75,6 +97,7 @@ export function DffSummary({
     certificationCompetenceDetails,
     eligibilityRequirement,
     eligibilityValidUntil,
+    eligibilityCandidateSituation,
     candidateConfirmationAt,
     attachments,
     swornStatementFile,
@@ -109,7 +132,10 @@ export function DffSummary({
             Contexte de la demande
           </h2>
           <h3>Nature de la demande</h3>
-          <EligibiltyBadge eligibilityRequirement={eligibilityRequirement} />
+          <EligibiltyBadge
+            eligibilityRequirement={eligibilityRequirement}
+            eligibilityCandidateSituation={eligibilityCandidateSituation}
+          />
           {eligibilityValidUntil && (
             <dl className="mt-4 mb-4">
               <dt id="eligibility-valid-until-label" className="mb-0">
