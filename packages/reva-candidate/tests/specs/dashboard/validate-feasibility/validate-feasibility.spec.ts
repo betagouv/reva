@@ -252,7 +252,7 @@ test.describe("Dematerialized feasibility résumé", () => {
   test("displays eligibility information", async ({ page }) => {
     const dffSummary = page.getByTestId("dff-summary");
     await expect(
-      dffSummary.getByText("Accès au dossier de faisabilité intégral"),
+      dffSummary.getByText("Première demande de recevabilité"),
     ).toBeVisible();
   });
 

@@ -240,6 +240,7 @@
           ],
           "eligibilityRequirement": "FULL_ELIGIBILITY_REQUIREMENT",
           "eligibilityValidUntil": 1735646400000,
+          "eligibilityCandidateSituation": "PREMIERE_DEMANDE_RECEVABILITE",
           "swornStatementFile": {
             "name": "attestation-honneur.pdf",
             "previewUrl": "https://files.example.com/attestation-honneur.pdf",
