@@ -126,6 +126,7 @@ const dematerializedFeasibilityFile = {
   ],
   eligibilityRequirement: "FULL_ELIGIBILITY_REQUIREMENT",
   eligibilityValidUntil: 1735646400000,
+  eligibilityCandidateSituation: "PREMIERE_DEMANDE_RECEVABILITE",
   dffFile: {
     url: "https://files.example.com/dff-resume.pdf",
     name: "dossier-feasibilite.pdf",
@@ -522,7 +523,7 @@ scenarios.forEach(({ label, role, url, handlers, waitForQueries }) => {
       const dffSummary = page.getByTestId("dff-summary");
       await expect(dffSummary).toBeVisible();
       await expect(
-        dffSummary.getByText("Accès au dossier de faisabilité intégral"),
+        dffSummary.getByText("Première demande de recevabilité"),
       ).toBeVisible();
       await expect(dffSummary.getByLabel("Date de fin de validité")).toHaveText(
         "31/12/2024",
