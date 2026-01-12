@@ -24,6 +24,7 @@ type DematerializedFeasibilityFile {
   isReadyToBeSentToCertificationAuthority: Boolean!
   candidateConfirmationAt: Timestamp
   eligibilityRequirement: DFFEligibilityRequirement
+  eligibilityCandidateSituation: DFFEligibilityCandidateSituation
   eligibilityValidUntil: Timestamp
   dffFile: File
 }
