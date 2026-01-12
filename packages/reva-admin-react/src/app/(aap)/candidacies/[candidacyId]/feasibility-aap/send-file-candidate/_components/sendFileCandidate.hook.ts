@@ -87,6 +87,14 @@ const feasibilityWithDematerializedFeasibilityFileSendFileCandidateByCandidacyId
           additionalHourCount
           isCertificationPartial
           typology
+          feasibility {
+            certificationAuthority {
+              label
+              contactFullName
+              contactEmail
+              contactPhone
+            }
+          }
           conventionCollective {
             label
           }
