@@ -164,7 +164,7 @@ export default function CertificationSection({
           </p>
         )}
         {!!prequisitesByStatus?.acquired?.length && (
-          <Accordion label="Acquis" defaultExpanded={false}>
+          <Accordion label="Oui" defaultExpanded={false}>
             <ul>
               {prequisitesByStatus?.acquired?.map((prerequisite) => (
                 <li key={prerequisite?.id}>{prerequisite?.label}</li>
@@ -173,7 +173,7 @@ export default function CertificationSection({
           </Accordion>
         )}
         {!!prequisitesByStatus?.inProgress?.length && (
-          <Accordion label="En cours" defaultExpanded={false}>
+          <Accordion label="Non" defaultExpanded={false}>
             <ul>
               {prequisitesByStatus?.inProgress?.map((prerequisite) => (
                 <li key={prerequisite?.id}>{prerequisite?.label}</li>
