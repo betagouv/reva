@@ -3,6 +3,29 @@ import {
   DFFEligibilityRequirement,
 } from "@prisma/client";
 
+export const addFrame = ({
+  doc,
+  content,
+  startInPt,
+  widthInPt,
+}: {
+  doc: PDFKit.PDFDocument;
+  startInPt: number;
+  widthInPt: number;
+  content: (doc: PDFKit.PDFDocument) => void;
+}) => {
+  const yStart = doc.y;
+  content(doc);
+  doc.moveDown(1);
+  const yEnd = doc.y;
+  doc
+    .rect(startInPt, yStart, widthInPt, yEnd - yStart)
+    .strokeColor("#DDDDDD")
+    .lineWidth(0.5)
+    .stroke();
+  doc.text("", startInPt, doc.y); //reset x position to start of frame after frame end
+};
+
 export const addSection = ({
   title,
   iconPath,
@@ -14,28 +37,25 @@ export const addSection = ({
   content: (doc: PDFKit.PDFDocument) => void;
   doc: PDFKit.PDFDocument;
 }) => {
-  const yStart = doc.y;
-  doc.image(iconPath, doc.x + pxToPt(40), doc.y + pxToPt(40), {
-    fit: [pxToPt(40), pxToPt(40)],
+  addFrame({
+    doc,
+    startInPt: pxToPt(100),
+    widthInPt: pxToPt(1280),
+    content: (doc) => {
+      doc.image(iconPath, doc.x + pxToPt(40), doc.y + pxToPt(40), {
+        fit: [pxToPt(40), pxToPt(40)],
+      });
+
+      doc
+        .fontSize(14)
+        .font("assets/fonts/Marianne/Marianne-Bold.otf")
+        .text(title, doc.x + pxToPt(90), doc.y + pxToPt(32));
+
+      doc.moveDown(0.5);
+
+      content(doc);
+    },
   });
-
-  doc
-    .fontSize(14)
-    .font("assets/fonts/Marianne/Marianne-Bold.otf")
-    .text(title, doc.x + pxToPt(90), doc.y + pxToPt(32));
-
-  doc.moveDown(0.5);
-
-  content(doc);
-
-  doc.moveDown(1);
-  const yEnd = doc.y;
-
-  doc
-    .rect(pxToPt(100), yStart, pxToPt(1280), yEnd - yStart)
-    .strokeColor("#DDDDDD")
-    .lineWidth(0.5)
-    .stroke();
 };
 
 export const pxToPt = (pixels: number) => pixels / 2.48;
