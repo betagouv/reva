@@ -11,7 +11,7 @@ import {
   addSubTitle,
   getEligibilityLabelAndType,
   pxToPt,
-  sectionBuilder,
+  addSection,
 } from "../helpers/dfDematPdfHelper";
 
 const ASSETS_PATH =
@@ -23,6 +23,7 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
   const candidacy = await prismaClient.candidacy.findUnique({
     where: { id: candidacyId },
     include: {
+      certification: true,
       Feasibility: {
         where: {
           isActive: true,
@@ -163,9 +164,8 @@ const addContexteDemandeSection = ({
   doc: PDFKit.PDFDocument;
   eligibilityLabelAndType: { label: string; type: "info" | "warning" };
 }) => {
-  const { addSection } = sectionBuilder(doc);
-
   addSection({
+    doc,
     title: "Contexte de la demande",
     iconPath: `${ASSETS_PATH}/data-visualization.png`,
     content: (doc) => {
