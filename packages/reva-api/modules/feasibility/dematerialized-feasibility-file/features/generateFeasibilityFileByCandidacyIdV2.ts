@@ -7,6 +7,15 @@ import PDFDocument from "pdfkit";
 
 import { prismaClient } from "@/prisma/client";
 
+import {
+  addSubTitle,
+  pxToPt,
+  sectionBuilder,
+} from "../helpers/dfDematPdfHelper";
+
+const ASSETS_PATH =
+  "modules/feasibility/dematerialized-feasibility-file/assets/images/df-demat-pdf/";
+
 export const generateFeasibilityFileByCandidacyIdV2 = async (
   candidacyId: string,
 ): Promise<Buffer | undefined> => {
@@ -65,9 +74,9 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
       bufferPages: false,
       compress: true,
       margins: {
-        top: "20px",
+        top: pxToPt(20),
         bottom: "80px",
-        left: "40px",
+        left: pxToPt(100),
         right: "40px",
       },
     });
@@ -84,19 +93,28 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
       }
     });
 
+    const { addSection } = sectionBuilder(doc);
+
     addDocumentHeader(doc);
 
-    // Finalize PDF file
+    addSection({
+      title: "Contexte de la demande",
+      iconPath: `${ASSETS_PATH}data-visualization.png`,
+      content: (doc) => {
+        addSubTitle({ subTitle: "Nature de la demande", doc });
+      },
+    });
+
     doc.end();
   });
 };
 
 const addDocumentHeader = (doc: PDFKit.PDFDocument) => {
-  doc.image("assets/images/republique-francaise.png", doc.x, doc.y, {
+  doc.image(`${ASSETS_PATH}republique-francaise.png`, doc.x, doc.y, {
     fit: [104.25, 90.75],
   });
 
-  doc.image("assets/images/france-vae.png", doc.x + 400, doc.y + 6, {
+  doc.image(`${ASSETS_PATH}france-vae.png`, doc.x + 400, doc.y + 6, {
     fit: [155.25, 69.9],
   });
 
