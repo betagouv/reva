@@ -62,6 +62,7 @@ module.exports = {
           "light-decisions-border-border-default-grey": "#DDDDDD",
           "light-decisions-border-border-disabled-grey": "#E5E5E5",
           "light-decisions-text-disabled-grey": "#929292",
+          "light-decisions-background-background-alt-blue-france": "#F5F5FE",
         },
         fvae: {
           red: {
