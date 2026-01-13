@@ -1,3 +1,8 @@
+import {
+  DFFEligibilityCandidateSituation,
+  DFFEligibilityRequirement,
+} from "@prisma/client";
+
 export const sectionBuilder = (doc: PDFKit.PDFDocument) => {
   const addSection = ({
     title,
@@ -49,4 +54,57 @@ export const addSubTitle = ({
     .font("assets/fonts/Marianne/Marianne-Bold.otf")
     .text(subTitle, doc.x + pxToPt(-50));
   doc.moveDown(0.5);
+};
+
+export const getEligibilityLabelAndType = ({
+  eligibilityRequirement,
+  eligibilitySituation,
+}: {
+  eligibilityRequirement?: DFFEligibilityRequirement | null;
+  eligibilitySituation?: DFFEligibilityCandidateSituation | null;
+}): { label: string; type: "info" | "warning" } => {
+  if (eligibilitySituation) {
+    switch (eligibilitySituation) {
+      case DFFEligibilityCandidateSituation.PREMIERE_DEMANDE_RECEVABILITE:
+        return {
+          label: "PREMIÈRE DEMANDE DE RECEVABILITÉ",
+          type: "info",
+        };
+      case DFFEligibilityCandidateSituation.DETENTEUR_RECEVABILITE:
+        return {
+          label: "DÉTENTEUR DE RECEVABILITÉ",
+          type: "info",
+        };
+      case DFFEligibilityCandidateSituation.DETENTEUR_RECEVABILITE_AVEC_CHGT_CODE_RNCP_ET_REV_REFERENTIEL:
+        return {
+          label:
+            "DÉTENTEUR DE RECEVABILITÉ AVEC CHANGEMENT DE CODE RNCP ET RÉVISION DU RÉFÉRENTIEL",
+          type: "info",
+        };
+      case DFFEligibilityCandidateSituation.DETENTEUR_RECEVABILITE_AVEC_REV_SANS_CHGT_REFERENTIEL:
+        return {
+          label:
+            "DÉTENTEUR DE RECEVABILITÉ AVEC RÉVISION SANS CHANGEMENT DE RÉFÉRENTIEL",
+          type: "info",
+        };
+    }
+  }
+
+  switch (eligibilityRequirement) {
+    case DFFEligibilityRequirement.FULL_ELIGIBILITY_REQUIREMENT:
+      return {
+        label: "ACCÈS AU DOSSIER DE FAISABILITÉ INTÉGRAL",
+        type: "info",
+      };
+    case DFFEligibilityRequirement.PARTIAL_ELIGIBILITY_REQUIREMENT:
+      return {
+        label: "ACCÈS AU DOSSIER DE FAISABILITÉ ADAPTÉ",
+        type: "warning",
+      };
+  }
+
+  return {
+    label: "Inconnu",
+    type: "warning",
+  };
 };

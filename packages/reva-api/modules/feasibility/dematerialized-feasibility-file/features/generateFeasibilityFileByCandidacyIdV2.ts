@@ -9,12 +9,13 @@ import { prismaClient } from "@/prisma/client";
 
 import {
   addSubTitle,
+  getEligibilityLabelAndType,
   pxToPt,
   sectionBuilder,
 } from "../helpers/dfDematPdfHelper";
 
 const ASSETS_PATH =
-  "modules/feasibility/dematerialized-feasibility-file/assets/images/df-demat-pdf/";
+  "modules/feasibility/dematerialized-feasibility-file/assets/images/df-demat-pdf";
 
 export const generateFeasibilityFileByCandidacyIdV2 = async (
   candidacyId: string,
@@ -93,16 +94,18 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
       }
     });
 
-    const { addSection } = sectionBuilder(doc);
-
     addDocumentHeader(doc);
 
-    addSection({
-      title: "Contexte de la demande",
-      iconPath: `${ASSETS_PATH}data-visualization.png`,
-      content: (doc) => {
-        addSubTitle({ subTitle: "Nature de la demande", doc });
-      },
+    const eligibilityLabelAndType = getEligibilityLabelAndType({
+      eligibilityRequirement:
+        dematerializedFeasibilityFile.eligibilityRequirement,
+      eligibilitySituation:
+        dematerializedFeasibilityFile.eligibilityCandidateSituation,
+    });
+
+    addContexteDemandeSection({
+      doc,
+      eligibilityLabelAndType,
     });
 
     doc.end();
@@ -110,11 +113,11 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
 };
 
 const addDocumentHeader = (doc: PDFKit.PDFDocument) => {
-  doc.image(`${ASSETS_PATH}republique-francaise.png`, doc.x, doc.y, {
+  doc.image(`${ASSETS_PATH}/republique-francaise.png`, doc.x, doc.y, {
     fit: [104.25, 90.75],
   });
 
-  doc.image(`${ASSETS_PATH}france-vae.png`, doc.x + 400, doc.y + 6, {
+  doc.image(`${ASSETS_PATH}/france-vae.png`, doc.x + 400, doc.y + 6, {
     fit: [155.25, 69.9],
   });
 
@@ -151,4 +154,66 @@ const checkIsDFFReady = ({
   }
 
   return isDFFReady;
+};
+
+const addContexteDemandeSection = ({
+  doc,
+  eligibilityLabelAndType,
+}: {
+  doc: PDFKit.PDFDocument;
+  eligibilityLabelAndType: { label: string; type: "info" | "warning" };
+}) => {
+  const { addSection } = sectionBuilder(doc);
+
+  addSection({
+    title: "Contexte de la demande",
+    iconPath: `${ASSETS_PATH}/data-visualization.png`,
+    content: (doc) => {
+      addNatureDemandeSubSection({ doc, eligibilityLabelAndType });
+    },
+  });
+};
+
+const addNatureDemandeSubSection = ({
+  doc,
+  eligibilityLabelAndType,
+}: {
+  doc: PDFKit.PDFDocument;
+  eligibilityLabelAndType: { label: string; type: "info" | "warning" };
+}) => {
+  addSubTitle({ subTitle: "Nature de la demande", doc });
+
+  const { backgroundColor, textColor, iconPath } =
+    eligibilityLabelAndType.type === "info"
+      ? {
+          backgroundColor: "#e8edff",
+          textColor: "#0063cb",
+          iconPath: `${ASSETS_PATH}/info-fill.png`,
+        }
+      : {
+          backgroundColor: "#feebd0",
+          textColor: "#695240",
+          iconPath: `${ASSETS_PATH}/flashlight-fill.png`,
+        };
+  doc
+    .font("assets/fonts/Marianne/Marianne-Bold.otf")
+    .fontSize(8)
+    .table({
+      position: { x: doc.x + pxToPt(40), y: doc.y },
+      columnStyles: [doc.widthOfString(eligibilityLabelAndType.label) + 25],
+      data: [
+        [
+          {
+            border: 0,
+            backgroundColor,
+            textColor,
+            text: "        " + eligibilityLabelAndType.label,
+          },
+        ],
+      ],
+    });
+
+  doc.image(iconPath, doc.x + 2, doc.y - 13, {
+    fit: [12, 12],
+  });
 };
