@@ -70,7 +70,7 @@ export const addSubTitle = ({
   doc
     .fontSize(12)
     .font("assets/fonts/Marianne/Marianne-Bold.otf")
-    .text(subTitle, doc.x + pxToPt(-50));
+    .text(subTitle, pxToPt(140));
   doc.moveDown(0.5);
 };
 
