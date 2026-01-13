@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 
+import { isFeatureActiveForUser } from "@/modules/feature-flipping/feature-flipping.features";
 import {
   deleteFile,
   S3File,
@@ -8,6 +9,7 @@ import {
 import { prismaClient } from "@/prisma/client";
 
 import { generateFeasibilityFileByCandidacyId } from "./generateFeasibilityFileByCandidacyId";
+import { generateFeasibilityFileByCandidacyIdV2 } from "./generateFeasibilityFileByCandidacyIdV2";
 
 export const generateAndUploadFeasibilityFileByCandidacyId = async (
   candidacyId: string,
@@ -45,7 +47,14 @@ export const generateAndUploadFeasibilityFileByCandidacyId = async (
     throw new Error("Dossier de faisabilité dématérialisé non trouvé");
   }
 
-  const data = await generateFeasibilityFileByCandidacyId(candidacyId);
+  const isDFDematMiseEnConformiteFeatureActive = await isFeatureActiveForUser({
+    feature: "DF_DEMAT_MISE_EN_CONFORMITE",
+  });
+
+  const data = await (isDFDematMiseEnConformiteFeatureActive
+    ? await generateFeasibilityFileByCandidacyIdV2(candidacyId)
+    : await generateFeasibilityFileByCandidacyId(candidacyId));
+
   if (!data) {
     throw new Error(
       "Une erreur est survenue lors de la génération du pdf du dossier de faisabilité dématérialisé",
