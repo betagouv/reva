@@ -460,7 +460,7 @@ export const TrainingForm = ({
                 </Fragment>
               ))}
             <Checkbox
-              className="col-span-2"
+              className={`col-span-2 ${!candidacyFinancingMethodOtherSourceChecked ? "hidden" : ""}`}
               small
               options={[
                 {
@@ -471,7 +471,7 @@ export const TrainingForm = ({
                         handleOtherSourceFinancingMethodChange(
                           e.target.checked,
                         ),
-                      disabled,
+                      disabled: true,
                     }),
                   },
                 },
