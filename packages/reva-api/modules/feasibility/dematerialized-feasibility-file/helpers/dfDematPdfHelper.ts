@@ -50,6 +50,38 @@ export const addTag = ({
   doc.text("  " + text, startInPt + pxToPt(5), doc.y + pxToPt(5));
 };
 
+export const addInfoText = ({
+  title,
+  value,
+  x,
+  y,
+  maxWidthInPt,
+  doc,
+}: {
+  title: string;
+  value: string;
+  x?: number;
+  y?: number;
+  maxWidthInPt?: number;
+  doc: PDFKit.PDFDocument;
+}) => {
+  doc
+    .font("assets/fonts/Marianne/Marianne-Light.otf")
+    .fontSize(8)
+    .strokeColor("#161616")
+    .text(title, x ?? doc.x, y ?? doc.y, {
+      width: maxWidthInPt,
+    });
+
+  doc
+    .font("assets/fonts/Marianne/Marianne-Medium.otf")
+    .fontSize(8)
+    .strokeColor("#161616")
+    .text(value, {
+      width: maxWidthInPt,
+    });
+};
+
 export const addSection = ({
   title,
   iconPath,
