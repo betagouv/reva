@@ -124,6 +124,7 @@ input CandidateUpdateContactDetailsInput {
 
 type Mutation {
   candidate_askForRegistration(candidate: CandidateInput!): String!
+  candidate_askForRegistrationWithPassword(email: String!, certificationId: String): String!
   candidate_askForLogin(email: String!): String!
   candidate_loginWithToken(token: String!): String!
   candidate_loginWithCredentials(
