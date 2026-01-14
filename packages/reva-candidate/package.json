@@ -50,7 +50,7 @@
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/client-preset": "4.8.2",
     "@parcel/watcher": "^2.5.1",
-    "@playwright/test": "1.50.1",
+    "@playwright/test": "1.56.1",
     "@types/lodash": "^4.17.17",
     "@types/node": "^22",
     "@types/react": "^18",
