@@ -12,12 +12,13 @@ import { PageLayout } from "@/layouts/page.layout";
 
 import { useResetPassword } from "./reset-password.hooks";
 
-export default function ForgotPassword() {
+export default function ResetPassword() {
   const params = useSearchParams();
   const router = useRouter();
   const { resetKeycloakInstance } = useKeycloakContext();
 
-  const token = params.get("resetPasswordToken") || "";
+  const token =
+    params.get("resetPasswordToken") || params.get("setPasswordToken") || "";
 
   const [password, setPassword] = useState<string>("");
   const [passwordConfirmation, setPasswordConfirmation] = useState<string>("");
@@ -52,9 +53,15 @@ export default function ForgotPassword() {
     }
   };
 
+  const title = "Définir un mot de passe";
+
   return (
-    <PageLayout title="Connexion" data-testid="login-home" className="p-6 pt-8">
-      <h1 className="mb-10">Réinitialiser votre mot de passe France VAE</h1>
+    <PageLayout
+      title={title}
+      data-testid="reset-password-home"
+      className="p-6 pt-8"
+    >
+      <h1 className="mb-10">{title}</h1>
 
       <form className="flex flex-col gap-6" onSubmit={onSubmit}>
         <div className="flex flex-col gap-4">
@@ -109,7 +116,7 @@ export default function ForgotPassword() {
           data-testid="reset-password-home-submit"
           disabled={resetPassword.isPending}
         >
-          Mettre à jour
+          Valider
         </Button>
       </form>
     </PageLayout>
