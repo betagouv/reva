@@ -3,8 +3,9 @@ import { FeasibilityFormat } from "@prisma/client";
 
 import * as AuthHelper from "@/modules/shared/auth/auth.helper";
 import { prismaClient } from "@/prisma/client";
+import { createCandidateHelper } from "@/test/helpers/entities/create-candidate-helper";
 import { createCertificationHelper } from "@/test/helpers/entities/create-certification-helper";
-import { getGraphQLClient, getGraphQLError } from "@/test/test-graphql-client";
+import { getGraphQLClient } from "@/test/test-graphql-client";
 
 import { graphql } from "../../graphql/generated";
 
@@ -65,16 +66,8 @@ describe("candidateFinalizeRegistrationWithPassword", () => {
     expect(result.candidate_resetPassword).toEqual(tokens);
 
     expect(createAccountSpy).toHaveBeenCalledWith({ email }, "", ["candidate"]);
-    expect(resetPasswordSpy).toHaveBeenCalledWith(
-      keycloakId,
-      password,
-      "",
-    );
-    expect(generateTokensSpy).toHaveBeenCalledWith(
-      keycloakId,
-      password,
-      "",
-    );
+    expect(resetPasswordSpy).toHaveBeenCalledWith(keycloakId, password, "");
+    expect(generateTokensSpy).toHaveBeenCalledWith(keycloakId, password, "");
 
     const candidate = await prismaClient.candidate.findUnique({
       where: { email },
@@ -138,33 +131,51 @@ describe("candidateFinalizeRegistrationWithPassword", () => {
     expect(candidacy?.feasibilityFormat).toBe(certification.feasibilityFormat);
   });
 
-  test("throws when an IAM account already exists", async () => {
+  test("resets password when an IAM account already exists", async () => {
     const graphqlClient = getGraphQLClient({});
-    const email = faker.internet.email();
     const password = "StrongPassword123!";
+    const keycloakId = faker.string.uuid();
+    const existingCandidate = await createCandidateHelper({
+      keycloakId,
+    });
     const token = AuthHelper.generateJwt({
-      email,
+      email: existingCandidate.email,
       action: "finalize-registration",
     });
 
     vi.spyOn(AuthHelper, "getAccountInIAM").mockResolvedValue({
-      id: "existing-account",
+      id: keycloakId,
     });
 
     const createAccountSpy = vi.spyOn(AuthHelper, "createAccountInIAM");
+    const resetPasswordSpy = vi
+      .spyOn(AuthHelper, "resetPassword")
+      .mockResolvedValue(undefined);
 
-    try {
-      await graphqlClient.request(resetPasswordMutation, {
-        token,
-        password,
-      });
-      throw new Error("Expected error");
-    } catch (error) {
-      expect(getGraphQLError(error)).toContain(
-        "Un compte existe déjà avec cette adresse email. Veuillez vous connecter.",
-      );
-    }
+    const tokens = {
+      accessToken: "access-token",
+      refreshToken: "refresh-token",
+      idToken: "id-token",
+    };
+
+    const generateTokensSpy = vi
+      .spyOn(AuthHelper, "generateIAMTokenWithPassword")
+      .mockResolvedValue(tokens);
+
+    const result = await graphqlClient.request(resetPasswordMutation, {
+      token,
+      password,
+    });
 
     expect(createAccountSpy).not.toHaveBeenCalled();
+    expect(resetPasswordSpy).toHaveBeenCalledWith(keycloakId, password, "");
+    expect(generateTokensSpy).toHaveBeenCalledWith(keycloakId, password, "");
+    expect(result.candidate_resetPassword).toEqual(tokens);
+
+    const updatedCandidate = await prismaClient.candidate.findUnique({
+      where: { id: existingCandidate.id },
+    });
+
+    expect(updatedCandidate?.passwordUpdatedAt).not.toBeNull();
   });
 });

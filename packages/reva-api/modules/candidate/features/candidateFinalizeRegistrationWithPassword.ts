@@ -12,6 +12,8 @@ import {
 } from "@/modules/shared/auth/auth.helper";
 import { prismaClient } from "@/prisma/client";
 
+import { getCandidateByKeycloakId } from "./getCandidateByKeycloakId";
+
 interface FinalizeRegistrationWithPasswordInput {
   token: string;
   password: string;
@@ -40,9 +42,24 @@ export const candidateFinalizeRegistrationWithPassword = async ({
 
   const existingAccount = await getAccountInIAM(email, realm);
   if (existingAccount) {
-    throw new Error(
-      "Un compte existe déjà avec cette adresse email. Veuillez vous connecter.",
-    );
+    const keycloakId = existingAccount.id;
+    if (!keycloakId) {
+      throw new Error("Candidat non trouvé");
+    }
+
+    const candidate = await getCandidateByKeycloakId({ keycloakId });
+    if (!candidate) {
+      throw new Error("Candidat non trouvé");
+    }
+
+    await resetPassword(keycloakId, password, realm);
+
+    await prismaClient.candidate.update({
+      where: { id: candidate.id },
+      data: { passwordUpdatedAt: new Date() },
+    });
+
+    return generateIAMTokenWithPassword(keycloakId, password, realm);
   }
 
   const keycloakId = await createAccountInIAM({ email }, realm, ["candidate"]);
