@@ -5,6 +5,7 @@ import {
 } from "@prisma/client";
 import PDFDocument from "pdfkit";
 
+import { isAapAvailableForCertificationId } from "@/modules/referential/features/isAapAvailableForCertificationId";
 import { prismaClient } from "@/prisma/client";
 
 import {
@@ -12,6 +13,8 @@ import {
   getEligibilityLabelAndType,
   pxToPt,
   addSection,
+  addFrame,
+  addTag,
 } from "../helpers/dfDematPdfHelper";
 
 const ASSETS_PATH =
@@ -37,6 +40,12 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
 
   if (!candidacy) {
     throw new Error("Candidature non trouvée");
+  }
+
+  const { certification } = candidacy;
+
+  if (!certification) {
+    throw new Error("Certification non trouvée");
   }
 
   const feasibility = candidacy.Feasibility[0];
@@ -67,6 +76,10 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
       "Dossier de faisabilité incomplet pour la génération du pdf",
     );
   }
+
+  const aapAvailableForCertification = await isAapAvailableForCertificationId({
+    certificationId: certification.id,
+  });
 
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
@@ -107,6 +120,8 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
     addContexteDemandeSection({
       doc,
       eligibilityLabelAndType,
+      certification,
+      aapAvailableForCertification,
     });
 
     doc.end();
@@ -160,9 +175,13 @@ const checkIsDFFReady = ({
 const addContexteDemandeSection = ({
   doc,
   eligibilityLabelAndType,
+  certification,
+  aapAvailableForCertification,
 }: {
   doc: PDFKit.PDFDocument;
   eligibilityLabelAndType: { label: string; type: "info" | "warning" };
+  certification: { label: string; rncpId: string };
+  aapAvailableForCertification: boolean;
 }) => {
   addSection({
     doc,
@@ -170,6 +189,11 @@ const addContexteDemandeSection = ({
     iconPath: `${ASSETS_PATH}/data-visualization.png`,
     content: (doc) => {
       addNatureDemandeSubSection({ doc, eligibilityLabelAndType });
+      addCertificationSubSection({
+        doc,
+        certification,
+        aapAvailableForCertification,
+      });
     },
   });
 };
@@ -215,5 +239,58 @@ const addNatureDemandeSubSection = ({
 
   doc.image(iconPath, doc.x + 2, doc.y - 13, {
     fit: [12, 12],
+  });
+  doc.moveDown(1);
+};
+
+const addCertificationSubSection = ({
+  doc,
+  certification,
+  aapAvailableForCertification,
+}: {
+  doc: PDFKit.PDFDocument;
+  certification: { label: string; rncpId: string };
+  aapAvailableForCertification: boolean;
+}) => {
+  addSubTitle({
+    subTitle: "Informations sur la certification professionnelle visée",
+    doc,
+  });
+
+  addFrame({
+    doc,
+    startInPt: pxToPt(180),
+    widthInPt: pxToPt(1160),
+    content: (doc) => {
+      doc.moveDown(0.75);
+      addTag({
+        doc,
+        text: aapAvailableForCertification
+          ? "VAE en autonomie ou accompagnée"
+          : "VAE en autonomie",
+        startInPt: doc.x + pxToPt(72),
+      });
+      doc.image(
+        `${ASSETS_PATH}/verified-badge.png`,
+        doc.x,
+        doc.y + pxToPt(20),
+        {
+          fit: [pxToPt(16), pxToPt(16)],
+        },
+      );
+      doc
+        .font("assets/fonts/Marianne/Marianne-Light.otf")
+        .fontSize(6)
+        .text(`       RNCP ${certification.rncpId}`, doc.x, doc.y + pxToPt(16));
+
+      doc
+        .font("assets/fonts/Marianne/Marianne-Bold.otf")
+        .fontSize(11)
+        .text(certification.label, doc.x, doc.y + pxToPt(16), {
+          width: pxToPt(1096),
+        });
+
+      doc.moveDown(2);
+    },
   });
 };
