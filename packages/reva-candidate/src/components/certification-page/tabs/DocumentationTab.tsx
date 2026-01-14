@@ -71,6 +71,15 @@ const DocumentationTab = ({
             </Link>
           </div>
         </div>
+        {additionalInfo?.dossierDeValidationLink && (
+          <Link
+            href={additionalInfo?.dossierDeValidationLink}
+            className="fr-link mr-auto"
+            target="_blank"
+          >
+            Trame du dossier de validation
+          </Link>
+        )}
         {additionalInfo?.linkToReferential && (
           <span>
             <Link
