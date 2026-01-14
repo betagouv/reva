@@ -15,6 +15,7 @@ import {
   addSection,
   addFrame,
   addTag,
+  addInfoText,
 } from "../helpers/dfDematPdfHelper";
 
 const ASSETS_PATH =
@@ -122,6 +123,10 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
       eligibilityLabelAndType,
       certification,
       aapAvailableForCertification,
+      option: dematerializedFeasibilityFile.option,
+      firstForeignLanguage: dematerializedFeasibilityFile.firstForeignLanguage,
+      secondForeignLanguage:
+        dematerializedFeasibilityFile.secondForeignLanguage,
     });
 
     doc.end();
@@ -177,11 +182,17 @@ const addContexteDemandeSection = ({
   eligibilityLabelAndType,
   certification,
   aapAvailableForCertification,
+  option,
+  firstForeignLanguage,
+  secondForeignLanguage,
 }: {
   doc: PDFKit.PDFDocument;
   eligibilityLabelAndType: { label: string; type: "info" | "warning" };
   certification: { label: string; rncpId: string };
   aapAvailableForCertification: boolean;
+  option: string | null;
+  firstForeignLanguage: string | null;
+  secondForeignLanguage: string | null;
 }) => {
   addSection({
     doc,
@@ -193,6 +204,9 @@ const addContexteDemandeSection = ({
         doc,
         certification,
         aapAvailableForCertification,
+        option,
+        firstForeignLanguage,
+        secondForeignLanguage,
       });
     },
   });
@@ -247,10 +261,16 @@ const addCertificationSubSection = ({
   doc,
   certification,
   aapAvailableForCertification,
+  option,
+  firstForeignLanguage,
+  secondForeignLanguage,
 }: {
   doc: PDFKit.PDFDocument;
   certification: { label: string; rncpId: string };
   aapAvailableForCertification: boolean;
+  option: string | null;
+  firstForeignLanguage: string | null;
+  secondForeignLanguage: string | null;
 }) => {
   addSubTitle({
     subTitle: "Informations sur la certification professionnelle visée",
@@ -292,5 +312,32 @@ const addCertificationSubSection = ({
 
       doc.moveDown(2);
     },
+  });
+
+  doc.moveDown(0.5);
+
+  addInfoText({
+    title: "Option ou parcours :",
+    value: option ?? "",
+    doc,
+    maxWidthInPt: pxToPt(1160),
+  });
+
+  doc.moveDown(0.5);
+
+  const oldY = doc.y;
+
+  addInfoText({
+    title: "Langue vivante 1 :",
+    value: firstForeignLanguage ?? "",
+    doc,
+  });
+
+  addInfoText({
+    title: "Langue vivante 2 :",
+    value: secondForeignLanguage ?? "",
+    x: doc.x + pxToPt(300),
+    y: oldY,
+    doc,
   });
 };
