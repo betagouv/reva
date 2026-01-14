@@ -26,6 +26,30 @@ export const addFrame = ({
   doc.text("", startInPt, doc.y); //reset x position to start of frame after frame end
 };
 
+export const addTag = ({
+  doc,
+  text,
+  startInPt,
+}: {
+  doc: PDFKit.PDFDocument;
+  text: string;
+  startInPt: number;
+}) => {
+  doc.fontSize(7).font("assets/fonts/Marianne/Marianne-Light.otf");
+  doc
+    .roundedRect(
+      startInPt,
+      doc.y,
+      doc.widthOfString(text) + pxToPt(30),
+      pxToPt(35),
+      pxToPt(40),
+    )
+    .lineWidth(0.5)
+    .strokeColor("#DDDDDD")
+    .stroke();
+  doc.text("  " + text, startInPt + pxToPt(5), doc.y + pxToPt(5));
+};
+
 export const addSection = ({
   title,
   iconPath,
