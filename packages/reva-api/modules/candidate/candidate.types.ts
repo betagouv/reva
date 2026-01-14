@@ -66,7 +66,8 @@ export type CandidateAuthenticationInput =
 
 export type CandidateResetPasswordInput = {
   email: string;
-  action: "reset-password";
+  action: "reset-password" | "finalize-registration";
+  certificationId?: string;
 };
 
 export enum CandidateBusinessEvent {

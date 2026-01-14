@@ -14,6 +14,7 @@ import {
 } from "./candidate.types";
 import { askForLogin } from "./features/candidateAskForLogin";
 import { askForRegistration } from "./features/candidateAskForRegistration";
+import { candidateAskForRegistrationWithPassword } from "./features/candidateAskForRegistrationWithPassword";
 import { candidateForgotPassword } from "./features/candidateForgotPassword";
 import { candidateLoginWithCredentials } from "./features/candidateLoginWithCredentials";
 import { candidateLoginWithToken } from "./features/candidateLoginWithToken";
@@ -115,6 +116,10 @@ const unsafeResolvers = {
         };
       },
     ) => askForRegistration(params.candidate),
+    candidate_askForRegistrationWithPassword: async (
+      _: any,
+      params: { email: string; certificationId?: string },
+    ) => candidateAskForRegistrationWithPassword(params),
     candidate_askForLogin: async (_: unknown, params: { email: string }) =>
       askForLogin(params.email),
     candidate_loginWithToken: async (
