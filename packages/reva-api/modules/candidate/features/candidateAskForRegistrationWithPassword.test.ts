@@ -1,7 +1,8 @@
 import * as AuthHelper from "@/modules/shared/auth/auth.helper";
-import { getGraphQLClient, getGraphQLError } from "@/test/test-graphql-client";
+import { getGraphQLClient } from "@/test/test-graphql-client";
 
 import { graphql } from "../../graphql/generated";
+import * as LoginEmailModule from "../emails/sendLoginEmail";
 import * as RegistrationEmailModule from "../emails/sendRegistrationWithPasswordEmail";
 
 const askForRegistrationWithPasswordMutation = graphql(`
@@ -27,6 +28,10 @@ describe("candidateAskForRegistrationWithPassword", () => {
       .spyOn(RegistrationEmailModule, "sendRegistrationWithPasswordEmail")
       .mockResolvedValue(undefined);
 
+    const loginEmailSpy = vi
+      .spyOn(LoginEmailModule, "sendLoginEmail")
+      .mockResolvedValue(undefined);
+
     const result = await graphqlClient.request(
       askForRegistrationWithPasswordMutation,
       {
@@ -41,29 +46,33 @@ describe("candidateAskForRegistrationWithPassword", () => {
       email: "alice.doe@example.com",
       certificationId: "certification-id",
     });
+    expect(loginEmailSpy).not.toHaveBeenCalled();
   });
 
-  test("throws when an IAM account already exists", async () => {
+  test("sends login email when an IAM account already exists", async () => {
     const graphqlClient = getGraphQLClient({});
     vi.spyOn(AuthHelper, "getAccountInIAM").mockResolvedValue({
       id: "existing-account",
     });
 
-    const sendEmailSpy = vi
+    const registrationEmailSpy = vi
       .spyOn(RegistrationEmailModule, "sendRegistrationWithPasswordEmail")
       .mockResolvedValue(undefined);
 
-    try {
-      await graphqlClient.request(askForRegistrationWithPasswordMutation, {
+    const loginEmailSpy = vi
+      .spyOn(LoginEmailModule, "sendLoginEmail")
+      .mockResolvedValue(undefined);
+
+    const result = await graphqlClient.request(
+      askForRegistrationWithPasswordMutation,
+      {
         email: "alice.doe@example.com",
         certificationId: "certification-id",
-      });
-      throw new Error("Expected error");
-    } catch (error) {
-      expect(getGraphQLError(error)).toContain(
-        "Un compte existe déjà avec cette adresse email. Veuillez vous connecter ou utiliser la récupération de mot de passe.",
-      );
-    }
-    expect(sendEmailSpy).not.toHaveBeenCalled();
+      },
+    );
+
+    expect(result.candidate_askForRegistrationWithPassword).toBe("ok");
+    expect(registrationEmailSpy).not.toHaveBeenCalled();
+    expect(loginEmailSpy).toHaveBeenCalledWith("alice.doe@example.com");
   });
 });
