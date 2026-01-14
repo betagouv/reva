@@ -82,6 +82,57 @@ export const addInfoText = ({
     });
 };
 
+export const addCallout = ({
+  doc,
+  title,
+  description,
+  x,
+  y,
+  widthInPt,
+}: {
+  doc: PDFKit.PDFDocument;
+  title: string;
+  description: string;
+  x?: number;
+  y?: number;
+  widthInPt?: number;
+}) => {
+  doc
+    .font("assets/fonts/Marianne/Marianne-Regular.otf")
+    .fontSize(9)
+    .table({
+      position: { x: x ?? doc.x, y: y ?? doc.y },
+      maxWidth: widthInPt ?? undefined,
+      defaultStyle: {
+        border: [false, false, false, true],
+        borderColor: "#6a6af4",
+        backgroundColor: "#eeeeee",
+      },
+      data: [
+        [
+          {
+            text: title,
+            padding: {
+              top: "16px",
+              bottom: "2px",
+              left: "24px",
+              right: "24px",
+            },
+          },
+        ],
+        [
+          {
+            text: description,
+            font: {
+              src: "assets/fonts/Marianne/Marianne-Light.otf",
+            },
+            padding: { top: 0, bottom: "16px", left: "24px", right: "24px" },
+          },
+        ],
+      ],
+    });
+};
+
 export const addSection = ({
   title,
   iconPath,
