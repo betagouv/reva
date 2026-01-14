@@ -68,17 +68,25 @@ export const addInfoText = ({
   doc
     .font("assets/fonts/Marianne/Marianne-Light.otf")
     .fontSize(8)
-    .strokeColor("#161616")
-    .text(title, x ?? doc.x, y ?? doc.y, {
-      width: maxWidthInPt,
-    });
-
-  doc
-    .font("assets/fonts/Marianne/Marianne-Medium.otf")
-    .fontSize(8)
-    .strokeColor("#161616")
-    .text(value, {
-      width: maxWidthInPt,
+    .table({
+      defaultStyle: { border: false, padding: false },
+      position: { x: x ?? doc.x, y: y ?? doc.y },
+      maxWidth: maxWidthInPt ?? undefined,
+      data: [
+        [
+          {
+            text: title,
+          },
+        ],
+        [
+          {
+            text: value,
+            font: {
+              src: "assets/fonts/Marianne/Marianne-Medium.otf",
+            },
+          },
+        ],
+      ],
     });
 };
 
