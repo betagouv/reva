@@ -16,6 +16,7 @@ import {
   addFrame,
   addTag,
   addInfoText,
+  addCallout,
 } from "../helpers/dfDematPdfHelper";
 
 const ASSETS_PATH =
@@ -127,6 +128,7 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
       firstForeignLanguage: dematerializedFeasibilityFile.firstForeignLanguage,
       secondForeignLanguage:
         dematerializedFeasibilityFile.secondForeignLanguage,
+      isCertificationPartial: !!candidacy.isCertificationPartial,
     });
 
     doc.end();
@@ -185,6 +187,7 @@ const addContexteDemandeSection = ({
   option,
   firstForeignLanguage,
   secondForeignLanguage,
+  isCertificationPartial,
 }: {
   doc: PDFKit.PDFDocument;
   eligibilityLabelAndType: { label: string; type: "info" | "warning" };
@@ -193,6 +196,7 @@ const addContexteDemandeSection = ({
   option: string | null;
   firstForeignLanguage: string | null;
   secondForeignLanguage: string | null;
+  isCertificationPartial: boolean;
 }) => {
   addSection({
     doc,
@@ -207,6 +211,7 @@ const addContexteDemandeSection = ({
         option,
         firstForeignLanguage,
         secondForeignLanguage,
+        isCertificationPartial,
       });
     },
   });
@@ -264,6 +269,7 @@ const addCertificationSubSection = ({
   option,
   firstForeignLanguage,
   secondForeignLanguage,
+  isCertificationPartial,
 }: {
   doc: PDFKit.PDFDocument;
   certification: { label: string; rncpId: string };
@@ -271,6 +277,7 @@ const addCertificationSubSection = ({
   option: string | null;
   firstForeignLanguage: string | null;
   secondForeignLanguage: string | null;
+  isCertificationPartial: boolean;
 }) => {
   addSubTitle({
     subTitle: "Informations sur la certification professionnelle visée",
@@ -327,6 +334,8 @@ const addCertificationSubSection = ({
 
   const oldY = doc.y;
 
+  const oldX = doc.x;
+
   addInfoText({
     title: "Langue vivante 1 :",
     value: firstForeignLanguage ?? "",
@@ -339,5 +348,17 @@ const addCertificationSubSection = ({
     x: doc.x + pxToPt(300),
     y: oldY,
     doc,
+  });
+
+  doc.moveDown(1);
+
+  addCallout({
+    title: "Le candidat vise",
+    description: isCertificationPartial
+      ? "Un ou plusieurs bloc(s) de compétences de la certification"
+      : "La certification dans sa totalité",
+    x: oldX,
+    doc,
+    widthInPt: pxToPt(1160),
   });
 };
