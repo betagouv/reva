@@ -92,8 +92,8 @@ export default function ForgotPassword() {
           <Input
             disabled={resetPassword.isPending}
             nativeInputProps={{
-              id: "password",
-              name: "password",
+              id: "passwordConfirmation",
+              name: "passwordConfirmation",
               required: true,
               type: "password",
               spellCheck: "false",
