@@ -17,7 +17,9 @@ import {
   addTag,
   addInfoText,
   addCallout,
-} from "../helpers/dfDematPdfHelper";
+  addTitledBlock,
+  addDisabledCheckbox,
+} from "../helpers/df-demat-pdf-helper/dfDematPdfHelper";
 
 const ASSETS_PATH =
   "modules/feasibility/dematerialized-feasibility-file/assets/images/df-demat-pdf";
@@ -28,13 +30,15 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
   const candidacy = await prismaClient.candidacy.findUnique({
     where: { id: candidacyId },
     include: {
-      certification: true,
+      certification: { include: { competenceBlocs: true } },
       Feasibility: {
         where: {
           isActive: true,
         },
         include: {
-          dematerializedFeasibilityFile: true,
+          dematerializedFeasibilityFile: {
+            include: { dffCertificationCompetenceBlocs: true },
+          },
         },
       },
     },
@@ -119,6 +123,18 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
         dematerializedFeasibilityFile.eligibilityCandidateSituation,
     });
 
+    const dffBlocCompetenceBlocsIds =
+      dematerializedFeasibilityFile.dffCertificationCompetenceBlocs.map(
+        (bloc) => bloc.certificationCompetenceBlocId,
+      );
+
+    const certificationCompetenceBlocsWithSelectionStatus =
+      certification.competenceBlocs.map((bloc) => ({
+        code: bloc.code ?? "",
+        label: bloc.label ?? "",
+        selected: dffBlocCompetenceBlocsIds.includes(bloc.id ?? false),
+      }));
+
     addContexteDemandeSection({
       doc,
       eligibilityLabelAndType,
@@ -129,6 +145,7 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
       secondForeignLanguage:
         dematerializedFeasibilityFile.secondForeignLanguage,
       isCertificationPartial: !!candidacy.isCertificationPartial,
+      certificationCompetenceBlocsWithSelectionStatus,
     });
 
     doc.end();
@@ -188,6 +205,7 @@ const addContexteDemandeSection = ({
   firstForeignLanguage,
   secondForeignLanguage,
   isCertificationPartial,
+  certificationCompetenceBlocsWithSelectionStatus,
 }: {
   doc: PDFKit.PDFDocument;
   eligibilityLabelAndType: { label: string; type: "info" | "warning" };
@@ -197,6 +215,11 @@ const addContexteDemandeSection = ({
   firstForeignLanguage: string | null;
   secondForeignLanguage: string | null;
   isCertificationPartial: boolean;
+  certificationCompetenceBlocsWithSelectionStatus: {
+    code: string;
+    label: string;
+    selected: boolean;
+  }[];
 }) => {
   addSection({
     doc,
@@ -212,6 +235,7 @@ const addContexteDemandeSection = ({
         firstForeignLanguage,
         secondForeignLanguage,
         isCertificationPartial,
+        certificationCompetenceBlocsWithSelectionStatus,
       });
     },
   });
@@ -270,6 +294,7 @@ const addCertificationSubSection = ({
   firstForeignLanguage,
   secondForeignLanguage,
   isCertificationPartial,
+  certificationCompetenceBlocsWithSelectionStatus,
 }: {
   doc: PDFKit.PDFDocument;
   certification: { label: string; rncpId: string };
@@ -278,6 +303,11 @@ const addCertificationSubSection = ({
   firstForeignLanguage: string | null;
   secondForeignLanguage: string | null;
   isCertificationPartial: boolean;
+  certificationCompetenceBlocsWithSelectionStatus: {
+    code: string;
+    label: string;
+    selected: boolean;
+  }[];
 }) => {
   addSubTitle({
     subTitle: "Informations sur la certification professionnelle visée",
@@ -359,6 +389,24 @@ const addCertificationSubSection = ({
       : "La certification dans sa totalité",
     x: oldX,
     doc,
+    widthInPt: pxToPt(1160),
+  });
+
+  doc.moveDown(1);
+
+  addTitledBlock({
+    doc,
+    title: "Choix des blocs de compétences",
+    content: (doc) =>
+      certificationCompetenceBlocsWithSelectionStatus.forEach((bloc) => {
+        addDisabledCheckbox({
+          label: `${bloc.code} - ${bloc.label}`,
+          checked: bloc.selected,
+          doc,
+        });
+        doc.moveDown(0.5);
+      }),
+    startInPt: oldX,
     widthInPt: pxToPt(1160),
   });
 };
