@@ -14,12 +14,12 @@ import {
 import { Appointment } from "@/graphql/generated/graphql";
 
 interface AddToCalendarProps {
-  appointment: Omit<Appointment, "temporalStatus" | "type">;
+  event: Omit<Appointment, "temporalStatus" | "type">;
   buttonOutline?: boolean;
 }
 
 export const AddToCalendar = ({
-  appointment,
+  event,
   buttonOutline = false,
 }: AddToCalendarProps) => {
   const addToCalendarModal = useMemo(
@@ -34,10 +34,10 @@ export const AddToCalendar = ({
   const iconBasePath = "/admin2/logos/icons/";
   const icsDownloadHiddenLink = useRef<HTMLAnchorElement>(null);
 
-  const googleCalendarLink = createGoogleCalendarLink(appointment);
-  const outlookCalendarLink = createOutlookCalendarLink(appointment);
-  const icsFileContent = createIcsFile(appointment);
-  const icsFileName = `${appointment.title}.ics`;
+  const googleCalendarLink = createGoogleCalendarLink(event);
+  const outlookCalendarLink = createOutlookCalendarLink(event);
+  const icsFileContent = createIcsFile(event);
+  const icsFileName = `${event.title}.ics`;
 
   const handleIcsDownload = () => {
     const blob = new Blob([icsFileContent], { type: "text/calendar" });

@@ -153,7 +153,7 @@ export const AppointmentForm = ({
           </Button>
         )}
         <div className="ml-auto">
-          <AddToCalendar appointment={appointment} />
+          <AddToCalendar event={appointment} />
         </div>
       </div>
       <FormButtons

@@ -49,9 +49,7 @@ export default function AppointmentUpdateConfirmationPage() {
           >
             Gestion des rendez-vous
           </Button>
-          {appointment && (
-            <AddToCalendar appointment={appointment} buttonOutline />
-          )}
+          {appointment && <AddToCalendar event={appointment} buttonOutline />}
         </div>
       </div>
       <Image

@@ -93,7 +93,7 @@ const AppointmentDetailPage = () => {
               </tr>
             </table>
             <div className="self-end">
-              <AddToCalendar appointment={appointment} />
+              <AddToCalendar event={appointment} />
             </div>
           </div>
         </div>

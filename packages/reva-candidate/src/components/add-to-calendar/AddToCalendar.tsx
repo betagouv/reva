@@ -33,18 +33,18 @@ type JuryForCalendar = {
 type AppointmentForCalendar = Omit<Appointment, "temporalStatus">;
 
 interface AddToCalendarProps {
-  appointment: AppointmentForCalendar | JuryForCalendar;
+  event: AppointmentForCalendar | JuryForCalendar;
   buttonOutline?: boolean;
 }
 
 const isJury = (
-  appointment: AppointmentForCalendar | JuryForCalendar,
-): appointment is JuryForCalendar => {
-  return "dateOfSession" in appointment;
+  event: AppointmentForCalendar | JuryForCalendar,
+): event is JuryForCalendar => {
+  return "dateOfSession" in event;
 };
 
 export const AddToCalendar = ({
-  appointment,
+  event,
   buttonOutline = false,
 }: AddToCalendarProps) => {
   const iconBasePath = "/candidat/images/icons/";
@@ -59,18 +59,18 @@ export const AddToCalendar = ({
 
   const icsDownloadHiddenLink = useRef<HTMLAnchorElement>(null);
 
-  const googleCalendarLink = isJury(appointment)
-    ? createGoogleCalendarLinkForJury(appointment)
-    : createGoogleCalendarLink(appointment);
-  const outlookCalendarLink = isJury(appointment)
-    ? createOutlookCalendarLinkForJury(appointment)
-    : createOutlookCalendarLink(appointment);
-  const icsFileContent = isJury(appointment)
-    ? createIcsFileForJury(appointment)
-    : createIcsFile(appointment);
-  const icsFileName = isJury(appointment)
-    ? `jury${appointment.dateOfSession}.ics`
-    : `${appointment.title}.ics`;
+  const googleCalendarLink = isJury(event)
+    ? createGoogleCalendarLinkForJury(event)
+    : createGoogleCalendarLink(event);
+  const outlookCalendarLink = isJury(event)
+    ? createOutlookCalendarLinkForJury(event)
+    : createOutlookCalendarLink(event);
+  const icsFileContent = isJury(event)
+    ? createIcsFileForJury(event)
+    : createIcsFile(event);
+  const icsFileName = isJury(event)
+    ? `jury${event.dateOfSession}.ics`
+    : `${event.title}.ics`;
 
   const handleIcsDownload = () => {
     const blob = new Blob([icsFileContent], { type: "text/calendar" });

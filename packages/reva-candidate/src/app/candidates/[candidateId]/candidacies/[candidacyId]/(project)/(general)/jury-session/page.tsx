@@ -47,7 +47,7 @@ const JuryInformation = ({
       </tr>
     </table>
     <div className="self-end">
-      <AddToCalendar appointment={jury} />
+      <AddToCalendar event={jury} />
     </div>
   </div>
 );
