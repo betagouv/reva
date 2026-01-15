@@ -6,8 +6,8 @@ import { useGraphQlClient } from "@/components/graphql/graphql-client/GraphqlCli
 import { graphql } from "@/graphql/generated";
 import { CandidateUpdateInformationBySelfInput } from "@/graphql/generated/graphql";
 
-const getCandidateByIdForCivilInformationPage = graphql(`
-  query getCandidateByIdForCivilInformationPage($candidateId: ID!) {
+const getCandidateByIdForProfilePage = graphql(`
+  query getCandidateByIdForProfilePage($candidateId: ID!) {
     candidate_getCandidateById(id: $candidateId) {
       id
       firstname
@@ -54,7 +54,7 @@ const getDepartments = graphql(`
   }
 `);
 
-export const useCivilInformation = () => {
+export const useContactInformations = () => {
   const { graphqlClient } = useGraphQlClient();
 
   const { candidateId } = useParams<{
@@ -62,15 +62,9 @@ export const useCivilInformation = () => {
   }>();
 
   const { data: getCandidateData } = useQuery({
-    queryKey: [
-      "candidate",
-      "getCandidateByIdForCivilInformationPage",
-      candidateId,
-    ],
+    queryKey: ["candidate", "getCandidateByIdForProfilePage", candidateId],
     queryFn: () =>
-      graphqlClient.request(getCandidateByIdForCivilInformationPage, {
-        candidateId,
-      }),
+      graphqlClient.request(getCandidateByIdForProfilePage, { candidateId }),
   });
 
   const { data: getCountriesData } = useQuery({
@@ -97,7 +91,7 @@ export const useCivilInformation = () => {
   };
 };
 
-const updateCivilInformationMutation = graphql(`
+const updateContactInformationsMutation = graphql(`
   mutation updateCandidateInformationMutation(
     $candidateId: String!
     $candidateInformation: CandidateUpdateInformationBySelfInput!
@@ -111,41 +105,36 @@ const updateCivilInformationMutation = graphql(`
   }
 `);
 
-export const useUpdateCivilInformation = () => {
+export const useUpdateContactInformations = () => {
   const { graphqlClient } = useGraphQlClient();
   const queryClient = useQueryClient();
 
   const {
-    mutateAsync: updateCivilInformationMutate,
-    isPending: updateCivilInformationIsPending,
+    mutateAsync: updateContactInformationsMutate,
+    isPending: updateContactInformationsIsPending,
   } = useMutation({
-    mutationKey: ["updateCivilInformation"],
+    mutationKey: ["updateCandidateInformation"],
     mutationFn: ({
       candidateInformation,
     }: {
       candidateInformation: CandidateUpdateInformationBySelfInput;
     }) =>
-      graphqlClient.request(updateCivilInformationMutation, {
+      graphqlClient.request(updateContactInformationsMutation, {
         candidateId: candidateInformation.id,
         candidateInformation,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        predicate: (query) =>
-          query.queryKey.includes("updateCivilInformation") ||
-          query.queryKey.includes("candidate") ||
-          query.queryKey.includes("candidacy"),
-      });
+      queryClient.invalidateQueries({ queryKey: ["candidacy"] });
     },
   });
 
   return {
-    updateCivilInformationMutate,
-    updateCivilInformationIsPending,
+    updateContactInformationsMutate,
+    updateContactInformationsIsPending,
   };
 };
 
-type ProfileHookReturnType = ReturnType<typeof useCivilInformation>;
+type ProfileHookReturnType = ReturnType<typeof useContactInformations>;
 export type CandidateUseProfile = ProfileHookReturnType["candidate"];
 export type Countries = ProfileHookReturnType["countries"];
 export type Departments = ProfileHookReturnType["departments"];

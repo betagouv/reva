@@ -2,16 +2,12 @@ import { isBefore, sub, toDate } from "date-fns";
 import { z } from "zod";
 
 import { GenderEnum } from "@/constants/genders.constant";
-import { deserializeStringToPhoneNumberStructure } from "@/utils/deserializeStringToPhoneNumberStructure.util";
 import {
-  sanitizedEmail,
   sanitizedOptionalText,
-  sanitizedPhone,
   sanitizedText,
-  sanitizedZipCode,
 } from "@/utils/input-sanitization";
 
-export const candidateInformationSchema = () =>
+export const civilInformationSchema = () =>
   z
     .object({
       gender: z.nativeEnum(GenderEnum).default(GenderEnum.undisclosed),
@@ -26,12 +22,6 @@ export const candidateInformationSchema = () =>
       birthCity: sanitizedOptionalText(),
       nationality: sanitizedOptionalText(),
       countryIsFrance: z.boolean(),
-      street: sanitizedOptionalText(),
-      city: sanitizedOptionalText(),
-      zip: z.union([sanitizedZipCode(), z.literal("")]),
-      phone: sanitizedPhone(),
-      email: sanitizedEmail(),
-      addressComplement: sanitizedOptionalText(),
     })
     .superRefine((data, ctx) => {
       if (data.birthdate) {
@@ -61,23 +51,6 @@ export const candidateInformationSchema = () =>
         }
       }
 
-      const phoneNumberFormatted = deserializeStringToPhoneNumberStructure(
-        data.phone,
-      );
-
-      if (
-        phoneNumberFormatted.length >= 10 &&
-        phoneNumberFormatted.length <= 14
-      ) {
-        data.phone = phoneNumberFormatted;
-      } else {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Le numéro de téléphone est invalide",
-          path: ["phone"],
-        });
-      }
-
       if (data.countryIsFrance && !data.birthDepartment?.length) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -89,6 +62,6 @@ export const candidateInformationSchema = () =>
       return data;
     });
 
-export type FormCandidateInformationData = z.infer<
-  ReturnType<typeof candidateInformationSchema>
+export type FormCivilInformationData = z.infer<
+  ReturnType<typeof civilInformationSchema>
 >;

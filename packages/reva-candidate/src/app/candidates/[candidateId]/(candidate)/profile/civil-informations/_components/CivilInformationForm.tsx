@@ -16,14 +16,14 @@ import {
 } from "@/graphql/generated/graphql";
 
 import {
-  FormCandidateInformationData,
-  candidateInformationSchema,
+  FormCivilInformationData,
+  civilInformationSchema,
 } from "./civilInformationSchema";
 import {
   CandidateUseProfile,
   Countries,
   Departments,
-  useUpdateCandidateInformation,
+  useUpdateCivilInformation,
 } from "./useCivilInformation";
 
 export const CivilInformationForm = ({
@@ -37,7 +37,7 @@ export const CivilInformationForm = ({
   departments?: Departments;
   hideBackButton?: boolean;
 }) => {
-  const { updateCandidateInformationMutate } = useUpdateCandidateInformation();
+  const { updateCivilInformationMutate } = useUpdateCivilInformation();
   const router = useRouter();
 
   const franceId = countries?.find((c) => c.label === "France")?.id;
@@ -56,8 +56,8 @@ export const CivilInformationForm = ({
     formState: { errors, isDirty, isSubmitting },
     clearErrors,
     handleSubmit,
-  } = useForm<FormCandidateInformationData>({
-    resolver: zodResolver(candidateInformationSchema()),
+  } = useForm<FormCivilInformationData>({
+    resolver: zodResolver(civilInformationSchema()),
     defaultValues: {
       firstname: candidate?.firstname,
       lastname: candidate?.lastname,
@@ -71,12 +71,6 @@ export const CivilInformationForm = ({
       country: candidate?.country?.id ?? franceId,
       nationality: candidate?.nationality ?? "",
       countryIsFrance: candidate?.country?.id === franceId,
-      street: candidate?.street ?? "",
-      city: candidate?.city ?? "",
-      zip: candidate?.zip ?? "",
-      phone: candidate?.phone ?? "",
-      email: candidate?.email ?? "",
-      addressComplement: candidate?.addressComplement ?? "",
     },
   });
 
@@ -101,12 +95,6 @@ export const CivilInformationForm = ({
         countryIsFrance: candidate.country?.id === franceId,
         gender: (candidate.gender as GenderEnum) ?? GenderEnum.undisclosed,
         nationality: candidate.nationality ?? "",
-        street: candidate.street ?? "",
-        city: candidate.city ?? "",
-        zip: candidate.zip ?? "",
-        phone: candidate.phone ?? "",
-        email: candidate.email ?? "",
-        addressComplement: candidate.addressComplement ?? "",
       });
     },
     [reset, franceId],
@@ -132,7 +120,7 @@ export const CivilInformationForm = ({
     setValue("country", candidate?.country?.id ?? franceId);
   }, [franceId, countries, candidate, setValue]);
 
-  const onSubmit = async (data: FormCandidateInformationData) => {
+  const onSubmit = async (data: FormCivilInformationData) => {
     const candidateInformation: CandidateUpdateInformationBySelfInput = {
       id: candidate?.id,
       firstname: data.firstname,
@@ -155,7 +143,7 @@ export const CivilInformationForm = ({
     };
 
     try {
-      await updateCandidateInformationMutate({
+      await updateCivilInformationMutate({
         candidateInformation,
       });
       successToast("Les informations ont bien été mises à jour");
@@ -177,7 +165,7 @@ export const CivilInformationForm = ({
         data-testid="civil-information-form"
       >
         <div className="grid grid-cols-4 gap-6">
-          <div className="col-span-3 flex flex-col gap-4">
+          <div className="col-span-3 flex flex-col gap-6">
             <RadioButtons
               className="mb-0"
               legend="Civilité"

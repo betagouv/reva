@@ -55,7 +55,7 @@ export default function Profile() {
             title="Mes informations de contact"
             hasButton
             buttonTitle="Modifier"
-            buttonOnClick={() => router.push(`./contact-information`)}
+            buttonOnClick={() => router.push(`./contact-informations`)}
             buttonPriority="secondary"
           >
             <p className="mb-0">
