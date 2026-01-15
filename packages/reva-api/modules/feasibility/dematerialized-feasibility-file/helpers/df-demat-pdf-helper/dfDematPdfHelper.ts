@@ -265,3 +265,39 @@ export const addTitledBlock = ({
   content(doc);
   doc.text("", startInPt, doc.y); //reset x position to start of block after block end
 };
+
+export const addDisabledCheckbox = ({
+  label,
+  checked,
+  doc,
+}: {
+  label: string;
+  checked: boolean;
+  doc: PDFKit.PDFDocument;
+}) => {
+  const oldX = doc.x;
+  if (checked) {
+    doc.image(
+      "modules/feasibility/dematerialized-feasibility-file/helpers/df-demat-pdf-helper/assets/checkbox-disabled-checked.png",
+      doc.x,
+      doc.y + 1.5,
+      {
+        fit: [pxToPt(24), pxToPt(24)],
+      },
+    );
+  } else {
+    doc.image(
+      "modules/feasibility/dematerialized-feasibility-file/helpers/df-demat-pdf-helper/assets/checkbox-disabled-unchecked.png",
+      doc.x,
+      doc.y + 1.5,
+      {
+        fit: [pxToPt(24), pxToPt(24)],
+      },
+    );
+  }
+  doc
+    .fontSize(8)
+    .font("assets/fonts/Marianne/Marianne-Light.otf")
+    .text(label, doc.x + pxToPt(30), doc.y);
+  doc.text("", oldX, doc.y); //reset x position to start of checkbox after checkbox end
+};
