@@ -2,7 +2,7 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
 import { CandidacyModalities } from "@/components/aap-candidacy-layout/CandidacyModalities";
@@ -12,6 +12,10 @@ import { useGraphQlClient } from "@/components/graphql/graphql-client/GraphqlCli
 import { NotAuthorized } from "@/components/not-authorized";
 
 import { graphql } from "@/graphql/generated";
+
+const PATHS_WITH_HIDDEN_SIDE_MENU = [
+  /^\/candidacies\/[^/]+\/appointments\/[^/]+\/update-confirmation/,
+];
 
 const getCandidacyMenuQuery = graphql(`
   query getCandidacyMenuAndCandidateInfos($candidacyId: ID!) {
@@ -63,9 +67,18 @@ export const AapCandidacyLayout = ({ children }: { children: ReactNode }) => {
   );
 
   const { canAccess } = useCanAccessCandidacy(candidacyId);
+  const currentPathname = usePathname();
+
+  const shouldHideSideMenu = PATHS_WITH_HIDDEN_SIDE_MENU.some((path) =>
+    path.test(currentPathname),
+  );
 
   if (canAccess === false) {
     return <NotAuthorized />;
+  }
+
+  if (shouldHideSideMenu) {
+    return <div className="w-full">{children}</div>;
   }
 
   const menuHeaderEntries =
