@@ -50,7 +50,7 @@ export const getActiveCandidacyMenu = async ({
         ? "ACTIVE_WITH_EDIT_HINT"
         : "ACTIVE_WITHOUT_HINT";
 
-    if (candidacy.ccnId) {
+    if (candidacy.ccnId || candidacy.typology !== "NON_SPECIFIE") {
       trainingUrl = buildUrl({
         suffix: "training",
       });
