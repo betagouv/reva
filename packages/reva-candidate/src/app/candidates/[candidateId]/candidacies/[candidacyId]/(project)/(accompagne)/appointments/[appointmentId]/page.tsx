@@ -1,16 +1,9 @@
 "use client";
 import Breadcrumb from "@codegouvfr/react-dsfr/Breadcrumb";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import Image from "next/image";
-import { useRef } from "react";
 
 import { GenericAppointmentTile } from "@/app/_components/home/dashboard/dashboard-sidebar/appointments/GenericAppointmentTile";
-import {
-  createGoogleCalendarLink,
-  createIcsFile,
-  createOutlookCalendarLink,
-} from "@/utils/calendarLinks";
+import { AddToCalendar } from "@/components/add-to-calendar/AddToCalendar";
 
 import { useAppointmentDetail } from "./appointmentDetail.hooks";
 
@@ -22,14 +15,8 @@ const durationToPlainText = {
   FOUR_HOURS: "4 heures",
 } as const;
 
-const addToCalendarModal = createModal({
-  id: "add-to-calendar-modal",
-  isOpenedByDefault: false,
-});
-
 const AppointmentDetailPage = () => {
   const { appointment, organism } = useAppointmentDetail();
-  const icsDownloaHiddenLink = useRef<HTMLAnchorElement>(null);
 
   if (!appointment) return null;
   return (
@@ -105,80 +92,15 @@ const AppointmentDetailPage = () => {
                 </td>
               </tr>
             </table>
-            <Button
-              priority="tertiary no outline"
-              className="self-end"
-              onClick={() => addToCalendarModal.open()}
-              iconId="ri-calendar-check-line"
-            >
-              Ajouter à mon agenda
-            </Button>
+            <div className="self-end">
+              <AddToCalendar appointment={appointment} />
+            </div>
           </div>
         </div>
         <Button linkProps={{ href: "../" }} priority="secondary">
           Retour
         </Button>
       </div>
-      <addToCalendarModal.Component title="Ajouter à mon agenda">
-        <p>Ajoutez vos rendez-vous à votre agenda pour ne pas les oublier.</p>
-        <div className="flex flex-row gap-4 justify-center">
-          <Button
-            priority="tertiary"
-            linkProps={{ href: createGoogleCalendarLink(appointment) }}
-            className="after:hidden p-3"
-            title="Ajouter à Google Calendar"
-          >
-            <Image
-              src="/candidat/images/icons/googlecalendar.svg"
-              alt="Google Calendar"
-              width={32}
-              height={32}
-            />
-          </Button>
-          <a
-            ref={icsDownloaHiddenLink}
-            href="#"
-            download={`${appointment.title}.ics`}
-            className="hidden"
-          ></a>
-          <Button
-            priority="tertiary"
-            className="after:hidden p-3"
-            title="Ajouter à l'agenda de votre appareil"
-            onClick={() => {
-              const icsFile = createIcsFile(appointment);
-              const blob = new Blob([icsFile], { type: "text/calendar" });
-              const url = URL.createObjectURL(blob);
-              icsDownloaHiddenLink.current!.href = url;
-              icsDownloaHiddenLink.current!.click();
-              setTimeout(() => {
-                icsDownloaHiddenLink.current!.href = "";
-                window.URL.revokeObjectURL(url);
-              }, 100);
-            }}
-          >
-            <Image
-              src="/candidat/images/icons/applecalendar.svg"
-              alt="Apple Calendar"
-              width={32}
-              height={32}
-            />
-          </Button>
-          <Button
-            priority="tertiary"
-            linkProps={{ href: createOutlookCalendarLink(appointment) }}
-            className="after:hidden p-3"
-            title="Ajouter à Outlook"
-          >
-            <Image
-              src="/candidat/images/icons/outlook.svg"
-              alt="Outlook"
-              width={32}
-              height={32}
-            />
-          </Button>
-        </div>
-      </addToCalendarModal.Component>
     </div>
   );
 };

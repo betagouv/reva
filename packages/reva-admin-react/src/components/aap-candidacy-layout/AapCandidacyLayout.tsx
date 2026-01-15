@@ -14,7 +14,7 @@ import { NotAuthorized } from "@/components/not-authorized";
 import { graphql } from "@/graphql/generated";
 
 const PATHS_WITH_HIDDEN_SIDE_MENU = [
-  /^\/candidacies\/[^/]+\/appointments\/[^/]+\/update-confirmation/,
+  /^\/candidacies\/[^/]+\/appointments\/[^/]+\/update-confirmation\/?$/,
 ];
 
 const getCandidacyMenuQuery = graphql(`

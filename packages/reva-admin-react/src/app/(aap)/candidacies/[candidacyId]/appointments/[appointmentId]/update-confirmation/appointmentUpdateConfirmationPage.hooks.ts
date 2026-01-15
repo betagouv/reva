@@ -22,7 +22,11 @@ const getCandidacyAndAppointmentQuery = graphql(`
       appointmentId: $appointmentId
     ) {
       id
+      title
       date
+      duration
+      location
+      description
     }
   }
 `);
