@@ -2,6 +2,7 @@ import {
   CompetenceBlocsPartCompletionEnum,
   DFFDecision,
   DFFEligibilityRequirement,
+  PrerequisiteState,
 } from "@prisma/client";
 import PDFDocument from "pdfkit";
 
@@ -37,7 +38,10 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
         },
         include: {
           dematerializedFeasibilityFile: {
-            include: { dffCertificationCompetenceBlocs: true },
+            include: {
+              dffCertificationCompetenceBlocs: true,
+              prerequisites: true,
+            },
           },
         },
       },
@@ -146,6 +150,11 @@ export const generateFeasibilityFileByCandidacyIdV2 = async (
         dematerializedFeasibilityFile.secondForeignLanguage,
       isCertificationPartial: !!candidacy.isCertificationPartial,
       certificationCompetenceBlocsWithSelectionStatus,
+      prerequisites:
+        dematerializedFeasibilityFile.prerequisites.map((p) => ({
+          label: p.label,
+          state: p.state,
+        })) ?? [],
     });
 
     doc.end();
@@ -206,6 +215,7 @@ const addContexteDemandeSection = ({
   secondForeignLanguage,
   isCertificationPartial,
   certificationCompetenceBlocsWithSelectionStatus,
+  prerequisites,
 }: {
   doc: PDFKit.PDFDocument;
   eligibilityLabelAndType: { label: string; type: "info" | "warning" };
@@ -220,6 +230,7 @@ const addContexteDemandeSection = ({
     label: string;
     selected: boolean;
   }[];
+  prerequisites: { label: string; state: PrerequisiteState }[];
 }) => {
   addSection({
     doc,
@@ -236,6 +247,10 @@ const addContexteDemandeSection = ({
         secondForeignLanguage,
         isCertificationPartial,
         certificationCompetenceBlocsWithSelectionStatus,
+      });
+      addCertificationPrerequisitesSubSection({
+        doc,
+        prerequisites,
       });
     },
   });
@@ -408,5 +423,47 @@ const addCertificationSubSection = ({
       }),
     startInPt: oldX,
     widthInPt: pxToPt(1160),
+  });
+  doc.moveDown(1);
+};
+
+const addCertificationPrerequisitesSubSection = ({
+  doc,
+  prerequisites,
+}: {
+  doc: PDFKit.PDFDocument;
+  prerequisites: { label: string; state: PrerequisiteState }[];
+}) => {
+  addSubTitle({
+    subTitle:
+      "Pré-requis à la délivrance de la certification professionnelle visée ",
+    doc,
+  });
+  addTitledBlock({
+    doc,
+    title: "Oui",
+    startInPt: pxToPt(180),
+    widthInPt: pxToPt(1160),
+    content: (doc) => {
+      prerequisites
+        .filter((p) => p.state === "ACQUIRED")
+        .forEach((prerequisite) =>
+          doc.text("- " + prerequisite.label, doc.x, doc.y),
+        );
+    },
+  });
+  doc.moveDown(1);
+  addTitledBlock({
+    doc,
+    title: "Non",
+    startInPt: pxToPt(180),
+    widthInPt: pxToPt(1160),
+    content: (doc) => {
+      prerequisites
+        .filter((p) => p.state === "IN_PROGRESS")
+        .forEach((prerequisite) =>
+          doc.text("- " + prerequisite.label, doc.x, doc.y),
+        );
+    },
   });
 };
