@@ -1,6 +1,6 @@
 import Tile from "@codegouvfr/react-dsfr/Tile";
 
-import { CompleteIncompleteBadge } from "./CompleteIncompleteBadge";
+import { IncompleteBadge } from "./IncompleteBadge";
 
 export const CertificationTile = ({
   selectedCertificationId,
@@ -9,7 +9,8 @@ export const CertificationTile = ({
 }) => (
   <Tile
     data-testid="certification-tile"
-    start={<CompleteIncompleteBadge isComplete={!!selectedCertificationId} />}
+    start={!selectedCertificationId ? <IncompleteBadge /> : undefined}
+    desc={selectedCertificationId ? "Modifier" : undefined}
     title="Diplôme visé"
     small
     linkProps={{

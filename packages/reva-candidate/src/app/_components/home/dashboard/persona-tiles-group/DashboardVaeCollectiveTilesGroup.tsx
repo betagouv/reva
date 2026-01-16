@@ -43,12 +43,15 @@ export const DashboardVaeCollectiveTilesGroup = ({
           <CertificationTile
             selectedCertificationId={candidacy?.certification?.id}
           />
-          <TypeAccompagnementTile
-            disabled
-            typeAccompagnement={candidacy.typeAccompagnement}
+          <TypeAccompagnementTile disabled />
+          <GoalsTile
+            hasCompletedGoals={hasCompletedGoals}
+            readOnly={candidacyAlreadySubmitted}
           />
-          <GoalsTile hasCompletedGoals={hasCompletedGoals} />
-          <ExperiencesTile experiences={candidacy.experiences} />
+          <ExperiencesTile
+            experiences={candidacy.experiences}
+            readOnly={candidacyAlreadySubmitted}
+          />
           <OrganismTile
             hasSelectedCertification={!!candidacy.certification?.id}
             hasSelectedOrganism={hasSelectedOrganism}

@@ -46,11 +46,15 @@ export const DashboardAccompagneTilesGroup = ({
           <CertificationTile
             selectedCertificationId={candidacy?.certification?.id}
           />
-          <TypeAccompagnementTile
-            typeAccompagnement={candidacy.typeAccompagnement}
+          <TypeAccompagnementTile />
+          <GoalsTile
+            hasCompletedGoals={hasCompletedGoals}
+            readOnly={candidacyAlreadySubmitted}
           />
-          <GoalsTile hasCompletedGoals={hasCompletedGoals} />
-          <ExperiencesTile experiences={candidacy.experiences} />
+          <ExperiencesTile
+            experiences={candidacy.experiences}
+            readOnly={candidacyAlreadySubmitted}
+          />
           <OrganismTile
             hasSelectedCertification={!!candidacy.certification?.id}
             hasSelectedOrganism={hasSelectedOrganism}

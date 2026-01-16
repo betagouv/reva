@@ -8,12 +8,6 @@ const SentBadge = () => (
   </Badge>
 );
 
-const ToSendBadge = () => (
-  <Badge severity="warning" data-testid="to-send-badge">
-    à envoyer
-  </Badge>
-);
-
 export const SubmitCandidacyTile = ({
   candidacyAlreadySubmitted,
   canSubmitCandidacy,
@@ -23,18 +17,20 @@ export const SubmitCandidacyTile = ({
 }) => {
   const router = useRouter();
 
+  const getDesc = () => {
+    if (candidacyAlreadySubmitted) {
+      return "";
+    }
+    if (canSubmitCandidacy) {
+      return "Vérifier et envoyer";
+    }
+    return "Compléter toutes les sections";
+  };
+
   return (
     <Tile
       data-testid="submit-candidacy-tile"
-      start={
-        <>
-          {candidacyAlreadySubmitted ? (
-            <SentBadge />
-          ) : (
-            canSubmitCandidacy && <ToSendBadge />
-          )}
-        </>
-      }
+      start={candidacyAlreadySubmitted ? <SentBadge /> : undefined}
       disabled={!candidacyAlreadySubmitted && !canSubmitCandidacy}
       title="Envoi de la candidature"
       small
@@ -44,11 +40,7 @@ export const SubmitCandidacyTile = ({
         },
       }}
       imageUrl="/candidat/images/pictograms/mail-send.svg"
-      desc={
-        candidacyAlreadySubmitted || canSubmitCandidacy
-          ? ""
-          : "Compléter toutes les sections"
-      }
+      desc={getDesc()}
     />
   );
 };

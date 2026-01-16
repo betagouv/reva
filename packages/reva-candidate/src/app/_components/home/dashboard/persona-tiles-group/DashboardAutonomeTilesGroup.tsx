@@ -28,9 +28,7 @@ export const DashboardAutonomeTilesGroup = ({
           <CertificationTile
             selectedCertificationId={candidacy?.certification?.id}
           />
-          <TypeAccompagnementTile
-            typeAccompagnement={candidacy.typeAccompagnement}
-          />
+          <TypeAccompagnementTile />
         </div>
       </DashboardTilesSection>
 

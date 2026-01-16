@@ -1,15 +1,18 @@
 import Tile from "@codegouvfr/react-dsfr/Tile";
 
-import { CompleteIncompleteBadge } from "./CompleteIncompleteBadge";
+import { IncompleteBadge } from "./IncompleteBadge";
 
 export const GoalsTile = ({
   hasCompletedGoals,
+  readOnly,
 }: {
+  readOnly: boolean;
   hasCompletedGoals: boolean;
 }) => (
   <Tile
     data-testid="goals-tile"
-    start={<CompleteIncompleteBadge isComplete={hasCompletedGoals} />}
+    start={!hasCompletedGoals ? <IncompleteBadge /> : undefined}
+    desc={hasCompletedGoals && !readOnly ? "Modifier" : undefined}
     title="Objectifs"
     small
     linkProps={{

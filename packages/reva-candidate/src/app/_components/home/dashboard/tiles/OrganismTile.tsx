@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { CandidacyStatusStep } from "@/graphql/generated/graphql";
 
-import { CompleteIncompleteBadge } from "./CompleteIncompleteBadge";
+import { IncompleteBadge } from "./IncompleteBadge";
 
 export const OrganismTile = ({
   hasSelectedOrganism,
@@ -27,16 +27,23 @@ export const OrganismTile = ({
     !hasSelectedCertification ||
     endAccompagnementConfirmed;
 
+  const canModifyOrganism = hasSelectedOrganism && !endAccompagnementConfirmed;
+
+  const getStartContent = () => {
+    if (endAccompagnementConfirmed) {
+      return <Tag small>Accompagnement terminé</Tag>;
+    }
+    if (!hasSelectedOrganism) {
+      return <IncompleteBadge />;
+    }
+    return undefined;
+  };
+
   return (
     <Tile
       data-testid="organism-tile"
-      start={
-        endAccompagnementConfirmed ? (
-          <Tag small>Accompagnement terminé</Tag>
-        ) : (
-          <CompleteIncompleteBadge isComplete={hasSelectedOrganism} />
-        )
-      }
+      start={getStartContent()}
+      desc={canModifyOrganism ? "Modifier" : undefined}
       title="Accompagnateur"
       small
       buttonProps={{
