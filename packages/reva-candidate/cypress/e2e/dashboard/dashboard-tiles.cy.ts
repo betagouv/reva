@@ -3,8 +3,6 @@ import { addDays, format, subDays } from "date-fns";
 import candidate1Data from "../../fixtures/candidate1.json";
 import { stubQuery } from "../../utils/graphql";
 
-const candidate = candidate1Data.data.candidate_getCandidateById;
-
 context("Dashboard Tiles", () => {
   const interceptGraphQL = (candidacy?: unknown) => {
     cy.intercept("POST", "/api/graphql", (req) => {
@@ -89,9 +87,6 @@ context("Dashboard Tiles", () => {
           '[data-testid="organism-tile"] [data-testid="incomplete-badge"]',
         ).should("be.visible");
 
-        cy.get(
-          '[data-testid="submit-candidacy-tile"] [data-testid="to-send-badge"]',
-        ).should("not.exist");
         cy.get('[data-testid="submit-candidacy-tile"] button').should(
           "be.disabled",
         );
@@ -131,10 +126,7 @@ context("Dashboard Tiles", () => {
           interceptGraphQL(candidacy);
 
           cy.get(
-            `[data-testid="${fieldInfo.field}-tile"] [data-testid="complete-badge"]`,
-          ).should("be.visible");
-          cy.get(
-            '[data-testid="submit-candidacy-tile"] [data-testid="to-send-badge"]',
+            `[data-testid="${fieldInfo.field}-tile"] [data-testid="incomplete-badge"]`,
           ).should("not.exist");
           cy.get('[data-testid="submit-candidacy-tile"] button').should(
             "be.disabled",
@@ -160,9 +152,10 @@ context("Dashboard Tiles", () => {
 
         interceptGraphQL(candidacy);
 
-        cy.get(
-          '[data-testid="submit-candidacy-tile"] [data-testid="to-send-badge"]',
-        ).should("be.visible");
+        cy.get('[data-testid="submit-candidacy-tile"]').should(
+          "contain.text",
+          "Vérifier et envoyer",
+        );
         cy.get('[data-testid="submit-candidacy-tile"] button').should(
           "not.be.disabled",
         );
