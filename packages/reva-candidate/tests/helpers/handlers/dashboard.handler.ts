@@ -4,7 +4,7 @@ import { graphQLResolver } from "../network/msw";
 import { waitGraphQL } from "../network/requests";
 
 import type { CandidacyEntity } from "../entities/create-candidacy.entity";
-interface DashboardHandlersOptions {
+export interface DashboardHandlersOptions {
   candidacy: CandidacyEntity;
   activeFeaturesForConnectedUser?: string[];
 }

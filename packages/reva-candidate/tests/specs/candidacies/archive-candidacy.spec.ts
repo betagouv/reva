@@ -1,9 +1,9 @@
 import {
   expect,
+  graphql,
   test,
   type Page,
 } from "next/experimental/testmode/playwright/msw";
-import { graphql } from "next/experimental/testmode/playwright/msw";
 
 import { login } from "@tests/helpers/auth/auth";
 import {
@@ -117,6 +117,10 @@ test.describe("archive candidacy with feasibility file sent", () => {
     );
     await expect(candidacyCard).toBeVisible();
     candidacyCard.click();
+
+    await expect(page).toHaveURL(
+      `candidates/${candidate.id}/candidacies/${candidacy.id}/`,
+    );
 
     const abandonCandidacyButton = page.getByRole("button", {
       name: "Abandonner cette candidature",

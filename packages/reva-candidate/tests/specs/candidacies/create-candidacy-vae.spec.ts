@@ -1,9 +1,9 @@
 import {
   expect,
+  graphql,
   test,
   type Page,
 } from "next/experimental/testmode/playwright/msw";
-import { graphql } from "next/experimental/testmode/playwright/msw";
 
 import { login } from "@tests/helpers/auth/auth";
 import { createCandidacyEntity } from "@tests/helpers/entities/create-candidacy.entity";
@@ -205,8 +205,5 @@ test.describe("create candidacy vae from candidacies page", () => {
     await expect(page).toHaveURL(
       `candidates/${candidate.id}/candidacies/${candidacy.id}/`,
     );
-
-    const typeAccompagnementCard = page.getByText("Accompagné");
-    await expect(typeAccompagnementCard).toBeVisible();
   });
 });

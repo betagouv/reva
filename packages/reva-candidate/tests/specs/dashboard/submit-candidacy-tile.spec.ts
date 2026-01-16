@@ -7,7 +7,7 @@ import { createCertificationEntity } from "@tests/helpers/entities/create-certif
 import { createOrganismEntity } from "@tests/helpers/entities/create-organism.entity";
 import {
   dashboardHandlers,
-  DashboardHandlersOptions,
+  type DashboardHandlersOptions,
 } from "@tests/helpers/handlers/dashboard.handler";
 
 import type { CandidacyStatusStep } from "@/graphql/generated/graphql";
@@ -71,7 +71,7 @@ test.describe("Tile is enabled", () => {
     });
 
     await expect(tile.getByRole("button")).toBeEnabled();
-    await expect(tile.getByTestId("to-send-badge")).toBeVisible();
+    await expect(tile).toContainText("Vérifier et envoyer");
   });
 
   const submittedStatuses: CandidacyStatusStep[] = [
