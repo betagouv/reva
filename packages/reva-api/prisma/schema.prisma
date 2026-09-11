@@ -2159,6 +2159,7 @@ enum PermissionVaeCollective {
 
 enum RoleVaeCollective {
   ADMINISTRATEUR_PORTEUR_DE_PROJET
+  CREATEUR_COHORTE
 }
 
 model RolePermissionVaeCollective {
