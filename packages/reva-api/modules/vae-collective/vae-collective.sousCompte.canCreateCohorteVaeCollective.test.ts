@@ -65,10 +65,10 @@ describe("SousCompteVaeCollective.canCreateCohorteVaeCollective", () => {
       cohorteVaeCollective.commanditaireVaeCollectiveId;
 
     const sousCompte = await createSousCompte({ commanditaireVaeCollectiveId });
-    await prismaClient.permissionSpecificToSousCompteVaeCollective.create({
+    await prismaClient.roleSpecificToSousCompteVaeCollective.create({
       data: {
         sousCompteVaeCollectiveId: sousCompte.id,
-        permission: "CREER_COHORTE",
+        role: "CREATEUR_COHORTE",
       },
     });
 

@@ -17,19 +17,19 @@ export const updateSousCompteVaeCollective = async ({
   }
 
   if (canCreateCohorteVaeCollective) {
-    await prismaClient.permissionSpecificToSousCompteVaeCollective.upsert({
+    await prismaClient.roleSpecificToSousCompteVaeCollective.upsert({
       where: {
-        permission_sousCompteVaeCollectiveId: {
-          permission: "CREER_COHORTE",
+        role_sousCompteVaeCollectiveId: {
+          role: "CREATEUR_COHORTE",
           sousCompteVaeCollectiveId,
         },
       },
-      create: { sousCompteVaeCollectiveId, permission: "CREER_COHORTE" },
+      create: { sousCompteVaeCollectiveId, role: "CREATEUR_COHORTE" },
       update: {},
     });
   } else {
-    await prismaClient.permissionSpecificToSousCompteVaeCollective.deleteMany({
-      where: { sousCompteVaeCollectiveId, permission: "CREER_COHORTE" },
+    await prismaClient.roleSpecificToSousCompteVaeCollective.deleteMany({
+      where: { sousCompteVaeCollectiveId, role: "CREATEUR_COHORTE" },
     });
   }
 

@@ -54,10 +54,10 @@ const updateSousCompteVaeCollective = ({
 };
 
 const findCreerCohortePermission = (sousCompteVaeCollectiveId: string) =>
-  prismaClient.permissionSpecificToSousCompteVaeCollective.findUnique({
+  prismaClient.roleSpecificToSousCompteVaeCollective.findUnique({
     where: {
-      permission_sousCompteVaeCollectiveId: {
-        permission: "CREER_COHORTE",
+      role_sousCompteVaeCollectiveId: {
+        role: "CREATEUR_COHORTE",
         sousCompteVaeCollectiveId,
       },
     },
@@ -100,10 +100,10 @@ describe("update sous compte vae collective", () => {
     const sousCompte = await createSousCompteVaeCollectiveHelper({
       commanditaireVaeCollectiveId,
     });
-    await prismaClient.permissionSpecificToSousCompteVaeCollective.create({
+    await prismaClient.roleSpecificToSousCompteVaeCollective.create({
       data: {
         sousCompteVaeCollectiveId: sousCompte.id,
-        permission: "CREER_COHORTE",
+        role: "CREATEUR_COHORTE",
       },
     });
 

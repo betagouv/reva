@@ -142,17 +142,15 @@ describe("create sous compte vae collective", () => {
     });
 
     const permission =
-      await prismaClient.permissionSpecificToSousCompteVaeCollective.findUnique(
-        {
-          where: {
-            permission_sousCompteVaeCollectiveId: {
-              permission: "CREER_COHORTE",
-              sousCompteVaeCollectiveId:
-                res.vaeCollective_createSousCompteVaeCollective.id,
-            },
+      await prismaClient.roleSpecificToSousCompteVaeCollective.findUnique({
+        where: {
+          role_sousCompteVaeCollectiveId: {
+            role: "CREATEUR_COHORTE",
+            sousCompteVaeCollectiveId:
+              res.vaeCollective_createSousCompteVaeCollective.id,
           },
         },
-      );
+      });
 
     expect(permission).not.toBeNull();
   });
@@ -175,17 +173,15 @@ describe("create sous compte vae collective", () => {
     });
 
     const permission =
-      await prismaClient.permissionSpecificToSousCompteVaeCollective.findUnique(
-        {
-          where: {
-            permission_sousCompteVaeCollectiveId: {
-              permission: "CREER_COHORTE",
-              sousCompteVaeCollectiveId:
-                res.vaeCollective_createSousCompteVaeCollective.id,
-            },
+      await prismaClient.roleSpecificToSousCompteVaeCollective.findUnique({
+        where: {
+          role_sousCompteVaeCollectiveId: {
+            role: "CREATEUR_COHORTE",
+            sousCompteVaeCollectiveId:
+              res.vaeCollective_createSousCompteVaeCollective.id,
           },
         },
-      );
+      });
 
     expect(permission).toBeNull();
   });

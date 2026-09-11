@@ -36,10 +36,10 @@ export const createSousCompteVaeCollective = async ({
     });
 
   if (canCreateCohorteVaeCollective) {
-    await prismaClient.permissionSpecificToSousCompteVaeCollective.create({
+    await prismaClient.roleSpecificToSousCompteVaeCollective.create({
       data: {
         sousCompteVaeCollectiveId: sousCompteVaeCollective.id,
-        permission: "CREER_COHORTE",
+        role: "CREATEUR_COHORTE",
       },
     });
   }
