@@ -157,9 +157,10 @@ const FILTER_ACCORDION_LABELS = [
 ] as const;
 
 const ALL_FILTERS_QUERY_STRING =
-  "candidacy=VALIDATION&training=PARCOURS_ENVOYE&feasibility=RECEVABLE&dossierDeValidation=ENVOYE&juryStatuses=SCHEDULED&juryResults=FAILURE&funding=FVAE_FINANCEMENT&cohorteVaeCollectiveIds=a1b2c3d4-e5f6-7890-abcd-ef1234567890&archive=ARCHIVE&accompagnement=EN_COURS";
+  "activeCandidacies=true&candidacy=VALIDATION&training=PARCOURS_ENVOYE&feasibility=RECEVABLE&dossierDeValidation=ENVOYE&juryStatuses=SCHEDULED&juryResults=FAILURE&funding=FVAE_FINANCEMENT&cohorteVaeCollectiveIds=a1b2c3d4-e5f6-7890-abcd-ef1234567890&archive=ARCHIVE&accompagnement=EN_COURS";
 
 const FILTER_QUERY_PARAMS = [
+  "activeCandidacies",
   "candidacy",
   "training",
   "feasibility",
@@ -235,6 +236,26 @@ test.describe("Candidacies for AAP page", () => {
       await login({ role: "aap", page });
       await page.goto(
         "/admin2/candidacies/candidacies-for-aap/?candidacy=VALIDATION",
+      );
+      await waitForPageQueries(page);
+
+      await expect(
+        page.getByRole("heading", {
+          level: 2,
+          name: "Aucun résultat pour votre recherche",
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "Effacer les filtres" }),
+      ).toBeVisible();
+    });
+
+    test("displays the empty state with a clear filters button when the Actives filter is selected", async ({
+      page,
+    }) => {
+      await login({ role: "admin", page });
+      await page.goto(
+        "/admin2/candidacies/candidacies-for-aap/?activeCandidacies=true",
       );
       await waitForPageQueries(page);
 
@@ -358,6 +379,95 @@ test.describe("Candidacies for AAP page", () => {
     });
   });
 
+  test.describe("Actives filter", () => {
+    test.use({
+      mswHandlers: [
+        [...aapCommonHandlers, ...createCandidaciesForAapHandlers()],
+        { scope: "test" },
+      ],
+    });
+
+    test("is hidden when an AAP is connected", async ({ page }) => {
+      await login({ role: "aap", page });
+      await page.goto("/admin2/candidacies/candidacies-for-aap/");
+      await waitForPageQueries(page);
+
+      await page
+        .getByRole("button", { name: "Candidatures", exact: true })
+        .click();
+
+      await expect(
+        page.getByRole("checkbox", { name: "Actives" }),
+      ).toBeHidden();
+    });
+
+    test("is visible when an admin is connected", async ({ page }) => {
+      await login({ role: "admin", page });
+      await page.goto("/admin2/candidacies/candidacies-for-aap/");
+      await waitForPageQueries(page);
+
+      await page
+        .getByRole("button", { name: "Candidatures", exact: true })
+        .click();
+
+      await expect(
+        page.getByRole("checkbox", { name: "Actives" }),
+      ).toBeVisible();
+    });
+
+    test("is checked and opens the Candidatures accordion when selected", async ({
+      page,
+    }) => {
+      await login({ role: "admin", page });
+      await page.goto(
+        "/admin2/candidacies/candidacies-for-aap/?activeCandidacies=true",
+      );
+      await waitForPageQueries(page);
+
+      await expect(
+        page.getByRole("button", { name: "Candidatures", exact: true }),
+      ).toHaveAttribute("aria-expanded", "true");
+
+      await expect(
+        page.getByRole("checkbox", { name: "Actives" }),
+      ).toBeChecked();
+    });
+
+    test("adds activeCandidacies to the URL when checked", async ({ page }) => {
+      await login({ role: "admin", page });
+      await page.goto("/admin2/candidacies/candidacies-for-aap/");
+      await waitForPageQueries(page);
+
+      await page
+        .getByRole("button", { name: "Candidatures", exact: true })
+        .click();
+
+      const getCandidaciesPromise = waitGraphQL(page, "getCandidaciesForAAP");
+      await page.locator("label").filter({ hasText: "Actives" }).click();
+      await getCandidaciesPromise;
+
+      const searchParams = new URL(page.url()).searchParams;
+      expect(searchParams.get("activeCandidacies")).toBe("true");
+    });
+
+    test("removes activeCandidacies from the URL when unchecked", async ({
+      page,
+    }) => {
+      await login({ role: "admin", page });
+      await page.goto(
+        "/admin2/candidacies/candidacies-for-aap/?activeCandidacies=true",
+      );
+      await waitForPageQueries(page);
+
+      const getCandidaciesPromise = waitGraphQL(page, "getCandidaciesForAAP");
+      await page.locator("label").filter({ hasText: "Actives" }).click();
+      await getCandidaciesPromise;
+
+      const searchParams = new URL(page.url()).searchParams;
+      expect(searchParams.get("activeCandidacies")).toBe(null);
+    });
+  });
+
   test.describe("Brouillon / Projet filter", () => {
     test.use({
       mswHandlers: [
@@ -392,6 +502,66 @@ test.describe("Candidacies for AAP page", () => {
       await expect(
         page.getByRole("checkbox", { name: "Brouillon / Projet" }),
       ).toBeVisible();
+    });
+
+    test("is checked and opens the Candidatures accordion when selected", async ({
+      page,
+    }) => {
+      await login({ role: "admin", page });
+      await page.goto(
+        "/admin2/candidacies/candidacies-for-aap/?candidacy=PROJET",
+      );
+      await waitForPageQueries(page);
+
+      await expect(
+        page.getByRole("button", { name: "Candidatures", exact: true }),
+      ).toHaveAttribute("aria-expanded", "true");
+
+      await expect(
+        page.getByRole("checkbox", { name: "Brouillon / Projet" }),
+      ).toBeChecked();
+    });
+
+    test("adds Brouillon / Projet to the URL when checked", async ({
+      page,
+    }) => {
+      await login({ role: "admin", page });
+      await page.goto("/admin2/candidacies/candidacies-for-aap/");
+      await waitForPageQueries(page);
+
+      await page
+        .getByRole("button", { name: "Candidatures", exact: true })
+        .click();
+
+      const getCandidaciesPromise = waitGraphQL(page, "getCandidaciesForAAP");
+      await page
+        .locator("label")
+        .filter({ hasText: "Brouillon / Projet" })
+        .click();
+      await getCandidaciesPromise;
+
+      const searchParams = new URL(page.url()).searchParams;
+      expect(searchParams.get("candidacy")).toBe("PROJET");
+    });
+
+    test("removes Brouillon / Projet from the URL when unchecked", async ({
+      page,
+    }) => {
+      await login({ role: "admin", page });
+      await page.goto(
+        "/admin2/candidacies/candidacies-for-aap/?candidacy=PROJET",
+      );
+      await waitForPageQueries(page);
+
+      const getCandidaciesPromise = waitGraphQL(page, "getCandidaciesForAAP");
+      await page
+        .locator("label")
+        .filter({ hasText: "Brouillon / Projet" })
+        .click();
+      await getCandidaciesPromise;
+
+      const searchParams = new URL(page.url()).searchParams;
+      expect(searchParams.get("candidacy")).toBe(null);
     });
   });
 });

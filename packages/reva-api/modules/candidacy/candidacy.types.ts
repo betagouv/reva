@@ -192,6 +192,7 @@ export interface GetCandidaciesForAAPInput {
   limit?: number;
   searchFilter?: string;
   sortByFilter?: CandidacySortByFilter;
+  activeCandidacies?: boolean;
   candidacyStatuses?: CandidacyStatusStep[];
   typeAccompagnementStatuses?: TypeAccompagnementStatusFilter[];
   trainingStatuses?: CandidacyStatusStep[];

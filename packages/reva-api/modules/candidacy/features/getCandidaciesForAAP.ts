@@ -46,6 +46,7 @@ export const getCandidaciesForAAP = async ({
   limit = 10000,
   searchFilter,
   sortByFilter,
+  activeCandidacies,
   candidacyStatuses,
   typeAccompagnementStatuses,
   trainingStatuses,
@@ -73,33 +74,17 @@ export const getCandidaciesForAAP = async ({
     },
   ];
 
-  // If archive status is not set, filter out candidacies with dropout
-  if (
-    !archiveStatuses ||
-    !archiveStatuses.includes(ArchiveStatusFilter.ARCHIVE)
-  ) {
-    const archiveStatusesWhereInput: Prisma.CandidacyWithLastActiveDfDvJuryWhereInput[] =
+  // Active candidacies filter
+  if (activeCandidacies) {
+    const activeCandidaciesWhereInput: Prisma.CandidacyWithLastActiveDfDvJuryWhereInput[] =
       [];
 
-    archiveStatusesWhereInput.push({
+    activeCandidaciesWhereInput.push({
       candidacy: {
         status: {
           notIn: [CandidacyStatusStep.ARCHIVE],
         },
         candidacyDropOut: null,
-      },
-    });
-
-    andClauses.push({ AND: archiveStatusesWhereInput });
-  }
-
-  // If end accompagnement status is not set, filter out candidacies with end accompagnement not confirmed by candidate or admin
-  if (!accompagnementStatuses) {
-    const endAccompagnementStatusesWhereInput: Prisma.CandidacyWithLastActiveDfDvJuryWhereInput[] =
-      [];
-
-    endAccompagnementStatusesWhereInput.push({
-      candidacy: {
         endAccompagnementStatus: {
           notIn: [
             EndAccompagnementStatus.CONFIRMED_BY_CANDIDATE,
@@ -109,7 +94,7 @@ export const getCandidaciesForAAP = async ({
       },
     });
 
-    andClauses.push({ AND: endAccompagnementStatusesWhereInput });
+    andClauses.push({ AND: activeCandidaciesWhereInput });
   }
 
   // Filters for non-admin users
