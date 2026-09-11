@@ -2038,14 +2038,14 @@ model CommanditaireVaeCollective {
 }
 
 model SousCompteVaeCollective {
-  id                                           String                                        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  commanditaireVaeCollectiveId                 String                                        @map("commanditaire_vae_collective_id") @db.Uuid
-  commanditaireVaeCollective                   CommanditaireVaeCollective                    @relation(fields: [commanditaireVaeCollectiveId], references: [id])
-  accountId                                    String                                        @map("account_id") @db.Uuid
-  account                                      Account                                       @relation(fields: [accountId], references: [id])
-  createdAt                                    DateTime                                      @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                                    DateTime?                                     @map("updated_at") @db.Timestamptz(6)
-  permissionSpecificToSousCompteVaeCollectives PermissionSpecificToSousCompteVaeCollective[]
+  id                                    String                                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  commanditaireVaeCollectiveId          String                                  @map("commanditaire_vae_collective_id") @db.Uuid
+  commanditaireVaeCollective            CommanditaireVaeCollective              @relation(fields: [commanditaireVaeCollectiveId], references: [id])
+  accountId                             String                                  @map("account_id") @db.Uuid
+  account                               Account                                 @relation(fields: [accountId], references: [id])
+  createdAt                             DateTime                                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                             DateTime?                               @map("updated_at") @db.Timestamptz(6)
+  roleSpecificToSousCompteVaeCollective RoleSpecificToSousCompteVaeCollective[]
 
   @@map("sous_compte_vae_collective")
 }
@@ -2196,14 +2196,14 @@ model KeycloakRoleOnRoleVaeCollective {
   @@map("keycloak_role_on_role_vae_collective")
 }
 
-model PermissionSpecificToSousCompteVaeCollective {
+model RoleSpecificToSousCompteVaeCollective {
   id                        String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  permission                PermissionVaeCollective @map("permission")
+  role                      RoleVaeCollective       @map("role")
   sousCompteVaeCollective   SousCompteVaeCollective @relation(fields: [sousCompteVaeCollectiveId], references: [id])
   sousCompteVaeCollectiveId String                  @map("sous_compte_vae_collective_id") @db.Uuid
   createdAt                 DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                 DateTime?               @map("updated_at") @db.Timestamptz(6)
 
-  @@unique([permission, sousCompteVaeCollectiveId])
-  @@map("permission_specific_to_sous_compte_vae_collective")
+  @@unique([role, sousCompteVaeCollectiveId])
+  @@map("role_specific_to_sous_compte_vae_collective")
 }
