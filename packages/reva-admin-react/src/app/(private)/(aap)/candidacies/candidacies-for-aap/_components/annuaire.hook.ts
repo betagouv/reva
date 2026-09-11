@@ -19,6 +19,7 @@ import {
 } from "@/graphql/generated/graphql";
 
 export interface AnnuaireFilters {
+  activeCandidacies: boolean;
   candidacyStatuses: CandidacyStatusStep[];
   typeAccompagnementStatuses: TypeAccompagnementStatusFilter[];
   trainingStatuses: CandidacyStatusStep[];
@@ -51,6 +52,7 @@ const getCandidaciesForAAP = graphql(`
     $offset: Int
     $searchFilter: String
     $sortByFilter: CandidacySortByFilter
+    $activeCandidacies: Boolean
     $candidacyStatuses: [CandidacyStatusStep!]
     $typeAccompagnementStatuses: [TypeAccompagnementStatusFilter!]
     $trainingStatuses: [CandidacyStatusStep!]
@@ -69,6 +71,7 @@ const getCandidaciesForAAP = graphql(`
       limit: 10
       searchFilter: $searchFilter
       sortByFilter: $sortByFilter
+      activeCandidacies: $activeCandidacies
       candidacyStatuses: $candidacyStatuses
       typeAccompagnementStatuses: $typeAccompagnementStatuses
       trainingStatuses: $trainingStatuses
@@ -160,6 +163,7 @@ export const useAnnuaire = () => {
   const maisonMereAAPIdParam = searchParams.get("maisonMereAAPId");
 
   const filters = useMemo<AnnuaireFilters>(() => {
+    const activeCandidaciesParam = searchParams.get("activeCandidacies");
     const candidacyParam = searchParams.get("candidacy");
     const typeAccompagnementParam = searchParams.get("typeAccompagnement");
     const trainingParam = searchParams.get("training");
@@ -175,6 +179,7 @@ export const useAnnuaire = () => {
     );
 
     return {
+      activeCandidacies: activeCandidaciesParam === "true",
       candidacyStatuses: candidacyParam
         ? (candidacyParam.split(",") as CandidacyStatusStep[])
         : [],
@@ -231,6 +236,7 @@ export const useAnnuaire = () => {
       searchFilter,
       sortByFilter,
       currentPage,
+      filters.activeCandidacies,
       filters.candidacyStatuses,
       filters.typeAccompagnementStatuses,
       filters.trainingStatuses,
@@ -249,6 +255,7 @@ export const useAnnuaire = () => {
         offset,
         searchFilter,
         sortByFilter,
+        activeCandidacies: filters.activeCandidacies,
         candidacyStatuses:
           filters.candidacyStatuses.length > 0
             ? filters.candidacyStatuses
@@ -313,6 +320,14 @@ export const useAnnuaire = () => {
     (newFilters: Partial<AnnuaireFilters>) => {
       const queryParams = new URLSearchParams(searchParams);
       queryParams.set("page", "1");
+
+      if (newFilters.activeCandidacies !== undefined) {
+        if (newFilters.activeCandidacies) {
+          queryParams.set("activeCandidacies", "true");
+        } else {
+          queryParams.delete("activeCandidacies");
+        }
+      }
 
       if (newFilters.candidacyStatuses !== undefined) {
         if (newFilters.candidacyStatuses.length > 0) {
@@ -445,6 +460,13 @@ export const useAnnuaire = () => {
     [router, searchParams],
   );
 
+  const toggleActiveCandidacies = useCallback(
+    (active: boolean) => {
+      updateFilters({ activeCandidacies: active });
+    },
+    [updateFilters],
+  );
+
   const toggleCandidacyStatus = useCallback(
     (status: CandidacyStatusStep) => {
       const newStatuses = filters.candidacyStatuses.includes(status)
@@ -567,6 +589,7 @@ export const useAnnuaire = () => {
     const queryParams = new URLSearchParams(searchParams);
     queryParams.set("page", "1");
 
+    queryParams.delete("activeCandidacies");
     queryParams.delete("candidacy");
     queryParams.delete("typeAccompagnement");
     queryParams.delete("training");
@@ -587,6 +610,7 @@ export const useAnnuaire = () => {
 
   const hasActiveFilters = useMemo(
     () =>
+      filters.activeCandidacies ||
       filters.candidacyStatuses.length > 0 ||
       filters.typeAccompagnementStatuses.length > 0 ||
       filters.trainingStatuses.length > 0 ||
@@ -599,6 +623,7 @@ export const useAnnuaire = () => {
       filters.accompagnementStatuses.length > 0 ||
       filters.cohorteVaeCollectiveIds.length > 0,
     [
+      filters.activeCandidacies,
       filters.candidacyStatuses,
       filters.typeAccompagnementStatuses,
       filters.trainingStatuses,
@@ -620,6 +645,7 @@ export const useAnnuaire = () => {
     filters,
     searchFilter,
     setSearchFilter,
+    toggleActiveCandidacies,
     toggleCandidacyStatus,
     toggleTypeAccompagnementStatus,
     toggleTrainingStatus,

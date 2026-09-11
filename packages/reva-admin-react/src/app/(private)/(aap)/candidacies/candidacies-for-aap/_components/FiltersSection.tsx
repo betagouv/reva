@@ -21,6 +21,7 @@ import { AnnuaireFilters } from "./annuaire.hook";
 interface FiltersSectionProps {
   filters: AnnuaireFilters;
   cohortes: Array<{ id: string; nom: string }>;
+  onToggleActiveCandidacies: (active: boolean) => void;
   onToggleCandidacyStatus: (status: CandidacyStatusStep) => void;
   onToggleTypeAccompagnementStatus: (
     status: TypeAccompagnementStatusFilter,
@@ -43,6 +44,7 @@ interface FiltersSectionProps {
 export const FiltersSection = ({
   filters,
   cohortes,
+  onToggleActiveCandidacies,
   onToggleCandidacyStatus,
   onToggleTypeAccompagnementStatus,
   onToggleTrainingStatus,
@@ -64,7 +66,9 @@ export const FiltersSection = ({
       <Accordion
         label="Candidatures"
         className="bg-white"
-        defaultExpanded={filters.candidacyStatuses.length > 0}
+        defaultExpanded={
+          filters.activeCandidacies || filters.candidacyStatuses.length > 0
+        }
       >
         <Checkbox
           small
@@ -72,6 +76,14 @@ export const FiltersSection = ({
           options={[
             ...(isAdmin
               ? [
+                  {
+                    label: "Actives",
+                    nativeInputProps: {
+                      checked: filters.activeCandidacies,
+                      onChange: () =>
+                        onToggleActiveCandidacies(!filters.activeCandidacies),
+                    },
+                  },
                   {
                     label: "Brouillon / Projet",
                     nativeInputProps: {

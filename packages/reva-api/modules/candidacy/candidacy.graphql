@@ -372,6 +372,7 @@ type Query {
     limit: Int
     searchFilter: String
     sortByFilter: CandidacySortByFilter
+    activeCandidacies: Boolean
     candidacyStatuses: [CandidacyStatusStep!]
     typeAccompagnementStatuses: [TypeAccompagnementStatusFilter!]
     trainingStatuses: [CandidacyStatusStep!]

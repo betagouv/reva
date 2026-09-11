@@ -53,6 +53,7 @@ const getCandidaciesForAAP = async ({
   const getCandidaciesForAAPQuery = graphql(`
     query candidacy_getCandidaciesForAAP(
       $cohorteVaeCollectiveIds: [ID!]
+      $activeCandidacies: Boolean
       $typeAccompagnementStatuses: [TypeAccompagnementStatusFilter!]
       $trainingStatuses: [CandidacyStatusStep!]
       $feasibilityStatuses: [FeasibilityStatusFilter!]
@@ -66,6 +67,7 @@ const getCandidaciesForAAP = async ({
     ) {
       candidacy_getCandidaciesForAAP(
         cohorteVaeCollectiveIds: $cohorteVaeCollectiveIds
+        activeCandidacies: $activeCandidacies
         typeAccompagnementStatuses: $typeAccompagnementStatuses
         trainingStatuses: $trainingStatuses
         feasibilityStatuses: $feasibilityStatuses
@@ -86,6 +88,7 @@ const getCandidaciesForAAP = async ({
 
   return graphqlClient.request(getCandidaciesForAAPQuery, {
     cohorteVaeCollectiveIds: input.cohorteVaeCollectiveIds,
+    activeCandidacies: input.activeCandidacies,
     typeAccompagnementStatuses: input.typeAccompagnementStatuses,
     trainingStatuses: input.trainingStatuses,
     feasibilityStatuses: input.feasibilityStatuses,
@@ -143,6 +146,256 @@ const createCandidacyWithDematerializedFeasibility = async ({
 };
 
 describe("candidacy_getCandidaciesForAAP", () => {
+  describe("activeCandidacies", () => {
+    describe("AAP", () => {
+      test("should return only active candidacies", async () => {
+        const organism = await createOrganismHelper();
+
+        const activeCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        await createCandidacyHelper({
+          candidacyActiveStatus: CandidacyStatusStep.ARCHIVE,
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        const dropOutCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+        await createCandidacyDropOutHelper({
+          candidacyId: dropOutCandidacy.id,
+        });
+
+        await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus:
+              EndAccompagnementStatus.CONFIRMED_BY_CANDIDATE,
+          },
+        });
+
+        await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus: EndAccompagnementStatus.CONFIRMED_BY_ADMIN,
+          },
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId:
+            organism.organismOnAccounts[0].account.keycloakId || "",
+          userRole: "manage_candidacy",
+          input: {
+            activeCandidacies: true,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(1);
+        expect(resp.candidacy_getCandidaciesForAAP.rows[0].id).toBe(
+          activeCandidacy.id,
+        );
+      });
+
+      test("should exclude archived candidacies", async () => {
+        const organism = await createOrganismHelper();
+
+        const activeCandidacy = await createCandidacyHelper({
+          candidacyActiveStatus: CandidacyStatusStep.PARCOURS_CONFIRME,
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        await createCandidacyHelper({
+          candidacyActiveStatus: CandidacyStatusStep.ARCHIVE,
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId:
+            organism.organismOnAccounts[0].account.keycloakId || "",
+          userRole: "manage_candidacy",
+          input: {
+            activeCandidacies: true,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(1);
+        expect(resp.candidacy_getCandidaciesForAAP.rows[0].id).toBe(
+          activeCandidacy.id,
+        );
+      });
+
+      test("should exclude drop out candidacies", async () => {
+        const organism = await createOrganismHelper();
+
+        const activeCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        const dropOutCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+        await createCandidacyDropOutHelper({
+          candidacyId: dropOutCandidacy.id,
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId:
+            organism.organismOnAccounts[0].account.keycloakId || "",
+          userRole: "manage_candidacy",
+          input: {
+            activeCandidacies: true,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(1);
+        expect(resp.candidacy_getCandidaciesForAAP.rows[0].id).toBe(
+          activeCandidacy.id,
+        );
+      });
+
+      test("should exclude candidacies with ended accompagnement", async () => {
+        const organism = await createOrganismHelper();
+
+        const notRequestedCandidacy = await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus: EndAccompagnementStatus.NOT_REQUESTED,
+          },
+        });
+
+        const pendingCandidacy = await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus: EndAccompagnementStatus.PENDING,
+          },
+        });
+
+        await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus:
+              EndAccompagnementStatus.CONFIRMED_BY_CANDIDATE,
+          },
+        });
+
+        await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus: EndAccompagnementStatus.CONFIRMED_BY_ADMIN,
+          },
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId:
+            organism.organismOnAccounts[0].account.keycloakId || "",
+          userRole: "manage_candidacy",
+          input: {
+            activeCandidacies: true,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(2);
+        expect(
+          resp.candidacy_getCandidaciesForAAP.rows.map(({ id }) => id).sort(),
+        ).toEqual([notRequestedCandidacy.id, pendingCandidacy.id].sort());
+      });
+
+      test("should return all candidacies when activeCandidacies is false", async () => {
+        const organism = await createOrganismHelper();
+
+        const activeCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        const archivedCandidacy = await createCandidacyHelper({
+          candidacyActiveStatus: CandidacyStatusStep.ARCHIVE,
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        const dropOutCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+        await createCandidacyDropOutHelper({
+          candidacyId: dropOutCandidacy.id,
+        });
+
+        const endedAccompagnementCandidacy = await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus:
+              EndAccompagnementStatus.CONFIRMED_BY_CANDIDATE,
+          },
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId:
+            organism.organismOnAccounts[0].account.keycloakId || "",
+          userRole: "manage_candidacy",
+          input: {
+            activeCandidacies: false,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(4);
+        expect(
+          resp.candidacy_getCandidaciesForAAP.rows.map(({ id }) => id).sort(),
+        ).toEqual(
+          [
+            activeCandidacy.id,
+            archivedCandidacy.id,
+            dropOutCandidacy.id,
+            endedAccompagnementCandidacy.id,
+          ].sort(),
+        );
+      });
+    });
+
+    describe("Admin", () => {
+      test("should return only active candidacies", async () => {
+        const organism = await createOrganismHelper();
+
+        const activeCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        await createCandidacyHelper({
+          candidacyActiveStatus: CandidacyStatusStep.ARCHIVE,
+          candidacyArgs: { organismId: organism.id },
+        });
+
+        const dropOutCandidacy = await createCandidacyHelper({
+          candidacyArgs: { organismId: organism.id },
+        });
+        await createCandidacyDropOutHelper({
+          candidacyId: dropOutCandidacy.id,
+        });
+
+        await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            endAccompagnementStatus:
+              EndAccompagnementStatus.CONFIRMED_BY_CANDIDATE,
+          },
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId: "1b0e7046-ca61-4259-b716-785f36ab79b2",
+          userRole: "admin",
+          input: {
+            activeCandidacies: true,
+            maisonMereAAPId: organism.maisonMereAAPId || undefined,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(1);
+        expect(resp.candidacy_getCandidaciesForAAP.rows[0].id).toBe(
+          activeCandidacy.id,
+        );
+      });
+    });
+  });
+
   describe("VAE collective", () => {
     describe("AAP", () => {
       test("should return a list of candidacies when searching with a valid vae collective cohorte id", async () => {

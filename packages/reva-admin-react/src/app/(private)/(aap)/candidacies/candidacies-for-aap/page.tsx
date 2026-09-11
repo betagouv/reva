@@ -40,6 +40,7 @@ export default function AnnuairePage() {
     filters,
     searchFilter,
     setSearchFilter: onSearchFilterChange,
+    toggleActiveCandidacies,
     toggleCandidacyStatus,
     toggleTypeAccompagnementStatus,
     toggleTrainingStatus,
@@ -143,6 +144,7 @@ export default function AnnuairePage() {
         <FiltersSection
           filters={filters}
           cohortes={cohortes}
+          onToggleActiveCandidacies={toggleActiveCandidacies}
           onToggleCandidacyStatus={toggleCandidacyStatus}
           onToggleTypeAccompagnementStatus={toggleTypeAccompagnementStatus}
           onToggleTrainingStatus={toggleTrainingStatus}
