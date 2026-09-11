@@ -25,7 +25,6 @@ export const createSousCompteVaeCollective = async ({
     lastname: accountLastname,
     group: "sous_compte_vae_collective",
     dontSendKeycloakEmail: true,
-    disableEmailOtp: true,
   });
 
   const sousCompteVaeCollective =

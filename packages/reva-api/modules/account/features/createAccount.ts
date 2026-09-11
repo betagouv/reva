@@ -22,7 +22,6 @@ export const createAccount = async (params: {
   maisonMereAAPRaisonSociale?: string;
   dontSendKeycloakEmail?: boolean;
   isApiUser?: boolean;
-  disableEmailOtp?: boolean;
 }): Promise<Account> => {
   const isEnableEmailOtpOnAccountCreationFeatureActive =
     await isFeatureActiveForUser({
@@ -30,8 +29,7 @@ export const createAccount = async (params: {
       feature: "ENABLE_EMAIL_OTP_ON_ACCOUNT_CREATION",
     });
 
-  const emailOtpEnabled =
-    !params.disableEmailOtp && isEnableEmailOtpOnAccountCreationFeatureActive;
+  const emailOtpEnabled = isEnableEmailOtpOnAccountCreationFeatureActive;
 
   // On n'envoie pas d'email de définition de mot de passe si le flag dontSendKeycloakEmail est positionné ou si l'envitonnement est sandbox
   // Les comptes créés dans l'environnement de sandbox ou avec le flag isApiUser sont destinés à une utilisation via API
