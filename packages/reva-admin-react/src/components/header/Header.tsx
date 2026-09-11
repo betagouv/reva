@@ -80,7 +80,7 @@ const PATHS = {
 
 const LABELS = {
   AAP: "AAP",
-  ADMIN_CERTIFICATION_AUTHORITY_CANDIDACIES: "Certificateurs/Candidatures",
+  ADMIN_CERTIFICATION_AUTHORITY_CANDIDACIES: "Certificateurs / Candidatures",
   ANNUAIRES: "Annuaires",
   CANDIDACIES: "Candidatures",
   CERTIFICATION_AUTHORITY: "Certificateur",
@@ -117,7 +117,7 @@ const isAAPCandidaciesPath = (pathname: string) => {
   const exclusionPattern =
     /\/candidacies\/(?!(annuaire|.*\/candidacy-drop-out)\/).*/;
   const subPathPattern =
-    /\/candidacies\/.*\/(feasibility\/)|(dossier-de-validation\/)|(jury\/)|(transfer.*\/)/;
+    /\/candidacies\/.*\/(feasibility\/)|(dossier-de-validation\/)|(jury\/)|(transfer.*\/)|(candidacy-drop-out\/)|(logs-certificateur\/)/;
 
   return !!pathname.match(exclusionPattern) && !pathname.match(subPathPattern);
 };
@@ -128,7 +128,7 @@ const isAAPVaeCollectivesPath = (pathname: string) =>
 const isCertificationAuthorityCandidaciesPath = (pathname: string) => {
   const mainPattern = /\/candidacies\/annuaire/;
   const subPathPattern =
-    /\/candidacies\/.*\/(feasibility\/)|(dossier-de-validation\/)|(jury\/)|(transfer.*\/)|(candidacy-drop-out\/)/;
+    /\/candidacies\/.*\/(feasibility\/)|(dossier-de-validation\/)|(jury\/)|(transfer.*\/)|(candidacy-drop-out\/)|(logs-certificateur\/)/;
 
   return !!(pathname.match(mainPattern) || pathname.match(subPathPattern));
 };

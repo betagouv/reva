@@ -127,7 +127,7 @@ const CandidacyPageLayout = ({ children }: { children: ReactNode }) => {
           <ul>Journal des actions</ul>
         </>,
 
-        `/candidacies/${candidacyId}/logs`,
+        `/candidacies/${candidacyId}/logs-certificateur`,
       ),
     );
   }
