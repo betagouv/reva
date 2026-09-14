@@ -2062,19 +2062,18 @@ model SousCompteVaeCollective {
 }
 
 model CohorteVaeCollective {
-  id                                           String                                         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  nom                                          String                                         @map("nom") @db.VarChar(255)
-  commanditaireVaeCollectiveId                 String                                         @map("commanditaire_vae_collective_id") @db.Uuid
-  commanditaireVaeCollective                   CommanditaireVaeCollective                     @relation(fields: [commanditaireVaeCollectiveId], references: [id])
-  createdAt                                    DateTime                                       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                                    DateTime?                                      @map("updated_at") @db.Timestamptz(6)
-  certificationCohorteVaeCollectives           CertificationCohorteVaeCollective[]
-  codeInscription                              String?                                        @unique @map("code_inscription") @db.VarChar(15)
-  candidacy                                    Candidacy[]
-  status                                       CohorteVaeCollectiveStatus                     @default(BROUILLON) @map("status")
-  organismId                                   String?                                        @map("organism_id") @db.Uuid
-  organism                                     Organism?                                      @relation(fields: [organismId], references: [id])
-  rolePermissionSpecificToCohorteVaeCollective RolePermissionSpecificToCohorteVaeCollective[]
+  id                                 String                              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nom                                String                              @map("nom") @db.VarChar(255)
+  commanditaireVaeCollectiveId       String                              @map("commanditaire_vae_collective_id") @db.Uuid
+  commanditaireVaeCollective         CommanditaireVaeCollective          @relation(fields: [commanditaireVaeCollectiveId], references: [id])
+  createdAt                          DateTime                            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                          DateTime?                           @map("updated_at") @db.Timestamptz(6)
+  certificationCohorteVaeCollectives CertificationCohorteVaeCollective[]
+  codeInscription                    String?                             @unique @map("code_inscription") @db.VarChar(15)
+  candidacy                          Candidacy[]
+  status                             CohorteVaeCollectiveStatus          @default(BROUILLON) @map("status")
+  organismId                         String?                             @map("organism_id") @db.Uuid
+  organism                           Organism?                           @relation(fields: [organismId], references: [id])
 
   @@map("cohorte_vae_collective")
 }
@@ -2182,19 +2181,6 @@ model RolePermissionVaeCollective {
 
   @@unique([role, permission])
   @@map("role_permission_vae_collective")
-}
-
-model RolePermissionSpecificToCohorteVaeCollective {
-  id                     String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  role                   RoleVaeCollective       @map("role")
-  permission             PermissionVaeCollective @map("permission")
-  cohorteVaeCollective   CohorteVaeCollective?   @relation(fields: [cohorteVaeCollectiveId], references: [id])
-  cohorteVaeCollectiveId String?                 @db.Uuid
-  createdAt              DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt              DateTime?               @map("updated_at") @db.Timestamptz(6)
-
-  @@unique([role, permission])
-  @@map("role_permission_specific_to_cohorte_vae_collective")
 }
 
 model KeycloakRoleOnRoleVaeCollective {
