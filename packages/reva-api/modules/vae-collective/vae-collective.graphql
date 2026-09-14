@@ -23,6 +23,7 @@ type SousCompteVaeCollective {
   id: ID!
   account: Account!
   canCreateCohorteVaeCollective: Boolean!
+  rolesSpecificToCohorte(cohorteVaeCollectiveId: ID!): [RoleVaeCollective!]!
 }
 
 type SousCompteVaeCollectivePage {
@@ -70,6 +71,11 @@ enum PermissionVaeCollective {
   CREER_SOUS_COMPTE
   MODIFIER_SOUS_COMPTE
   SUPPRIMER_SOUS_COMPTE
+}
+
+enum RoleVaeCollective {
+  ADMINISTRATEUR_PORTEUR_DE_PROJET
+  CREATEUR_COHORTE
 }
 
 type Query {

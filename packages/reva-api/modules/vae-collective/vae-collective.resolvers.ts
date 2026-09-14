@@ -24,6 +24,7 @@ import { getCommanditaireVaeCollectiveByGestionnaireAccountId } from "./features
 import { getCommanditaireVaeCollectiveById } from "./features/getCommanditaireVaeCollectiveById";
 import { getCommanditaireVaeCollectives } from "./features/getCommanditaireVaeCollectives";
 import { getMetabaseDashboardIframeUrlVaeCollective } from "./features/getMetabaseDashboardIframeUrlVaeCollective";
+import { getRolesSpecificToSousCompteAndCohorteVaeCollective } from "./features/getRolesSpecificToSousCompteAndCohorteVaeCollective";
 import { getSousComptesByCommanditaireVaeCollectiveId } from "./features/getSousComptesByCommanditaireVaeCollectiveId";
 import { getSousCompteVaeCollectiveById } from "./features/getSousCompteVaeCollectiveById";
 import { getUserPermissions } from "./features/getUserPermissions";
@@ -75,6 +76,22 @@ const unsafeResolvers = {
       id: string;
     }) =>
       canSousCompteCreateCohorteVaeCollective({ sousCompteVaeCollectiveId }),
+    rolesSpecificToCohorte: async (
+      {
+        id: sousCompteVaeCollectiveId,
+      }: {
+        id: string;
+      },
+      {
+        cohorteVaeCollectiveId,
+      }: {
+        cohorteVaeCollectiveId: string;
+      },
+    ) =>
+      getRolesSpecificToSousCompteAndCohorteVaeCollective({
+        sousCompteVaeCollectiveId,
+        cohorteVaeCollectiveId,
+      }),
   },
   Candidacy: {
     cohorteVaeCollective: async ({
@@ -324,6 +341,8 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     account: isAnyone,
     // Uniquement accessible via CommanditaireVaeCollective.sousComptes, déjà protégé ci-dessous.
     canCreateCohorteVaeCollective: isAnyone,
+    // Uniquement accessible via CommanditaireVaeCollective.sousComptes, déjà protégé ci-dessous.
+    rolesSpecificToCohorte: isAnyone,
   },
   Candidacy: {
     // Champ d'une candidature déjà protégée par la policy de son parent.
