@@ -332,10 +332,14 @@ const resolveCertificationAuthorityInfo = async (
       select: {
         id: true,
         certificationAuthorityId: true,
-        certificationAuthorityLocalAccount: {
+        certificationAuthorityLocalAccountOnAccount: {
           select: {
-            id: true,
-            certificationAuthorityId: true,
+            certificationAuthorityLocalAccount: {
+              select: {
+                id: true,
+                certificationAuthorityId: true,
+              },
+            },
           },
         },
       },
@@ -357,12 +361,15 @@ const resolveCertificationAuthorityInfo = async (
     }
 
     // Certification Authority local account
-    if (account.certificationAuthorityLocalAccount?.certificationAuthorityId) {
+    const certificationAuthorityLocalAccount =
+      account.certificationAuthorityLocalAccountOnAccount
+        ?.certificationAuthorityLocalAccount;
+    if (certificationAuthorityLocalAccount?.certificationAuthorityId) {
       return {
         certificationAuthorityId:
-          account.certificationAuthorityLocalAccount.certificationAuthorityId,
+          certificationAuthorityLocalAccount.certificationAuthorityId,
         certificationAuthorityLocalAccountId:
-          account.certificationAuthorityLocalAccount.id,
+          certificationAuthorityLocalAccount.id,
       };
     }
 

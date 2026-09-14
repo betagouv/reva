@@ -70,13 +70,17 @@ export const getIsCertificationAuthorityAccountOrLocalAccountStructureMember =
           keycloakId: userKeycloakId,
         },
         select: {
-          certificationAuthorityLocalAccount: {
+          certificationAuthorityLocalAccountOnAccount: {
             select: {
-              certificationAuthority: {
+              certificationAuthorityLocalAccount: {
                 select: {
-                  id: true,
-                  certificationAuthorityOnCertificationAuthorityStructure: {
-                    select: { certificationAuthorityStructureId: true },
+                  certificationAuthority: {
+                    select: {
+                      id: true,
+                      certificationAuthorityOnCertificationAuthorityStructure: {
+                        select: { certificationAuthorityStructureId: true },
+                      },
+                    },
                   },
                 },
               },
@@ -86,13 +90,14 @@ export const getIsCertificationAuthorityAccountOrLocalAccountStructureMember =
       });
 
       userAccountAuthorityStructureIds = toStructureIds(
-        userAccount?.certificationAuthorityLocalAccount?.certificationAuthority
+        userAccount?.certificationAuthorityLocalAccountOnAccount
+          ?.certificationAuthorityLocalAccount?.certificationAuthority
           ?.certificationAuthorityOnCertificationAuthorityStructure,
       );
 
       userCertificationAuthorityId =
-        userAccount?.certificationAuthorityLocalAccount?.certificationAuthority
-          ?.id;
+        userAccount?.certificationAuthorityLocalAccountOnAccount
+          ?.certificationAuthorityLocalAccount?.certificationAuthority?.id;
     }
 
     if (!userAccount) {

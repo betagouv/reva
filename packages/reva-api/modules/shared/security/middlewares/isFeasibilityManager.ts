@@ -55,9 +55,10 @@ export const isFeasibilityManager =
 
       const account = await prismaClient.account.findUnique({
         where: { keycloakId: context.auth.userInfo.sub },
+        include: { certificationAuthorityLocalAccountOnAccount: true },
       });
 
-      if (!account?.certificationAuthorityLocalAccountId) {
+      if (!account?.certificationAuthorityLocalAccountOnAccount) {
         throw new Error(NOT_AUTHORIZED_CANDIDACY_MANAGE);
       }
 
@@ -68,7 +69,8 @@ export const isFeasibilityManager =
               certificationAuthorityLocalAccountId_candidacyId: {
                 candidacyId: candidacyId,
                 certificationAuthorityLocalAccountId:
-                  account.certificationAuthorityLocalAccountId,
+                  account.certificationAuthorityLocalAccountOnAccount
+                    .certificationAuthorityLocalAccountId,
               },
             },
           },

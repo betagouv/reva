@@ -71,8 +71,10 @@ export const createCertificationAuthorityLocalAccount = async ({
   } catch (error) {
     await prismaClient.account.deleteMany({
       where: {
-        certificationAuthorityLocalAccountId:
-          createdCertificationAuthorityLocalAccount.id,
+        certificationAuthorityLocalAccountOnAccount: {
+          certificationAuthorityLocalAccountId:
+            createdCertificationAuthorityLocalAccount.id,
+        },
       },
     });
     await prismaClient.certificationAuthorityLocalAccount.delete({

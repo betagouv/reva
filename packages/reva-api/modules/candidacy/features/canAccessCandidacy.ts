@@ -40,7 +40,10 @@ export const canAccessCandidacy = async ({
 
   const account = await prismaClient.account.findFirst({
     where: { keycloakId },
-    include: { organismOnAccounts: true },
+    include: {
+      organismOnAccounts: true,
+      certificationAuthorityLocalAccountOnAccount: true,
+    },
   });
   if (!account) {
     return false;
@@ -113,7 +116,7 @@ export const canAccessCandidacy = async ({
       return false;
     }
 
-    if (!account.certificationAuthorityLocalAccountId) {
+    if (!account.certificationAuthorityLocalAccountOnAccount) {
       return false;
     }
 
@@ -124,7 +127,8 @@ export const canAccessCandidacy = async ({
             certificationAuthorityLocalAccountId_candidacyId: {
               candidacyId: candidacyId,
               certificationAuthorityLocalAccountId:
-                account.certificationAuthorityLocalAccountId,
+                account.certificationAuthorityLocalAccountOnAccount
+                  .certificationAuthorityLocalAccountId,
             },
           },
         },

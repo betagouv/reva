@@ -7,7 +7,9 @@ export const getHumanAccountByCertificationAuthorityLocalAccountId = async ({
 }) =>
   prismaClient.account.findFirst({
     where: {
-      certificationAuthorityLocalAccountId,
+      certificationAuthorityLocalAccountOnAccount: {
+        certificationAuthorityLocalAccountId,
+      },
       isApiUser: false,
     },
   });

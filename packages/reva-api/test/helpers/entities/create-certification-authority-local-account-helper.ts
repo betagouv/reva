@@ -36,13 +36,17 @@ export const createCertificationAuthorityLocalAccountHelper = async (
     });
 
   const account = existingAccountId
-    ? await prismaClient.account.update({
+    ? await prismaClient.account.findUniqueOrThrow({
         where: { id: existingAccountId },
-        data: { certificationAuthorityLocalAccountId: localAccount.id },
       })
-    : await createAccountHelper({
-        certificationAuthorityLocalAccountId: localAccount.id,
-      });
+    : await createAccountHelper();
+
+  await prismaClient.certificationAuthorityLocalAccountOnAccount.create({
+    data: {
+      accountId: account.id,
+      certificationAuthorityLocalAccountId: localAccount.id,
+    },
+  });
 
   return {
     ...localAccount,

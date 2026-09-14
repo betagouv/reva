@@ -73,8 +73,9 @@ export const transferCandidacyToCertificationAuthorityLocalAccount =
           id: certificationAuthorityLocalAccountId,
         },
         include: {
-          Account: {
-            where: { isApiUser: false },
+          certificationAuthorityLocalAccountOnAccount: {
+            where: { account: { isApiUser: false } },
+            include: { account: true },
           },
         },
       });
@@ -82,7 +83,9 @@ export const transferCandidacyToCertificationAuthorityLocalAccount =
       throw new Error(COMPTE_LOCAL_AUTORITE_CERTIFICATION_NON_TROUVE);
     }
 
-    const humanAccount = certificationAuthorityLocalAccount.Account[0];
+    const humanAccount =
+      certificationAuthorityLocalAccount
+        .certificationAuthorityLocalAccountOnAccount[0]?.account;
     if (!humanAccount) {
       throw new Error(COMPTE_LOCAL_AUTORITE_CERTIFICATION_NON_TROUVE);
     }
@@ -221,12 +224,17 @@ export const transferCandidacyToCertificationAuthorityLocalAccount =
       const account = await prismaClient.account.findUnique({
         where: { keycloakId: userInfo.userKeycloakId },
         include: {
-          certificationAuthorityLocalAccount: true,
+          certificationAuthorityLocalAccountOnAccount: {
+            include: {
+              certificationAuthorityLocalAccount: true,
+            },
+          },
         },
       });
 
       const previousCertificationAuthorityLocalAccount =
-        account?.certificationAuthorityLocalAccount;
+        account?.certificationAuthorityLocalAccountOnAccount
+          ?.certificationAuthorityLocalAccount;
 
       if (previousCertificationAuthorityLocalAccount) {
         previousCertificationAuthorityName = account.lastname || "";

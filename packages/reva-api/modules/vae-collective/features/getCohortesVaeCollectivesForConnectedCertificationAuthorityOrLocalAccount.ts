@@ -42,7 +42,9 @@ export const getCohortesVaeCollectivesForConnectedCertificationAuthorityOrLocalA
       const certificationAuthorityLocalAccount =
         await prismaClient.certificationAuthorityLocalAccount.findFirst({
           where: {
-            Account: { some: { keycloakId: userKeycloakId } },
+            certificationAuthorityLocalAccountOnAccount: {
+              some: { account: { keycloakId: userKeycloakId } },
+            },
           },
         });
 

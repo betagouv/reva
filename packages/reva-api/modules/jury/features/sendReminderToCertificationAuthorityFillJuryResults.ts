@@ -24,8 +24,9 @@ export const sendReminderToCertificationAuthorityFillJuryResults = async () => {
             include: {
               certificationAuthorityLocalAccount: {
                 include: {
-                  Account: {
-                    where: { isApiUser: false },
+                  certificationAuthorityLocalAccountOnAccount: {
+                    where: { account: { isApiUser: false } },
+                    include: { account: true },
                   },
                 },
               },
@@ -45,7 +46,8 @@ export const sendReminderToCertificationAuthorityFillJuryResults = async () => {
 
       for (const cala of jury.candidacy
         .certificationAuthorityLocalAccountOnCandidacy) {
-        for (const account of cala.certificationAuthorityLocalAccount.Account) {
+        for (const { account } of cala.certificationAuthorityLocalAccount
+          .certificationAuthorityLocalAccountOnAccount) {
           emails.push(account.email);
         }
       }

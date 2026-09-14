@@ -162,8 +162,9 @@ export const sendDFFToCertificationAuthority = async ({
         },
       },
       include: {
-        Account: {
-          where: { isApiUser: false },
+        certificationAuthorityLocalAccountOnAccount: {
+          where: { account: { isApiUser: false } },
+          include: { account: true },
         },
       },
     });
@@ -181,7 +182,9 @@ export const sendDFFToCertificationAuthority = async ({
   }
 
   for (const cala of certificationAuthorityLocalAccounts) {
-    for (const account of cala.Account) {
+    for (const {
+      account,
+    } of cala.certificationAuthorityLocalAccountOnAccount) {
       emails.push(account.email);
     }
   }

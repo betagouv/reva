@@ -5,17 +5,18 @@ export const getCertificationAuthorityLocalAccountByAccountId = async ({
 }: {
   accountId: string;
 }) => {
-  const account = await prismaClient.account.findUnique({
-    where: { id: accountId },
-    include: {
-      certificationAuthorityLocalAccount: {
-        include: {
-          certificationAuthorityLocalAccountOnDepartment: true,
-          certificationAuthorityLocalAccountOnCertification: true,
+  const accountOnLocalAccount =
+    await prismaClient.certificationAuthorityLocalAccountOnAccount.findUnique({
+      where: { accountId },
+      include: {
+        certificationAuthorityLocalAccount: {
+          include: {
+            certificationAuthorityLocalAccountOnDepartment: true,
+            certificationAuthorityLocalAccountOnCertification: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return account?.certificationAuthorityLocalAccount ?? null;
+  return accountOnLocalAccount?.certificationAuthorityLocalAccount ?? null;
 };

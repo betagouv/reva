@@ -545,8 +545,7 @@ model Account {
   lastname                             String?                             @db.VarChar(255)
   certificationAuthority               CertificationAuthority?             @relation(fields: [certificationAuthorityId], references: [id], onDelete: NoAction)
   certificationAuthorityId             String?                             @map("certification_authority_id") @db.Uuid
-  certificationAuthorityLocalAccount   CertificationAuthorityLocalAccount? @relation(fields: [certificationAuthorityLocalAccountId], references: [id], onDelete: NoAction)
-  certificationAuthorityLocalAccountId String?                             @map("certification_authority_local_account_id") @db.Uuid
+  certificationAuthorityLocalAccountOnAccount CertificationAuthorityLocalAccountOnAccount?
   keycloakId                           String                              @unique @map("keycloak_id") @db.Uuid
   maisonMereAAP                        MaisonMereAAP[]
   featureBetaTest                      FeatureBetaTest[]
@@ -564,7 +563,6 @@ model Account {
 
   @@index([email])
   @@index([certificationAuthorityId])
-  @@index([certificationAuthorityLocalAccountId])
   @@index([keycloakId])
   @@map("account")
 }
@@ -1239,7 +1237,7 @@ model CertificationAuthorityLocalAccount {
   contactPhone                                      String?                                             @map("contact_phone") @db.VarChar(25)
   createdAt                                         DateTime                                            @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                                         DateTime?                                           @map("updated_at") @db.Timestamptz(6)
-  Account                                           Account[]
+  certificationAuthorityLocalAccountOnAccount       CertificationAuthorityLocalAccountOnAccount[]
   certificationAuthorityLocalAccountOnCertification CertificationAuthorityLocalAccountOnCertification[]
   certificationAuthorityLocalAccountOnDepartment    CertificationAuthorityLocalAccountOnDepartment[]
   certificationAuthority                            CertificationAuthority                              @relation(fields: [certificationAuthorityId], references: [id], onDelete: NoAction)
@@ -1248,6 +1246,19 @@ model CertificationAuthorityLocalAccount {
 
   @@index([certificationAuthorityId])
   @@map("certification_authority_local_account")
+}
+
+model CertificationAuthorityLocalAccountOnAccount {
+  id                                   String                             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  certificationAuthorityLocalAccount   CertificationAuthorityLocalAccount @relation(map: "cala_on_account_cala", fields: [certificationAuthorityLocalAccountId], references: [id], onDelete: Cascade)
+  certificationAuthorityLocalAccountId String                             @map("certification_authority_local_account_id") @db.Uuid
+  account                              Account                            @relation(map: "cala_on_account_account", fields: [accountId], references: [id], onDelete: Cascade)
+  accountId                            String                             @unique(map: "cala_on_account_account_id_key") @map("account_id") @db.Uuid
+  createdAt                            DateTime                           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                            DateTime?                          @map("updated_at") @db.Timestamptz(6)
+
+  @@index([certificationAuthorityLocalAccountId], map: "cala_on_account_cala_id_idx")
+  @@map("certification_authority_local_account_on_account")
 }
 
 model CertificationAuthorityLocalAccountOnCertification {

@@ -21,7 +21,9 @@ export const updateCertificationAuthorityLocalAccountGeneralInformation =
   }) => {
     const oldAccount = await prismaClient.account.findFirst({
       where: {
-        certificationAuthorityLocalAccountId,
+        certificationAuthorityLocalAccountOnAccount: {
+          certificationAuthorityLocalAccountId,
+        },
         isApiUser: false,
       },
     });

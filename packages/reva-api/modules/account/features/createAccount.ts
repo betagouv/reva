@@ -106,8 +106,15 @@ export const createAccount = async (params: {
       lastname: params.lastname,
       organismId: params.organismId,
       certificationAuthorityId: params.certificationAuthorityId,
-      certificationAuthorityLocalAccountId:
-        params.certificationAuthorityLocalAccountId,
+      certificationAuthorityLocalAccountOnAccount:
+        params.certificationAuthorityLocalAccountId
+          ? {
+              create: {
+                certificationAuthorityLocalAccountId:
+                  params.certificationAuthorityLocalAccountId,
+              },
+            }
+          : undefined,
       isApiUser: params.isApiUser,
       emailOtpEnabled,
     },
