@@ -293,6 +293,36 @@ test.describe("Next actions tiles", () => {
   });
 
   test.describe("AUTONOME", () => {
+    test.describe("Compléter mes formations", () => {
+      const certification = createCertificationEntity();
+      const candidate = createCandidateEntity();
+      const candidacy = createCandidacyEntity({
+        candidate,
+        status: "PROJET",
+        certification,
+        goalsCount: 1,
+        experiencesCount: 1,
+      });
+
+      const { handlers, dashboardWait } = dashboardHandlers({
+        candidacy,
+        activeFeaturesForConnectedUser: ["DF_DEMAT_AUTONOME"],
+      });
+      test.use({
+        mswHandlers: [handlers, { scope: "test" }],
+      });
+
+      test("shows 'Compléter mes formations' when no formations", async ({
+        page,
+      }) => {
+        await login(page);
+        await dashboardWait(page);
+        await expect(
+          page.getByRole("button", { name: "Compléter mes formations" }),
+        ).toBeVisible();
+      });
+    });
+
     test.describe("Envoyer mon dossier de faisabilité", () => {
       const candidate = createCandidateEntity();
       const candidacy = createCandidacyEntity({
@@ -451,6 +481,9 @@ test.describe("Next actions tiles", () => {
       const candidacy = createCandidacyEntity({
         candidate,
         feasibility,
+        goalsCount: 1,
+        experiencesCount: 1,
+        typeAccompagnement: "ACCOMPAGNE",
       });
       const { handlers, dashboardWait } = dashboardHandlers({
         candidacy,

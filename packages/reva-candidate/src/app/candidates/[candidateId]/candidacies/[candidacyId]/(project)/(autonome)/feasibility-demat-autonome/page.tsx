@@ -8,6 +8,9 @@ import { format, isBefore, toDate } from "date-fns";
 import { deburr } from "lodash";
 import { useRouter } from "next/navigation";
 
+import { ExperiencesTile } from "@/app/_components/home/dashboard/tiles/ExperiencesTile";
+import { FormationsTile } from "@/app/_components/home/dashboard/tiles/FormationsTile";
+import { GoalsTile } from "@/app/_components/home/dashboard/tiles/GoalsTile";
 import { Panel } from "@/components/layout/Panel";
 import { PdfLink } from "@/components/legacy/organisms/DffSummary/components/PdfLink";
 import { DffSummary } from "@/components/legacy/organisms/DffSummary/DffSummary";
@@ -42,6 +45,11 @@ const modalWhatToPayAttentionTo = createModal({
   isOpenedByDefault: false,
 });
 
+const modalMissingData = createModal({
+  id: "missing-data",
+  isOpenedByDefault: false,
+});
+
 export default function FeasibilityDematAutonomeResourcesPage() {
   const router = useRouter();
   const { candidacy } = useFeasibilityDematAutonomePage();
@@ -52,6 +60,15 @@ export default function FeasibilityDematAutonomeResourcesPage() {
 
   const candidate = candidacy.candidate;
   const certification = candidacy.certification;
+
+  const hasCompletedFormations =
+    !!candidacy.candidate.highestDegree &&
+    !!candidacy.candidate.niveauDeFormationLePlusEleve;
+  const hasCompletedGoals =
+    (candidacy?.goals && candidacy.goals.length > 0) || false;
+  const hasCompletedExperience =
+    (candidacy?.experiences && candidacy.experiences.length > 0) || false;
+
   const feasibility = candidacy.feasibility;
   const dematerializedFeasibilityFile =
     feasibility?.dematerializedFeasibilityFile;
@@ -310,6 +327,15 @@ export default function FeasibilityDematAutonomeResourcesPage() {
               }
               disabled={candidacy.warningOnFeasibilitySubmission !== "NONE"}
               isIncomplete={feasibilityDecisionIsIncomplete}
+              buttonProps={
+                !hasCompletedFormations ||
+                !hasCompletedGoals ||
+                !hasCompletedExperience
+                  ? {
+                      onClick: modalMissingData.open,
+                    }
+                  : undefined
+              }
             />
           </div>
 
@@ -444,6 +470,50 @@ export default function FeasibilityDematAutonomeResourcesPage() {
           vos réponses et utilisez les ressources disponibles pour vous aider.
         </p>
       </modalWhatToPayAttentionTo.Component>
+
+      <modalMissingData.Component
+        title={
+          <div>
+            <span
+              className="fr-icon-warning-fill mr-2"
+              aria-hidden="true"
+            ></span>
+            Dossier incomplet
+          </div>
+        }
+        size="large"
+      >
+        <p>
+          Vous devez avoir renseigné toutes les sections précédent le dossier de
+          faisabilité afin de pouvoir envoyer le dossier au certificateur.
+        </p>
+
+        <p>Vous avez oublié de compléter la (les) section(s) suivante(s) :</p>
+
+        <div className="grid md:grid-cols-3 grid-rows-1">
+          {!hasCompletedGoals && (
+            <GoalsTile
+              href="../set-goals"
+              hasCompletedGoals={hasCompletedGoals}
+              readOnly
+            />
+          )}
+          {!hasCompletedFormations && (
+            <FormationsTile
+              href="../set-formations"
+              hasCompletedFormations={hasCompletedFormations}
+              readOnly
+            />
+          )}
+          {!hasCompletedExperience && (
+            <ExperiencesTile
+              href="../experiences"
+              experiences={candidacy.experiences}
+              readOnly
+            />
+          )}
+        </div>
+      </modalMissingData.Component>
     </Panel>
   );
 }

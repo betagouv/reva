@@ -25,6 +25,7 @@ export const deleteExperienceFromCandidacy = async ({
     where: { id: candidacyId },
     select: {
       status: true,
+      typeAccompagnement: true,
     },
   });
 
@@ -32,7 +33,11 @@ export const deleteExperienceFromCandidacy = async ({
     throw new Error(CANDIDATURE_NON_TROUVEE);
   }
 
-  if (userRoles.includes("candidate") && candidacy.status !== "PROJET") {
+  if (
+    userRoles.includes("candidate") &&
+    candidacy.typeAccompagnement === "ACCOMPAGNE" &&
+    candidacy.status !== "PROJET"
+  ) {
     throw new Error(
       "Impossible de supprimer les expériences après avoir envoyé la candidature à l'AAP",
     );

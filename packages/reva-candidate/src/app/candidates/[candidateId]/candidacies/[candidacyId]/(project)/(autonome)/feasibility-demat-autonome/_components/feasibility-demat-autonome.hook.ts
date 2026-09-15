@@ -89,6 +89,9 @@ const getCandidacyByIdForFeasibilityDematAutonomePage = graphql(`
         id
         label
       }
+      experiences {
+        id
+      }
       goals {
         id
         label

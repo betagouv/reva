@@ -5,9 +5,11 @@ import { IncompleteBadge } from "./IncompleteBadge";
 export const FormationsTile = ({
   hasCompletedFormations,
   readOnly,
+  href,
 }: {
   readOnly: boolean;
   hasCompletedFormations: boolean;
+  href?: string;
 }) => {
   const getDesc = () => {
     if (!hasCompletedFormations) return undefined;
@@ -23,7 +25,7 @@ export const FormationsTile = ({
       small
       imageSvg
       linkProps={{
-        href: "./set-formations",
+        href: href || "./set-formations",
       }}
       imageUrl="/candidat/images/pictograms/school.svg"
       className="h-[200px]"

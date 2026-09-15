@@ -15,20 +15,16 @@ import { useSetGoals } from "./set-goals.hooks";
 export default function SetGoals() {
   const router = useRouter();
 
-  const {
-    getGoals,
-    updateGoals,
-    canEditCandidacy,
-    candidacyAlreadySubmitted,
-    candidacy,
-  } = useSetGoals();
+  const { getGoals, updateGoals, canEditCandidacy, candidacy } = useSetGoals();
 
-  const formShouldBeDisabled = !canEditCandidacy || candidacyAlreadySubmitted;
+  const formShouldBeDisabled = !canEditCandidacy;
   const goals = getGoals.data?.getReferential.goals || [];
 
   const [selectedGoalIds, setSelectedGoalIds] = useState<string[]>(
     candidacy?.goals.map((goal) => goal.id) || [],
   );
+
+  console.log("formShouldBeDisabled", formShouldBeDisabled);
 
   useEffect(() => {
     setSelectedGoalIds(candidacy?.goals.map((goal) => goal.id) || []);

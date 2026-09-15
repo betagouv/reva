@@ -5,16 +5,14 @@ import { useGraphQlClient } from "@/components/graphql/graphql-client/GraphqlCli
 import { candidateCanEditCandidacy } from "@/utils/candidateCanEditCandidacy.util";
 
 import { graphql } from "@/graphql/generated";
-import {
-  CandidacyStatusStep,
-  ExperienceInput,
-} from "@/graphql/generated/graphql";
+import { ExperienceInput } from "@/graphql/generated/graphql";
 
 const getCandidacyByIdForAddExperience = graphql(`
   query getCandidacyByIdForAddExperience($candidacyId: ID!) {
     getCandidacyById(id: $candidacyId) {
       id
       status
+      typeAccompagnement
       candidacyDropOut {
         status
       }
@@ -78,18 +76,23 @@ export const useAddExperience = () => {
 
   const candidacy = data?.getCandidacyById;
 
-  const canEditCandidacy = candidateCanEditCandidacy({
-    candidacyStatus: candidacy?.status as CandidacyStatusStep,
-    typeAccompagnement: "ACCOMPAGNE",
+  let canEditCandidacy = candidateCanEditCandidacy({
+    candidacyStatus: candidacy?.status,
+    typeAccompagnement: candidacy?.typeAccompagnement,
     candidacyDropOut: !!candidacy?.candidacyDropOut,
   });
 
-  const candidacyAlreadySubmitted = candidacy?.status !== "PROJET";
+  // Candidat accompagné et candidacy.status différent de PROJET
+  if (
+    candidacy?.typeAccompagnement === "ACCOMPAGNE" &&
+    candidacy?.status !== "PROJET"
+  ) {
+    canEditCandidacy = false;
+  }
 
   return {
     addExperience,
     canEditCandidacy,
     candidacy,
-    candidacyAlreadySubmitted,
   };
 };
