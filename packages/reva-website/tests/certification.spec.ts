@@ -232,12 +232,18 @@ test("shows available parcours", async ({ page, msw }) => {
   );
 
   await page.goto(certificationPath);
-  await page.getByRole("tab", { name: "Établissements" }).click();
-  await expect(
-    page.getByText(
-      "Établissements proposant ce diplôme sur la plateforme France VAE",
-    ),
-  ).toBeVisible();
+  // DSFR wires up tab switching asynchronously (dynamic import of its core
+  // script, deferred until after hydration), so a click can land before the
+  // behavior is attached and be silently dropped. Retry the click until the
+  // panel actually switches instead of clicking once.
+  await expect(async () => {
+    await page.getByRole("tab", { name: "Établissements" }).click();
+    await expect(
+      page.getByText(
+        "Établissements proposant ce diplôme sur la plateforme France VAE",
+      ),
+    ).toBeVisible({ timeout: 1000 });
+  }).toPass();
   await expect(page.getByText("Certification Authority")).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Certification Authority" }),
