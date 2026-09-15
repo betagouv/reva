@@ -22,6 +22,7 @@ const ROUTES = {
   EXPERIENCES: "./experiences",
   FEASIBILITY: "./feasibility",
   SET_GOALS: "./set-goals",
+  SET_FORMATIONS: "./set-formations",
   SET_ORGANISM: "./set-organism",
   SUBMIT_CANDIDACY: "./submit-candidacy",
   VALIDATE_FEASIBILITY: "./validate-feasibility",
@@ -63,12 +64,16 @@ const getNextActionTiles = ({
 }): NextActionTile[] => {
   if (!candidacy) return [];
 
+  const isAutonome = candidacy.typeAccompagnement === "AUTONOME";
   const isAccompagne = candidacy.typeAccompagnement === "ACCOMPAGNE";
   const candidacyStatus = candidacy.status;
   const isProjectStatus = candidacyStatus === "PROJET";
   const isParcoursEnvoyeStatus = candidacyStatus === "PARCOURS_ENVOYE";
 
   const goalsCount = candidacy.goals?.length || 0;
+  const hasCompletedFormations =
+    !!candidacy.candidate.highestDegree &&
+    !!candidacy.candidate.niveauDeFormationLePlusEleve;
   const experiencesCount = candidacy.experiences?.length || 0;
   const hasOrganism = !!candidacy.organism?.id;
   const hasSelectedCertification = !!candidacy.certification?.id;
@@ -112,16 +117,26 @@ const getNextActionTiles = ({
   );
 
   const rules: { condition: boolean; tile: NextActionTile }[] = [
-    //! ACCOMPAGNE
-    // ACCOMPAGNE : Remplir mes objectifs
+    // Compléter mes objectifs
     {
-      condition: isProjectStatus && goalsCount === 0 && isAccompagne,
-      tile: { title: "Remplir mes objectifs", link: ROUTES.SET_GOALS },
+      condition:
+        candidacy?.feasibilityFormat === "DEMATERIALIZED" && goalsCount === 0,
+      tile: { title: "Compléter mes objectifs", link: ROUTES.SET_GOALS },
     },
-    // ACCOMPAGNE : Remplir mes expériences
+    // AUTONOME : Compléter mes formations
     {
-      condition: isProjectStatus && experiencesCount === 0 && isAccompagne,
-      tile: { title: "Remplir mes expériences", link: ROUTES.EXPERIENCES },
+      condition:
+        isAutonome &&
+        candidacy?.feasibilityFormat === "DEMATERIALIZED" &&
+        !hasCompletedFormations,
+      tile: { title: "Compléter mes formations", link: ROUTES.SET_FORMATIONS },
+    },
+    // Compléter mes expériences
+    {
+      condition:
+        candidacy?.feasibilityFormat === "DEMATERIALIZED" &&
+        experiencesCount === 0,
+      tile: { title: "Compléter mes expériences", link: ROUTES.EXPERIENCES },
     },
     // ACCOMPAGNE : Choisir mon accompagnateur
     {

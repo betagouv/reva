@@ -47,9 +47,8 @@ type ExperienceForm = z.infer<typeof schema>;
 export default function AddExperience() {
   const router = useRouter();
 
-  const { canEditCandidacy, candidacy, candidacyAlreadySubmitted } =
-    useAddExperience();
-  const inputShouldBeDisabled = !canEditCandidacy || candidacyAlreadySubmitted;
+  const { canEditCandidacy, candidacy } = useAddExperience();
+  const inputShouldBeDisabled = !canEditCandidacy;
 
   const { addExperience } = useAddExperience();
   const backUrl = "../";

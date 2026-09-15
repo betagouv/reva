@@ -50,15 +50,18 @@ export const updateCertificationOfCandidacy = async ({
     );
   }
 
-  if (
-    !(await canCandidateUpdateCandidacy({
-      candidacy,
-      userRoles,
-    }))
-  ) {
-    throw new Error(
-      "Impossible de changer de certification après avoir confirmé le parcours",
-    );
+  if (!(await canCandidateUpdateCandidacy({ candidacy }))) {
+    // Autorise le changement de certification si DF incomplet uniquement pour l'admin
+    if (
+      !(
+        candidacy.status === "DOSSIER_FAISABILITE_INCOMPLET" &&
+        userRoles?.includes("admin")
+      )
+    ) {
+      throw new Error(
+        "Impossible de changer de certification après avoir confirmé le parcours",
+      );
+    }
   }
 
   try {

@@ -23,8 +23,7 @@ const durationToString: {
 };
 
 export default function ExperiencesPage() {
-  const { candidacy, canEditCandidacy, candidacyAlreadySubmitted } =
-    useExperiences();
+  const { candidacy, canEditCandidacy } = useExperiences();
 
   const experiences = candidacy?.experiences;
 
@@ -79,7 +78,7 @@ export default function ExperiencesPage() {
               ))}
             </div>
 
-            {canEditCandidacy && !candidacyAlreadySubmitted && (
+            {canEditCandidacy && (
               <>
                 <hr className="mb-0 pb-4" />
                 <div>

@@ -179,11 +179,11 @@ test("should reset the training and status when selecting a new certification", 
   expect(financingMethodCount).toEqual(0);
 });
 
-test("should block candidate from updating certification when status is DOSSIER_FAISABILITE_INCOMPLET", async () => {
+test("should block candidate ACCOMPAGNE from updating certification when status is DOSSIER_FAISABILITE_INCOMPLET", async () => {
   const candidacy = await createCandidacyHelper({
     candidacyActiveStatus: CandidacyStatusStep.DOSSIER_FAISABILITE_INCOMPLET,
     candidacyArgs: {
-      typeAccompagnement: "AUTONOME",
+      typeAccompagnement: "ACCOMPAGNE",
     },
   });
   const certification = await createCertificationHelper();

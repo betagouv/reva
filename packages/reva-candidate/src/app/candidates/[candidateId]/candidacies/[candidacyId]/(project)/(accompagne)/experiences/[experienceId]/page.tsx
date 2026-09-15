@@ -57,15 +57,10 @@ export default function UpdateExperience() {
 
   const { experienceId } = params;
 
-  const {
-    updateExperience,
-    deleteExperience,
-    canEditCandidacy,
-    candidacy,
-    candidacyAlreadySubmitted,
-  } = useUpdateExperience();
+  const { updateExperience, deleteExperience, canEditCandidacy, candidacy } =
+    useUpdateExperience();
   const backUrl = "../";
-  const inputShouldBeDisabled = !canEditCandidacy || candidacyAlreadySubmitted;
+  const inputShouldBeDisabled = !canEditCandidacy;
 
   const experience = candidacy?.experiences.find(
     (experience) => experience.id == experienceId,
@@ -278,7 +273,7 @@ export default function UpdateExperience() {
         </div>
         <hr className="mt-4 pb-4" />
 
-        {canEditCandidacy && !candidacyAlreadySubmitted && (
+        {canEditCandidacy && (
           <Button
             priority="tertiary no outline"
             size="small"

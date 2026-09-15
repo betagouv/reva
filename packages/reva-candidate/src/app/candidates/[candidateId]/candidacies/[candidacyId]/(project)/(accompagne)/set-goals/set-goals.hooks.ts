@@ -5,16 +5,14 @@ import { useGraphQlClient } from "@/components/graphql/graphql-client/GraphqlCli
 import { candidateCanEditCandidacy } from "@/utils/candidateCanEditCandidacy.util";
 
 import { graphql } from "@/graphql/generated";
-import {
-  CandidacyStatusStep,
-  CandidateGoalInput,
-} from "@/graphql/generated/graphql";
+import { CandidateGoalInput } from "@/graphql/generated/graphql";
 
 const getCandidacyByIdForSetGoals = graphql(`
   query getCandidacyByIdForSetGoals($candidacyId: ID!) {
     getCandidacyById(id: $candidacyId) {
       id
       status
+      typeAccompagnement
       candidacyDropOut {
         status
       }
@@ -88,19 +86,24 @@ export const useSetGoals = () => {
 
   const candidacy = getCandidateData?.getCandidacyById;
 
-  const canEditCandidacy = candidateCanEditCandidacy({
-    candidacyStatus: candidacy?.status as CandidacyStatusStep,
-    typeAccompagnement: "ACCOMPAGNE",
+  let canEditCandidacy = candidateCanEditCandidacy({
+    candidacyStatus: candidacy?.status,
+    typeAccompagnement: candidacy?.typeAccompagnement,
     candidacyDropOut: !!candidacy?.candidacyDropOut,
   });
 
-  const candidacyAlreadySubmitted = candidacy?.status !== "PROJET";
+  // Candidat accompagné et candidacy.status différent de PROJET
+  if (
+    candidacy?.typeAccompagnement === "ACCOMPAGNE" &&
+    candidacy?.status !== "PROJET"
+  ) {
+    canEditCandidacy = false;
+  }
 
   return {
     getGoals,
     updateGoals,
     canEditCandidacy,
-    candidacyAlreadySubmitted,
     candidacy,
   };
 };

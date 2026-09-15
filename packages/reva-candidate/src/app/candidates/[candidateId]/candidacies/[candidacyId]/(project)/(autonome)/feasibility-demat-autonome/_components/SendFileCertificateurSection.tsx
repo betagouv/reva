@@ -2,6 +2,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Tile from "@codegouvfr/react-dsfr/Tile";
 import { format } from "date-fns";
 import Image from "next/image";
+import { ComponentProps } from "react";
 
 import { CustomErrorBadge } from "@/components/badge/custom-error-badge/CustomErrorBadge";
 
@@ -25,11 +26,13 @@ export const SendFileCertificationAuthoritySection = ({
   isReadyToBeSentToCertificationAuthority,
   disabled,
   isIncomplete,
+  buttonProps,
 }: {
   sentToCertificationAuthorityAt?: Date | null;
   isReadyToBeSentToCertificationAuthority: boolean;
   disabled?: boolean;
   isIncomplete?: boolean;
+  buttonProps?: ComponentProps<"button">;
 }) => {
   // Apres INCOMPLETE, l'envoi precedent n'est plus valide (pas de comparaison temporelle necessaire
   // car sendDFFToCertificationAuthority remet decision a PENDING, donc INCOMPLETE implique toujours stale)
@@ -57,7 +60,9 @@ export const SendFileCertificationAuthoritySection = ({
   if (isReadyToBeSentToCertificationAuthority) {
     const tileProps = disabled
       ? { disabled: true }
-      : { linkProps: { href: "./send-file-certification-authority" } };
+      : buttonProps
+        ? { buttonProps }
+        : { linkProps: { href: "./send-file-certification-authority" } };
     return (
       <Tile
         {...TILE_COMMON_PROPS}

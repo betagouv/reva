@@ -5,9 +5,11 @@ import { IncompleteBadge } from "./IncompleteBadge";
 export const GoalsTile = ({
   hasCompletedGoals,
   readOnly,
+  href,
 }: {
   readOnly: boolean;
   hasCompletedGoals: boolean;
+  href?: string;
 }) => {
   const getDesc = () => {
     if (!hasCompletedGoals) return undefined;
@@ -23,7 +25,7 @@ export const GoalsTile = ({
       small
       imageSvg
       linkProps={{
-        href: "./set-goals",
+        href: href || "./set-goals",
       }}
       imageUrl="/candidat/images/pictograms/conclusion.svg"
       className="h-[200px]"

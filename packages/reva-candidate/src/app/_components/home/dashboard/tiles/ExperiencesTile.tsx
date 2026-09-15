@@ -7,9 +7,11 @@ import { IncompleteBadge } from "./IncompleteBadge";
 export const ExperiencesTile = ({
   experiences,
   readOnly,
+  href,
 }: {
   experiences: ExperiencesUseCandidateForDashboard;
   readOnly: boolean;
+  href?: string;
 }) => {
   const hasExperiences = experiences.length > 0;
 
@@ -27,7 +29,7 @@ export const ExperiencesTile = ({
       small
       imageSvg
       linkProps={{
-        href: "./experiences",
+        href: href || "./experiences",
       }}
       imageUrl="/candidat/images/pictograms/culture.svg"
       className="h-[200px]"
