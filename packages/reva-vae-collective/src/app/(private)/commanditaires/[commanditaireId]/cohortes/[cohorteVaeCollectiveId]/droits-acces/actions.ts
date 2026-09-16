@@ -1,12 +1,15 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { getAccessTokenFromCookie } from "@/helpers/auth/get-access-token-from-cookie/getAccessTokenFromCookie";
 import { throwUrqlErrors } from "@/helpers/graphql/throw-urql-errors/throwUrqlErrors";
 import { client } from "@/helpers/graphql/urql-client/urqlClient";
 
 import { graphql } from "@/graphql/generated";
+import { RoleVaeCollective } from "@/graphql/generated/graphql";
 
-const RECORDS_PER_PAGE = 10;
+import { RECORDS_PER_PAGE } from "./constants";
 
 const getCommanditaireVaeCollectiveAndCohorteByIdQuery = graphql(`
   query getCommanditaireVaeCollectiveAndCohorteByIdQuery(
@@ -30,6 +33,9 @@ const getCommanditaireVaeCollectiveAndCohorteByIdQuery = graphql(`
             lastname
             email
           }
+          rolesSpecificToCohorte(
+            cohorteVaeCollectiveId: $cohorteVaeCollectiveId
+          )
         }
       }
     }
@@ -39,6 +45,22 @@ const getCommanditaireVaeCollectiveAndCohorteByIdQuery = graphql(`
     ) {
       id
       nom
+    }
+  }
+`);
+
+const updateRolesSpecificToCohorteOfSousCompteVaeCollectiveMutation = graphql(`
+  mutation updateRolesSpecificToCohorteOfSousCompteVaeCollective(
+    $commanditaireVaeCollectiveId: ID!
+    $cohorteVaeCollectiveId: ID!
+    $sousComptesIdsAndRoles: [SousCompteVaeCollectiveAndRoleInput!]!
+  ) {
+    vaeCollective_updateRolesSpecificToCohorteOfSousCompteVaeCollective(
+      commanditaireVaeCollectiveId: $commanditaireVaeCollectiveId
+      cohorteVaeCollectiveId: $cohorteVaeCollectiveId
+      sousComptesIdsAndRoles: $sousComptesIdsAndRoles
+    ) {
+      id
     }
   }
 `);
@@ -77,4 +99,41 @@ export const getCommanditaireVaeCollectiveAndCohorteById = async (
     cohorte,
     sousComptesPage,
   };
+};
+
+export const updateRolesSpecificToCohorteOfSousCompteVaeCollective = async ({
+  commanditaireVaeCollectiveId,
+  cohorteVaeCollectiveId,
+  sousComptesIdsAndRoles,
+}: {
+  commanditaireVaeCollectiveId: string;
+  cohorteVaeCollectiveId: string;
+  sousComptesIdsAndRoles: {
+    sousCompteVaeCollectiveId: string;
+    roles: RoleVaeCollective[];
+  }[];
+}) => {
+  const accessToken = await getAccessTokenFromCookie();
+
+  throwUrqlErrors(
+    await client.mutation(
+      updateRolesSpecificToCohorteOfSousCompteVaeCollectiveMutation,
+      {
+        commanditaireVaeCollectiveId,
+        cohorteVaeCollectiveId,
+        sousComptesIdsAndRoles,
+      },
+      {
+        fetchOptions: {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      },
+    ),
+  );
+
+  revalidatePath(
+    `/commanditaires/${commanditaireVaeCollectiveId}/cohortes/${cohorteVaeCollectiveId}/droits-acces`,
+  );
 };
