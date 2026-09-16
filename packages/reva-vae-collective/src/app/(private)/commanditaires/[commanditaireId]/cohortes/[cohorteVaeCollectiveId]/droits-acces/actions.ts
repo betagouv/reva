@@ -17,12 +17,13 @@ const getCommanditaireVaeCollectiveAndCohorteByIdQuery = graphql(`
     $cohorteVaeCollectiveId: ID!
     $offset: Int!
     $limit: Int!
+    $searchFilter: String
   ) {
     vaeCollective_getCommanditaireVaeCollective(
       commanditaireVaeCollectiveId: $commanditaireVaeCollectiveId
     ) {
       id
-      sousComptes(offset: $offset, limit: $limit) {
+      sousComptes(offset: $offset, limit: $limit, searchFilter: $searchFilter) {
         info {
           totalRows
         }
@@ -69,6 +70,7 @@ export const getCommanditaireVaeCollectiveAndCohorteById = async (
   commanditaireVaeCollectiveId: string,
   cohorteVaeCollectiveId: string,
   sousComptePage = 1,
+  searchFilter?: string,
 ) => {
   const accessToken = await getAccessTokenFromCookie();
 
@@ -80,6 +82,7 @@ export const getCommanditaireVaeCollectiveAndCohorteById = async (
         cohorteVaeCollectiveId,
         offset: (sousComptePage - 1) * RECORDS_PER_PAGE,
         limit: RECORDS_PER_PAGE,
+        searchFilter,
       },
       {
         fetchOptions: {

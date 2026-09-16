@@ -145,6 +145,98 @@ test.describe("Cohorte with more than one page of sous comptes", () => {
   });
 });
 
+test.describe("Searching for a sous compte", () => {
+  const allRows = [
+    {
+      id: "sous-compte-1",
+      account: {
+        firstname: "Jean",
+        lastname: "Dupont",
+        email: "jean.dupont@example.com",
+      },
+      rolesSpecificToCohorte: [],
+    },
+    {
+      id: "sous-compte-2",
+      account: {
+        firstname: "Marie",
+        lastname: "Curie",
+        email: "marie.curie@example.com",
+      },
+      rolesSpecificToCohorte: [],
+    },
+  ];
+
+  test.use({
+    mswHandlers: [
+      [
+        fvae.query(
+          "getCommanditaireVaeCollectiveAndCohorteByIdQuery",
+          ({ variables }) => {
+            const searchFilter = (variables.searchFilter as string) || "";
+            const rows = searchFilter
+              ? allRows.filter((row) =>
+                  row.account.firstname
+                    .toLowerCase()
+                    .includes(searchFilter.toLowerCase()),
+                )
+              : allRows;
+            return HttpResponse.json({
+              data: {
+                vaeCollective_getCommanditaireVaeCollective: {
+                  id: commanditaireId,
+                  sousComptes: {
+                    info: { totalRows: rows.length },
+                    rows,
+                  },
+                },
+                vaeCollective_getCohorteVaeCollectiveById: {
+                  id: cohorteVaeCollectiveId,
+                  nom: "macohorte",
+                },
+              },
+            });
+          },
+        ),
+        mockQueryActiveFeatures(),
+        mockQueryGetUserPermissions(),
+      ],
+      { scope: "test" },
+    ],
+  });
+
+  test("it should filter the sous comptes list when searching", async ({
+    page,
+  }) => {
+    await login({ page, role: "gestionnaireVaeCollective" });
+
+    await page.goto(pageUrl);
+
+    await expect(page.getByText("Curie Marie")).toBeVisible();
+
+    await page.getByRole("search").locator("input").fill("jean");
+    await page.getByRole("button", { name: "Rechercher" }).click();
+
+    await expect(page.getByText("Dupont Jean")).toBeVisible();
+    await expect(page.getByText("Curie Marie")).not.toBeVisible();
+  });
+
+  test("it should display an empty state when no sous compte matches the search", async ({
+    page,
+  }) => {
+    await login({ page, role: "gestionnaireVaeCollective" });
+
+    await page.goto(pageUrl);
+
+    await page.getByRole("search").locator("input").fill("nobody");
+    await page.getByRole("button", { name: "Rechercher" }).click();
+
+    await expect(
+      page.getByText("Aucun compte ne correspond à votre recherche."),
+    ).toBeVisible();
+  });
+});
+
 test.describe("Submitting the access rights form", () => {
   const sousCompteId = "sous-compte-1";
 

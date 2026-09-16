@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
+import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import Select from "@codegouvfr/react-dsfr/Select";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -77,8 +78,10 @@ export const AccessRightsForm = ({
 }) => {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchFilter, setSearchFilter] = useState("");
   const [visibleSousComptes, setVisibleSousComptes] =
     useState(initialSousComptes);
+  const [totalRowsCount, setTotalRowsCount] = useState(totalRows);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState<
     Record<string, SelectedRole>
@@ -92,9 +95,9 @@ export const AccessRightsForm = ({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const pageCount = Math.ceil(totalRows / RECORDS_PER_PAGE);
+  const pageCount = Math.ceil(totalRowsCount / RECORDS_PER_PAGE);
 
-  const loadPage = async (page: number) => {
+  const loadPage = async (page: number, filter: string = searchFilter) => {
     setIsLoadingPage(true);
     try {
       const { sousComptesPage } =
@@ -102,6 +105,7 @@ export const AccessRightsForm = ({
           commanditaireId,
           cohorteVaeCollectiveId,
           page,
+          filter || undefined,
         );
       const rows = (sousComptesPage?.rows ?? []).map(toAccessRight);
 
@@ -115,10 +119,16 @@ export const AccessRightsForm = ({
         return nextRoles;
       });
       setVisibleSousComptes(rows);
+      setTotalRowsCount(sousComptesPage?.info.totalRows ?? 0);
       setCurrentPage(page);
     } finally {
       setIsLoadingPage(false);
     }
+  };
+
+  const handleSearch = (filter: string) => {
+    setSearchFilter(filter);
+    loadPage(1, filter);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -142,66 +152,79 @@ export const AccessRightsForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <ul className="flex flex-col gap-1 list-none px-0 my-0">
-        {visibleSousComptes.map((sousCompte, index) => (
-          <li key={sousCompte.id}>
-            <SousCompteLine
-              firstname={sousCompte.firstname}
-              lastname={sousCompte.lastname}
-              email={sousCompte.email}
-              bottomDelimiter={index === visibleSousComptes.length - 1}
-              selectedRole={selectedRoles[sousCompte.id]}
-              onRoleChange={(role) =>
-                setSelectedRoles((previousRoles) => ({
-                  ...previousRoles,
-                  [sousCompte.id]: role,
-                }))
-              }
-            />
-          </li>
-        ))}
-      </ul>
-
-      <div className="flex justify-between items-center mt-6">
-        <Button
-          priority="tertiary"
-          linkProps={{
-            href: backUrl,
-          }}
-        >
-          Retour
-        </Button>
-        <div>
-          {pageCount > 1 && (
-            <Pagination
-              className="mt-4"
-              showFirstLast={false}
-              defaultPage={currentPage}
-              count={pageCount}
-              getPageLinkProps={(page) => ({
-                href: "#",
-                onClick: (event) => {
-                  event.preventDefault();
-                  if (page !== currentPage && !isLoadingPage) {
-                    loadPage(page);
+    <div className="flex flex-col">
+      <SearchBar
+        className="mb-12 w-[500px]"
+        label="Rechercher un nom, prénom, adresse électronique"
+        defaultValue={searchFilter}
+        onButtonClick={handleSearch}
+        allowEmptySearch
+      />
+      <form onSubmit={handleSubmit}>
+        {visibleSousComptes.length > 0 ? (
+          <ul className="flex flex-col gap-1 list-none px-0 my-0">
+            {visibleSousComptes.map((sousCompte, index) => (
+              <li key={sousCompte.id}>
+                <SousCompteLine
+                  firstname={sousCompte.firstname}
+                  lastname={sousCompte.lastname}
+                  email={sousCompte.email}
+                  bottomDelimiter={index === visibleSousComptes.length - 1}
+                  selectedRole={selectedRoles[sousCompte.id]}
+                  onRoleChange={(role) =>
+                    setSelectedRoles((previousRoles) => ({
+                      ...previousRoles,
+                      [sousCompte.id]: role,
+                    }))
                   }
-                },
-              })}
-            />
-          )}
-        </div>
-        <div>
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>Aucun compte ne correspond à votre recherche.</p>
+        )}
+
+        <div className="flex justify-between items-center mt-6">
           <Button
-            type="submit"
-            disabled={isSubmitting || isLoadingPage}
-            data-testid="submit-access-rights-button"
+            priority="tertiary"
+            linkProps={{
+              href: backUrl,
+            }}
           >
-            Enregistrer
+            Retour
           </Button>
+          <div>
+            {pageCount > 1 && (
+              <Pagination
+                className="mt-4"
+                showFirstLast={false}
+                defaultPage={currentPage}
+                count={pageCount}
+                getPageLinkProps={(page) => ({
+                  href: "#",
+                  onClick: (event) => {
+                    event.preventDefault();
+                    if (page !== currentPage && !isLoadingPage) {
+                      loadPage(page);
+                    }
+                  },
+                })}
+              />
+            )}
+          </div>
+          <div>
+            <Button
+              type="submit"
+              disabled={isSubmitting || isLoadingPage}
+              data-testid="submit-access-rights-button"
+            >
+              Enregistrer
+            </Button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
