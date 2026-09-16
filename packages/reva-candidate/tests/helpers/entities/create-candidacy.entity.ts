@@ -112,6 +112,7 @@ export const createCandidacyEntity = (
     candidacyStatuses,
     warningOnFeasibilitySubmission,
     certificationAuthorityLocalAccounts,
+    feasibilityFileDematAutonomeResourceHidden,
   } = options;
 
   const candidacy: CandidacyEntity = {
@@ -157,6 +158,7 @@ export const createCandidacyEntity = (
     endAccompagnementDate,
     candidacyDropOut,
     warningOnFeasibilitySubmission,
+    feasibilityFileDematAutonomeResourceHidden,
   };
 
   if (candidate) {
