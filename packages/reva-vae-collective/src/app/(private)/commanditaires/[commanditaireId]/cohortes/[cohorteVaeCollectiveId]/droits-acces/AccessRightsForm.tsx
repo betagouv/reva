@@ -3,15 +3,12 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { RoleVaeCollective } from "@/graphql/generated/graphql";
 
-import {
-  getCommanditaireVaeCollectiveAndCohorteById,
-  updateRolesSpecificToCohorteOfSousCompteVaeCollective,
-} from "./actions";
+import { updateRolesSpecificToCohorteOfSousCompteVaeCollective } from "./actions";
 import { RECORDS_PER_PAGE } from "./constants";
 
 type CohorteRole = Extract<
@@ -47,47 +44,33 @@ type SousCompteAccessRight = {
   roles: RoleVaeCollective[];
 };
 
-const toAccessRight = (row: {
-  id: string;
-  account?: {
-    firstname?: string | null;
-    lastname?: string | null;
-    email: string;
-  } | null;
-  rolesSpecificToCohorte: RoleVaeCollective[];
-}): SousCompteAccessRight => ({
-  id: row.id,
-  firstname: row.account?.firstname ?? "",
-  lastname: row.account?.lastname ?? "",
-  email: row.account?.email ?? "",
-  roles: row.rolesSpecificToCohorte,
-});
-
 export const AccessRightsForm = ({
   commanditaireId,
   cohorteVaeCollectiveId,
-  initialSousComptes,
+  sousComptes,
   totalRows,
   backUrl,
 }: {
   commanditaireId: string;
   cohorteVaeCollectiveId: string;
-  initialSousComptes: SousCompteAccessRight[];
+  sousComptes: SousCompteAccessRight[];
   totalRows: number;
   backUrl: string;
 }) => {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchFilter, setSearchFilter] = useState("");
-  const [visibleSousComptes, setVisibleSousComptes] =
-    useState(initialSousComptes);
-  const [totalRowsCount, setTotalRowsCount] = useState(totalRows);
-  const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [selectedRoles, setSelectedRoles] = useState<
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("page") ?? "1");
+  const searchFilter = searchParams.get("searchFilter") ?? "";
+
+  // Store the previous value of sousComptes to avoid unnecessary re-renders
+  const [previousSousComptes, setPreviousSousComptes] = useState(sousComptes);
+
+  const [selectedRoleBySousCompteId, setSelectedRoleBySousCompteId] = useState<
     Record<string, SelectedRole>
   >(() =>
     Object.fromEntries(
-      initialSousComptes.map((sousCompte) => [
+      sousComptes.map((sousCompte) => [
         sousCompte.id,
         getSelectedRole(sousCompte.roles),
       ]),
@@ -95,40 +78,32 @@ export const AccessRightsForm = ({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const pageCount = Math.ceil(totalRowsCount / RECORDS_PER_PAGE);
+  const pageCount = Math.ceil(totalRows / RECORDS_PER_PAGE);
 
-  const loadPage = async (page: number, filter: string = searchFilter) => {
-    setIsLoadingPage(true);
-    try {
-      const { sousComptesPage } =
-        await getCommanditaireVaeCollectiveAndCohorteById(
-          commanditaireId,
-          cohorteVaeCollectiveId,
-          page,
-          filter || undefined,
-        );
-      const rows = (sousComptesPage?.rows ?? []).map(toAccessRight);
-
-      setSelectedRoles((previousRoles) => {
-        const nextRoles = { ...previousRoles };
-        for (const sousCompte of rows) {
-          if (!(sousCompte.id in nextRoles)) {
-            nextRoles[sousCompte.id] = getSelectedRole(sousCompte.roles);
-          }
+  // Initialize new sousComptes entries in selectedRoleBySousCompteId during render when the sousComptes prop changes
+  // (rather than in a useEffect), per https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  if (sousComptes !== previousSousComptes) {
+    setPreviousSousComptes(sousComptes);
+    setSelectedRoleBySousCompteId((previousRoleBySousCompteId) => {
+      const nextRoleBySousCompteId = { ...previousRoleBySousCompteId };
+      let changed = false;
+      for (const sousCompte of sousComptes) {
+        if (!(sousCompte.id in nextRoleBySousCompteId)) {
+          nextRoleBySousCompteId[sousCompte.id] = getSelectedRole(
+            sousCompte.roles,
+          );
+          changed = true;
         }
-        return nextRoles;
-      });
-      setVisibleSousComptes(rows);
-      setTotalRowsCount(sousComptesPage?.info.totalRows ?? 0);
-      setCurrentPage(page);
-    } finally {
-      setIsLoadingPage(false);
-    }
-  };
+      }
+      return changed ? nextRoleBySousCompteId : previousRoleBySousCompteId;
+    });
+  }
 
   const handleSearch = (filter: string) => {
-    setSearchFilter(filter);
-    loadPage(1, filter);
+    const params = new URLSearchParams(searchParams);
+    params.set("searchFilter", filter);
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -138,7 +113,7 @@ export const AccessRightsForm = ({
       await updateRolesSpecificToCohorteOfSousCompteVaeCollective({
         commanditaireVaeCollectiveId: commanditaireId,
         cohorteVaeCollectiveId,
-        sousComptesIdsAndRoles: Object.entries(selectedRoles).map(
+        sousComptesIdsAndRoles: Object.entries(selectedRoleBySousCompteId).map(
           ([sousCompteVaeCollectiveId, role]) => ({
             sousCompteVaeCollectiveId,
             roles: role === NO_ROLE ? [] : [role],
@@ -154,6 +129,7 @@ export const AccessRightsForm = ({
   return (
     <div className="flex flex-col">
       <SearchBar
+        key={searchFilter}
         className="mb-12 w-[500px]"
         label="Rechercher un nom, prénom, adresse électronique"
         defaultValue={searchFilter}
@@ -161,21 +137,23 @@ export const AccessRightsForm = ({
         allowEmptySearch
       />
       <form onSubmit={handleSubmit}>
-        {visibleSousComptes.length > 0 ? (
+        {sousComptes.length > 0 ? (
           <ul className="flex flex-col gap-1 list-none px-0 my-0">
-            {visibleSousComptes.map((sousCompte, index) => (
+            {sousComptes.map((sousCompte, index) => (
               <li key={sousCompte.id}>
                 <SousCompteLine
                   firstname={sousCompte.firstname}
                   lastname={sousCompte.lastname}
                   email={sousCompte.email}
-                  bottomDelimiter={index === visibleSousComptes.length - 1}
-                  selectedRole={selectedRoles[sousCompte.id]}
+                  bottomDelimiter={index === sousComptes.length - 1}
+                  selectedRole={selectedRoleBySousCompteId[sousCompte.id]}
                   onRoleChange={(role) =>
-                    setSelectedRoles((previousRoles) => ({
-                      ...previousRoles,
-                      [sousCompte.id]: role,
-                    }))
+                    setSelectedRoleBySousCompteId(
+                      (previousRoleBySousCompteId) => ({
+                        ...previousRoleBySousCompteId,
+                        [sousCompte.id]: role,
+                      }),
+                    )
                   }
                 />
               </li>
@@ -201,22 +179,18 @@ export const AccessRightsForm = ({
                 showFirstLast={false}
                 defaultPage={currentPage}
                 count={pageCount}
-                getPageLinkProps={(page) => ({
-                  href: "#",
-                  onClick: (event) => {
-                    event.preventDefault();
-                    if (page !== currentPage && !isLoadingPage) {
-                      loadPage(page);
-                    }
-                  },
-                })}
+                getPageLinkProps={(page) => {
+                  const params = new URLSearchParams(searchParams);
+                  params.set("page", String(page));
+                  return { href: `${pathname}?${params.toString()}` };
+                }}
               />
             )}
           </div>
           <div>
             <Button
               type="submit"
-              disabled={isSubmitting || isLoadingPage}
+              disabled={isSubmitting}
               data-testid="submit-access-rights-button"
             >
               Enregistrer

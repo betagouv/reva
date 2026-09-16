@@ -5,15 +5,22 @@ import { getCommanditaireVaeCollectiveAndCohorteById } from "./actions";
 
 export default async function AccessRightsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ commanditaireId: string; cohorteVaeCollectiveId: string }>;
+  searchParams: Promise<{ page?: string; searchFilter?: string }>;
 }) {
   const { commanditaireId, cohorteVaeCollectiveId } = await params;
+  const { page, searchFilter } = await searchParams;
+
+  const currentPage = page ? Number(page) : 1;
 
   const { cohorte, sousComptesPage } =
     await getCommanditaireVaeCollectiveAndCohorteById(
       commanditaireId,
       cohorteVaeCollectiveId,
+      currentPage,
+      searchFilter || undefined,
     );
 
   if (!cohorte) {
@@ -46,7 +53,7 @@ export default async function AccessRightsPage({
         commanditaireId={commanditaireId}
         cohorteVaeCollectiveId={cohorteVaeCollectiveId}
         totalRows={sousComptesPage?.info.totalRows ?? 0}
-        initialSousComptes={(sousComptesPage?.rows ?? []).map((sousCompte) => ({
+        sousComptes={(sousComptesPage?.rows ?? []).map((sousCompte) => ({
           id: sousCompte.id,
           firstname: sousCompte.account?.firstname ?? "",
           lastname: sousCompte.account?.lastname ?? "",

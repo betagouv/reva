@@ -88,8 +88,9 @@ test.describe("Cohorte with more than one page of sous comptes", () => {
 
     await page.goto(pageUrl);
 
-    await page.getByRole("button", { name: "2", exact: true }).click();
+    await page.getByRole("link", { name: "2", exact: true }).click();
 
+    await expect(page).toHaveURL(/page=2/);
     await expect(page.getByText("Curie Marie")).toBeVisible();
     await expect(page.getByText("marie.curie@example.com")).toBeVisible();
   });
@@ -105,10 +106,12 @@ test.describe("Cohorte with more than one page of sous comptes", () => {
       .getByRole("combobox", { name: "Droits d'accès de Jean Dupont1" })
       .selectOption("LECTEUR_COHORTE");
 
-    await page.getByRole("button", { name: "2", exact: true }).click();
+    await page.getByRole("link", { name: "2", exact: true }).click();
+    await expect(page).toHaveURL(/page=2/);
     await expect(page.getByText("Curie Marie")).toBeVisible();
 
-    await page.getByRole("button", { name: "1", exact: true }).click();
+    await page.getByRole("link", { name: "1", exact: true }).click();
+    await expect(page).toHaveURL(/page=1/);
 
     await expect(
       page.getByRole("combobox", { name: "Droits d'accès de Jean Dupont1" }),
@@ -217,6 +220,8 @@ test.describe("Searching for a sous compte", () => {
     await page.getByRole("search").locator("input").fill("jean");
     await page.getByRole("button", { name: "Rechercher" }).click();
 
+    await expect(page).toHaveURL(/searchFilter=jean/);
+    await expect(page).toHaveURL(/page=1/);
     await expect(page.getByText("Dupont Jean")).toBeVisible();
     await expect(page.getByText("Curie Marie")).not.toBeVisible();
   });
@@ -424,7 +429,8 @@ test.describe("Submitting after visiting multiple pages", () => {
       .getByRole("combobox", { name: "Droits d'accès de Jean Dupont0" })
       .selectOption("EDITEUR_COHORTE");
 
-    await page.getByRole("button", { name: "2", exact: true }).click();
+    await page.getByRole("link", { name: "2", exact: true }).click();
+    await expect(page).toHaveURL(/page=2/);
     await page
       .getByRole("combobox", { name: "Droits d'accès de Marie Curie" })
       .selectOption("LECTEUR_COHORTE");
