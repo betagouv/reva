@@ -82,7 +82,11 @@ export const setCandidacyTypeAccompagnementToAutonome = async ({
     }
   }
 
-  // Si pas de DF envoyé, on passe au DF papier
+  const isDfDematAutonomeActive = await prismaClient.feature.findFirst({
+    where: { key: "DF_DEMAT_AUTONOME", isActive: true },
+  });
+
+  // Si pas de DF envoyé, on passe au DF pdf ou dématérialisé suivant la feature DF_DEMAT_AUTONOME
   return prismaClient.$transaction(async (tx) => {
     if (needsStatusRollback) {
       await updateCandidacyStatus({
@@ -95,7 +99,9 @@ export const setCandidacyTypeAccompagnementToAutonome = async ({
       where: { id: candidacyId },
       data: {
         typeAccompagnement: "AUTONOME",
-        feasibilityFormat: "UPLOADED_PDF",
+        feasibilityFormat: isDfDematAutonomeActive
+          ? "DEMATERIALIZED"
+          : "UPLOADED_PDF",
         organism: { disconnect: true },
       },
     });
