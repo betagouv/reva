@@ -127,12 +127,17 @@ const unsafeResolvers = {
       }),
     sousComptes: async (
       { id: commanditaireVaeCollectiveId }: { id: string },
-      { offset, limit }: { offset: number; limit: number },
+      {
+        offset,
+        limit,
+        searchFilter,
+      }: { offset: number; limit: number; searchFilter?: string },
     ) =>
       getSousComptesByCommanditaireVaeCollectiveId({
         commanditaireVaeCollectiveId,
         offset,
         limit,
+        searchFilter,
       }),
   },
   Query: {

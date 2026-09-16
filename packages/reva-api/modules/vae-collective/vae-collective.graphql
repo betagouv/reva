@@ -37,7 +37,11 @@ type CommanditaireVaeCollective {
   createdAt: Timestamp!
   cohorteVaeCollectives(offset: Int, limit: Int): CohorteVaeCollectivePage!
   metabaseDashboardIframeUrl: String
-  sousComptes(offset: Int, limit: Int): SousCompteVaeCollectivePage!
+  sousComptes(
+    offset: Int
+    limit: Int
+    searchFilter: String
+  ): SousCompteVaeCollectivePage!
 }
 
 type CommanditaireVaeCollectivePage {

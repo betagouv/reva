@@ -15,11 +15,12 @@ const vaeCollective_getCommanditaireVaeCollectiveSousComptes = graphql(`
     $commanditaireVaeCollectiveId: ID!
     $offset: Int
     $limit: Int
+    $searchFilter: String
   ) {
     vaeCollective_getCommanditaireVaeCollective(
       commanditaireVaeCollectiveId: $commanditaireVaeCollectiveId
     ) {
-      sousComptes(offset: $offset, limit: $limit) {
+      sousComptes(offset: $offset, limit: $limit, searchFilter: $searchFilter) {
         rows {
           id
           account {
@@ -39,12 +40,14 @@ const getSousComptes = ({
   commanditaireVaeCollectiveId,
   offset,
   limit,
+  searchFilter,
   role,
   keycloakId,
 }: {
   commanditaireVaeCollectiveId: string;
   offset?: number;
   limit?: number;
+  searchFilter?: string;
   role: KeyCloakUserRole;
   keycloakId?: string;
 }) => {
@@ -56,7 +59,7 @@ const getSousComptes = ({
 
   return graphqlClient.request(
     vaeCollective_getCommanditaireVaeCollectiveSousComptes,
-    { commanditaireVaeCollectiveId, offset, limit },
+    { commanditaireVaeCollectiveId, offset, limit, searchFilter },
   );
 };
 
@@ -131,6 +134,84 @@ describe("get sous comptes of a commanditaire vae collective", () => {
         (row) => row.account.id,
       ),
     ).toContain(sousCompteAccount.id);
+  });
+
+  test("should filter the sous comptes by firstname, lastname or email", async () => {
+    const cohorteVaeCollective = await createCohorteVaeCollectiveHelper();
+    const commanditaireVaeCollectiveId =
+      cohorteVaeCollective.commanditaireVaeCollectiveId;
+    const userKeycloakId =
+      cohorteVaeCollective.commanditaireVaeCollective?.gestionnaire?.keycloakId;
+
+    if (!userKeycloakId) {
+      throw new Error("Compte gestionnaire non trouvé");
+    }
+
+    const matchingAccount = await createAccountHelper({
+      firstname: "Jean",
+      lastname: "Dupont",
+      email: "jean.dupont@example.com",
+    });
+    const otherAccount = await createAccountHelper({
+      firstname: "Alice",
+      lastname: "Martin",
+      email: "alice.martin@example.com",
+    });
+
+    await prismaClient.sousCompteVaeCollective.create({
+      data: {
+        commanditaireVaeCollectiveId,
+        accountId: matchingAccount.id,
+      },
+    });
+    await prismaClient.sousCompteVaeCollective.create({
+      data: {
+        commanditaireVaeCollectiveId,
+        accountId: otherAccount.id,
+      },
+    });
+
+    const resByFirstname = await getSousComptes({
+      commanditaireVaeCollectiveId,
+      offset: 0,
+      limit: 10,
+      searchFilter: "jean",
+      role: "manage_vae_collective",
+      keycloakId: userKeycloakId,
+    });
+    expect(
+      resByFirstname.vaeCollective_getCommanditaireVaeCollective.sousComptes.rows.map(
+        (row) => row.account.id,
+      ),
+    ).toEqual([matchingAccount.id]);
+
+    const resByLastname = await getSousComptes({
+      commanditaireVaeCollectiveId,
+      offset: 0,
+      limit: 10,
+      searchFilter: "dupont",
+      role: "manage_vae_collective",
+      keycloakId: userKeycloakId,
+    });
+    expect(
+      resByLastname.vaeCollective_getCommanditaireVaeCollective.sousComptes.rows.map(
+        (row) => row.account.id,
+      ),
+    ).toEqual([matchingAccount.id]);
+
+    const resByEmail = await getSousComptes({
+      commanditaireVaeCollectiveId,
+      offset: 0,
+      limit: 10,
+      searchFilter: "jean.dupont@example.com",
+      role: "manage_vae_collective",
+      keycloakId: userKeycloakId,
+    });
+    expect(
+      resByEmail.vaeCollective_getCommanditaireVaeCollective.sousComptes.rows.map(
+        (row) => row.account.id,
+      ),
+    ).toEqual([matchingAccount.id]);
   });
 
   test("should not let a gestionnaire of a different commanditaire list the sous comptes", async () => {
