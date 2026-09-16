@@ -321,13 +321,14 @@ test.describe("Next actions tiles", () => {
       });
     });
 
-    test.describe("Envoyer mon dossier de faisabilité", () => {
+    test.describe("Envoyer mon dossier de faisabilité pdf", () => {
       const candidate = createCandidateEntity();
       const candidacy = createCandidacyEntity({
         candidate,
         status: "PROJET",
         certification: createCertificationEntity(),
         feasibility: null,
+        feasibilityFormat: "UPLOADED_PDF",
       });
       const { handlers, dashboardWait } = dashboardHandlers({
         candidacy,
@@ -353,6 +354,81 @@ test.describe("Next actions tiles", () => {
         ]);
         await expect(page).toHaveURL(
           `/candidat/candidates/${candidacy.candidate?.id}/candidacies/${candidacy.id}/feasibility/`,
+        );
+      });
+    });
+
+    test.describe("Envoyer mon dossier de faisabilité dématérialisé ressources", () => {
+      const candidate = createCandidateEntity();
+      const candidacy = createCandidacyEntity({
+        candidate,
+        status: "PROJET",
+        certification: createCertificationEntity(),
+        feasibility: null,
+        feasibilityFormat: "DEMATERIALIZED",
+      });
+      const { handlers, dashboardWait } = dashboardHandlers({
+        candidacy,
+      });
+      test.use({
+        mswHandlers: [handlers, { scope: "test" }],
+      });
+
+      test("shows 'Envoyer mon dossier de faisabilité' and routes", async ({
+        page,
+      }) => {
+        await login(page);
+        await dashboardWait(page);
+        const btn = page.getByRole("button", {
+          name: "Envoyer mon dossier de faisabilité",
+        });
+        await expect(btn).toBeVisible();
+        await Promise.all([
+          page.waitForURL(
+            `/candidat/candidates/${candidacy.candidate?.id}/candidacies/${candidacy.id}/feasibility-demat-autonome-resources/`,
+          ),
+          btn.click(),
+        ]);
+        await expect(page).toHaveURL(
+          `/candidat/candidates/${candidacy.candidate?.id}/candidacies/${candidacy.id}/feasibility-demat-autonome-resources/`,
+        );
+      });
+    });
+
+    test.describe("Envoyer mon dossier de faisabilité dématérialisé", () => {
+      const candidate = createCandidateEntity();
+      const candidacy = createCandidacyEntity({
+        candidate,
+        status: "PROJET",
+        certification: createCertificationEntity(),
+        feasibility: null,
+        feasibilityFormat: "DEMATERIALIZED",
+        feasibilityFileDematAutonomeResourceHidden: true,
+      });
+      const { handlers, dashboardWait } = dashboardHandlers({
+        candidacy,
+      });
+      test.use({
+        mswHandlers: [handlers, { scope: "test" }],
+      });
+
+      test("shows 'Envoyer mon dossier de faisabilité' and routes", async ({
+        page,
+      }) => {
+        await login(page);
+        await dashboardWait(page);
+        const btn = page.getByRole("button", {
+          name: "Envoyer mon dossier de faisabilité",
+        });
+        await expect(btn).toBeVisible();
+        await Promise.all([
+          page.waitForURL(
+            `/candidat/candidates/${candidacy.candidate?.id}/candidacies/${candidacy.id}/feasibility-demat-autonome/`,
+          ),
+          btn.click(),
+        ]);
+        await expect(page).toHaveURL(
+          `/candidat/candidates/${candidacy.candidate?.id}/candidacies/${candidacy.id}/feasibility-demat-autonome/`,
         );
       });
     });
