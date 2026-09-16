@@ -73,13 +73,16 @@ export const createCandidacy = async ({
           status: CandidacyStatusStep.PROJET,
         },
       },
-      ccnId: typeAccompagnement === "ACCOMPAGNE" ? candidate?.ccnId : null,
+      ccnId:
+        isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
+          ? candidate?.ccnId
+          : null,
       typology:
-        typeAccompagnement === "ACCOMPAGNE"
+        isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
           ? (candidate?.typology ?? CandidateTypology.NON_SPECIFIE)
           : CandidateTypology.NON_SPECIFIE,
       typologyAdditional:
-        typeAccompagnement === "ACCOMPAGNE"
+        isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
           ? candidate?.typologyAdditional
           : null,
     },

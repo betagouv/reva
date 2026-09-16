@@ -1,8 +1,10 @@
-import { FeasibilityFormat } from "@prisma/client";
+import { CandidateTypology, FeasibilityFormat } from "@prisma/client";
 
 import { authorizationHeaderForUser } from "@/test/helpers/authorization-helper";
+import { createCandidacyCCNHelper } from "@/test/helpers/entities/create-candidacy-ccn-helper";
 import { createCandidateHelper } from "@/test/helpers/entities/create-candidate-helper";
 import { createCertificationHelper } from "@/test/helpers/entities/create-certification-helper";
+import { createFeatureHelper } from "@/test/helpers/entities/create-feature-helper";
 import { createOrganismHelper } from "@/test/helpers/entities/create-organism-helper";
 import { createCohorteVaeCollectiveHelper } from "@/test/helpers/entities/create-vae-collective-helper";
 import { getGraphQLClient } from "@/test/test-graphql-client";
@@ -33,6 +35,8 @@ const createCandidacyMutation = graphql(`
       cohorteVaeCollective {
         id
       }
+      ccnId
+      typology
     }
   }
 `);
@@ -138,5 +142,101 @@ describe("createCandidacy", () => {
     expect(result.candidacy_createCandidacy?.cohorteVaeCollective?.id).toBe(
       cohorte.id,
     );
+  });
+
+  test("should assign the ccn and typology to the candidacy ACCOMPAGNE", async () => {
+    const conventionCollective = await createCandidacyCCNHelper();
+    const candidate = await createCandidateHelper({
+      ccnId: conventionCollective.id,
+      typology: CandidateTypology.SALARIE_PRIVE,
+    });
+    const certification = await createCertificationHelper({
+      feasibilityFormat: FeasibilityFormat.DEMATERIALIZED,
+    });
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "candidate",
+          keycloakId: candidate.keycloakId,
+        }),
+      },
+    });
+
+    const result = await graphqlClient.request(createCandidacyMutation, {
+      candidateId: candidate.id,
+      certificationId: certification.id,
+      typeAccompagnement: "ACCOMPAGNE",
+    });
+
+    expect(result.candidacy_createCandidacy?.ccnId).toBe(candidate.ccnId);
+    expect(result.candidacy_createCandidacy?.typology).toBe(candidate.typology);
+  });
+
+  test("should not assign the ccn and typology to the candidacy AUTONOME", async () => {
+    const conventionCollective = await createCandidacyCCNHelper();
+    const candidate = await createCandidateHelper({
+      ccnId: conventionCollective.id,
+      typology: CandidateTypology.SALARIE_PRIVE,
+    });
+    const certification = await createCertificationHelper({
+      feasibilityFormat: FeasibilityFormat.DEMATERIALIZED,
+    });
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "candidate",
+          keycloakId: candidate.keycloakId,
+        }),
+      },
+    });
+
+    const result = await graphqlClient.request(createCandidacyMutation, {
+      candidateId: candidate.id,
+      certificationId: certification.id,
+      typeAccompagnement: "AUTONOME",
+    });
+
+    expect(result.candidacy_createCandidacy?.ccnId).toBeNull();
+    expect(result.candidacy_createCandidacy?.typology).toBe(
+      CandidateTypology.NON_SPECIFIE,
+    );
+  });
+
+  test("should assign the ccn and typology to the candidacy AUTONOME if DF Demat Autonome feature is active", async () => {
+    await createFeatureHelper({
+      args: {
+        key: "DF_DEMAT_AUTONOME",
+        isActive: true,
+      },
+    });
+
+    const conventionCollective = await createCandidacyCCNHelper();
+    const candidate = await createCandidateHelper({
+      ccnId: conventionCollective.id,
+      typology: CandidateTypology.SALARIE_PRIVE,
+    });
+    const certification = await createCertificationHelper({
+      feasibilityFormat: FeasibilityFormat.DEMATERIALIZED,
+    });
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "candidate",
+          keycloakId: candidate.keycloakId,
+        }),
+      },
+    });
+
+    const result = await graphqlClient.request(createCandidacyMutation, {
+      candidateId: candidate.id,
+      certificationId: certification.id,
+      typeAccompagnement: "AUTONOME",
+    });
+
+    expect(result.candidacy_createCandidacy?.ccnId).toBe(candidate.ccnId);
+    expect(result.candidacy_createCandidacy?.typology).toBe(candidate.typology);
   });
 });
