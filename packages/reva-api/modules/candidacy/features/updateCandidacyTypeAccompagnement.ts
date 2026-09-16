@@ -99,15 +99,16 @@ export const updateCandidacyTypeAccompagnement = async ({
         isCertificationPartial: null,
         firstAppointmentOccuredAt: null,
         ccn:
-          typeAccompagnement === "ACCOMPAGNE" && candidacy.candidate?.ccnId
+          (isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE") &&
+          candidacy.candidate?.ccnId
             ? { connect: { id: candidacy.candidate.ccnId } }
             : { disconnect: true },
         typology:
-          typeAccompagnement === "ACCOMPAGNE"
+          isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
             ? (candidacy.candidate?.typology ?? CandidateTypology.NON_SPECIFIE)
             : CandidateTypology.NON_SPECIFIE,
         typologyAdditional:
-          typeAccompagnement === "ACCOMPAGNE"
+          isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
             ? (candidacy.candidate?.typologyAdditional ?? null)
             : null,
         feasibilityFormat:
