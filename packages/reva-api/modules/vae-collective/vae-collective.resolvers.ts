@@ -1,3 +1,5 @@
+import { RoleVaeCollective } from "@prisma/client";
+
 import {
   isAdmin,
   isAdminOrGestionnaireOfCommanditaireVaeCollective,
@@ -32,6 +34,7 @@ import { publishCohorteVAECollective } from "./features/publishCohorteVAECollect
 import { updateCohorteVAECollectiveCertification } from "./features/updateCohorteVAECollectiveCertification";
 import { updateCohorteVAECollectiveOrganism } from "./features/updateCohorteVAECollectiveOrganism";
 import { updateNomCohorteVaeCollective } from "./features/updateNomCohorteVaeCollective";
+import { updateRolesSpecificToCohorteOfSousCompteVaeCollective } from "./features/updateRolesSpecificToCohorteOfSousCompteVaeCollective";
 import { updateSousCompteVaeCollective } from "./features/updateSousCompteVaeCollective";
 import { hasVaeCollectivePermission } from "./security/hasVaeCollectivePermission";
 
@@ -313,6 +316,26 @@ const unsafeResolvers = {
         sousCompteVaeCollectiveId,
         canCreateCohorteVaeCollective,
       }),
+    vaeCollective_updateRolesSpecificToCohorteOfSousCompteVaeCollective: async (
+      _parent: unknown,
+      {
+        commanditaireVaeCollectiveId,
+        cohorteVaeCollectiveId,
+        sousComptesIdsAndRoles,
+      }: {
+        commanditaireVaeCollectiveId: string;
+        cohorteVaeCollectiveId: string;
+        sousComptesIdsAndRoles: {
+          sousCompteVaeCollectiveId: string;
+          roles: RoleVaeCollective[];
+        }[];
+      },
+    ) =>
+      updateRolesSpecificToCohorteOfSousCompteVaeCollective({
+        commanditaireVaeCollectiveId,
+        cohorteVaeCollectiveId,
+        sousComptesIdsAndRoles,
+      }),
   },
 };
 
@@ -388,5 +411,7 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     vaeCollective_updateSousCompteVaeCollective: hasVaeCollectivePermission(
       "MODIFIER_SOUS_COMPTE",
     ),
+    vaeCollective_updateRolesSpecificToCohorteOfSousCompteVaeCollective:
+      hasVaeCollectivePermission("MODIFIER_DROITS_ACCES_COHORTE"),
   },
 });

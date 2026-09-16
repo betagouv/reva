@@ -103,6 +103,11 @@ type Query {
   ): SousCompteVaeCollective!
 }
 
+input SousCompteVaeCollectiveAndRoleInput {
+  sousCompteVaeCollectiveId: ID!
+  roles: [RoleVaeCollective!]!
+}
+
 type Mutation {
   vaeCollective_createCohorteVaeCollective(
     commanditaireVaeCollectiveId: ID!
@@ -155,4 +160,10 @@ type Mutation {
     sousCompteVaeCollectiveId: ID!
     canCreateCohorteVaeCollective: Boolean!
   ): SousCompteVaeCollective!
+
+  vaeCollective_updateRolesSpecificToCohorteOfSousCompteVaeCollective(
+    commanditaireVaeCollectiveId: ID!
+    cohorteVaeCollectiveId: ID!
+    sousComptesIdsAndRoles: [SousCompteVaeCollectiveAndRoleInput!]!
+  ): CohorteVaeCollective!
 }
