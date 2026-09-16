@@ -116,23 +116,14 @@ const getNextActionTiles = ({
     candidacy.jury?.result || "",
   );
 
-  let feasibilityUrlAutonome: string = ROUTES.FEASIBILITY;
-
-  if (candidacy?.feasibilityFormat === "DEMATERIALIZED") {
-    feasibilityUrlAutonome =
-      candidacy.feasibilityFileDematAutonomeResourceHidden
-        ? "./feasibility-demat-autonome"
-        : "./feasibility-demat-autonome-resources";
-  }
-
   const rules: { condition: boolean; tile: NextActionTile }[] = [
-    // DF DEMATERIALIZED : Compléter mes objectifs
+    // Compléter mes objectifs
     {
       condition:
         candidacy?.feasibilityFormat === "DEMATERIALIZED" && goalsCount === 0,
       tile: { title: "Compléter mes objectifs", link: ROUTES.SET_GOALS },
     },
-    // DF DEMATERIALIZED : Compléter mes formations
+    // AUTONOME : Compléter mes formations
     {
       condition:
         isAutonome &&
@@ -140,7 +131,7 @@ const getNextActionTiles = ({
         !hasCompletedFormations,
       tile: { title: "Compléter mes formations", link: ROUTES.SET_FORMATIONS },
     },
-    // DF DEMATERIALIZED : Compléter mes expériences
+    // Compléter mes expériences
     {
       condition:
         candidacy?.feasibilityFormat === "DEMATERIALIZED" &&
@@ -190,15 +181,16 @@ const getNextActionTiles = ({
       },
     },
 
+    //! AUTONOME
     // AUTONOME Envoyer mon dossier de faisabilité
     {
       condition:
-        isAutonome &&
+        !isAccompagne &&
         (!feasibility?.feasibilityFileSentAt ||
           feasibility?.decision === "INCOMPLETE"),
       tile: {
         title: "Envoyer mon dossier de faisabilité",
-        link: feasibilityUrlAutonome,
+        link: ROUTES.FEASIBILITY,
       },
     },
 
