@@ -13,7 +13,12 @@ import { getUserPermissions } from "../features/getUserPermissions";
 // commanditaire ne suffit pas, il faut aussi vérifier que la cohorte visée
 // (args.cohorteVaeCollectiveId) appartient bien à ce commanditaire.
 const COHORTE_SCOPED_PERMISSIONS: ReadonlySet<PermissionVaeCollective> =
-  new Set(["VOIR_COHORTE", "MODIFIER_COHORTE", "SUPPRIMER_COHORTE"]);
+  new Set([
+    "VOIR_COHORTE",
+    "MODIFIER_COHORTE",
+    "SUPPRIMER_COHORTE",
+    "MODIFIER_DROITS_ACCES_COHORTE",
+  ]);
 
 // Permissions portant sur un sous-compte précis : le simple rattachement au
 // commanditaire ne suffit pas, il faut aussi vérifier que le sous-compte visé
