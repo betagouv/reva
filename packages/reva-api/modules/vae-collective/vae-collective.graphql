@@ -76,6 +76,8 @@ enum PermissionVaeCollective {
 enum RoleVaeCollective {
   ADMINISTRATEUR_PORTEUR_DE_PROJET
   CREATEUR_COHORTE
+  LECTEUR_COHORTE
+  EDITEUR_COHORTE
 }
 
 type Query {
