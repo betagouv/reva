@@ -21,7 +21,8 @@ const PostLoginClient = ({
 }: PostLoginClientProps) => {
   const { resetKeycloakInstance, authenticated } = useKeycloakContext();
   const [ready, setReady] = useState(false);
-  const { isVAECollectiveManager, isAdmin } = useAuth();
+  const { isVAECollectiveManager, isSousCompteVaeCollective, isAdmin } =
+    useAuth();
 
   useEffect(() => {
     if (!ready) {
@@ -32,7 +33,7 @@ const PostLoginClient = ({
 
   useEffect(() => {
     if (ready && authenticated && redirectAfterLogin) {
-      if (isVAECollectiveManager) {
+      if (isVAECollectiveManager || isSousCompteVaeCollective) {
         redirect(`/commanditaires/${commanditaireVaeCollectiveId}/cohortes`);
       }
 
@@ -44,6 +45,7 @@ const PostLoginClient = ({
     ready,
     authenticated,
     isVAECollectiveManager,
+    isSousCompteVaeCollective,
     isAdmin,
     commanditaireVaeCollectiveId,
     redirectAfterLogin,
