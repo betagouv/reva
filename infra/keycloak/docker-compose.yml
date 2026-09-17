@@ -16,7 +16,7 @@ services:
     restart: always
   keycloak:
     restart: always
-    image: quay.io/keycloak/keycloak:26.6.4
+    image: quay.io/keycloak/keycloak:26.7.4
     volumes:
       - ./themes/francevae:/opt/keycloak/themes/francevae
       - ./themes/francevae-candidate:/opt/keycloak/themes/francevae-candidate
