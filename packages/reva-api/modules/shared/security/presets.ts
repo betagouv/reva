@@ -19,6 +19,7 @@ import { isCertificationRegistryManagerOfCertification } from "./middlewares/isC
 import { isExperienceOfCandidacy } from "./middlewares/isExperienceOfCandidacy";
 import { isFeasibilityManager } from "./middlewares/isFeasibilityManager";
 import { isGestionnaireOfCommanditaireVaeCollective } from "./middlewares/isGestionnaireOfCommanditaireVaeCollective";
+import { isGestionnaireOrSousCompteOfCommanditaireVaeCollective } from "./middlewares/isGestionnaireOrSousCompteOfCommanditaireVaeCollective";
 import { isUserOwnerOfCandidate } from "./middlewares/isUserOwnerOfCandidate";
 
 export const isAdminOrManager = [hasRole(["admin", "manage_candidacy"])];
@@ -160,6 +161,14 @@ export const isAdminOrGestionnaireOfCommanditaireVaeCollective = [
   whenHasRole(
     "manage_vae_collective",
     isGestionnaireOfCommanditaireVaeCollective,
+  ),
+];
+
+export const isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective = [
+  hasRole(["admin", "manage_vae_collective"]),
+  whenHasRole(
+    "manage_vae_collective",
+    isGestionnaireOrSousCompteOfCommanditaireVaeCollective,
   ),
 ];
 
