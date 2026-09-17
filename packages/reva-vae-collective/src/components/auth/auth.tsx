@@ -8,7 +8,8 @@ export const useAuth = () => {
   const { accessToken } = useKeycloakContext();
 
   let isAdmin,
-    isVAECollectiveManager = false;
+    isVAECollectiveManager,
+    isSousCompteVaeCollective = false;
 
   let roles: UserRole[] = [];
 
@@ -21,11 +22,13 @@ export const useAuth = () => {
       []) as UserRole[];
     isAdmin = roles.includes("admin");
     isVAECollectiveManager = roles.includes("manage_vae_collective");
+    isSousCompteVaeCollective = roles.includes("sous_compte_vae_collective");
   }
 
   return {
     roles,
     isAdmin,
     isVAECollectiveManager,
+    isSousCompteVaeCollective,
   };
 };
