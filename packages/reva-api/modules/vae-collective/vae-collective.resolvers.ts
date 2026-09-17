@@ -3,6 +3,7 @@ import { RoleVaeCollective } from "@prisma/client";
 import {
   isAdmin,
   isAdminOrGestionnaireOfCommanditaireVaeCollective,
+  isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
   isAnyone,
 } from "@/modules/shared/security/presets";
 import { withPolicies } from "@/modules/shared/security/withPolicies";
@@ -379,7 +380,7 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
   },
   Query: {
     vaeCollective_getCommanditaireVaeCollective:
-      isAdminOrGestionnaireOfCommanditaireVaeCollective,
+      isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
     cohorteVaeCollective: isAnyone,
     // La sécurité est gérée dans la feature (filtre par rapport au rôle de l'utilisateur)
     cohortesVaeCollectivesForConnectedAap: isAnyone,
