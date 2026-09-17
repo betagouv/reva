@@ -9,17 +9,26 @@ import { redirectCommanditaireVaeCollective } from "./actions";
 
 export default function Home() {
   const { authenticated } = useKeycloakContext();
-  const { isAdmin, isVAECollectiveManager } = useAuth();
+  const { isAdmin, isVAECollectiveManager, isSousCompteVaeCollective } =
+    useAuth();
 
   useEffect(() => {
     if (authenticated && isAdmin) {
       redirect("/commanditaires");
     }
 
-    if (authenticated && isVAECollectiveManager) {
+    if (
+      authenticated &&
+      (isVAECollectiveManager || isSousCompteVaeCollective)
+    ) {
       redirectCommanditaireVaeCollective();
     }
-  }, [authenticated, isAdmin, isVAECollectiveManager]);
+  }, [
+    authenticated,
+    isAdmin,
+    isVAECollectiveManager,
+    isSousCompteVaeCollective,
+  ]);
 
   return null;
 }
