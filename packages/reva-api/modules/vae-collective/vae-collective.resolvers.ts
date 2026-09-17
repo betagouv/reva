@@ -22,8 +22,8 @@ import { getCohortesVaeCollectivesForConnectedAap } from "./features/getCohortes
 import { getCohortesVaeCollectivesForConnectedCertificationAuthorityOrLocalAccount } from "./features/getCohortesVaeCollectivesForConnectedCertificationAuthorityOrLocalAccount";
 import { getCohorteVAECollectiveByCodeInscription } from "./features/getCohorteVAECollectiveByCodeInscription";
 import { getCohorteVAECollectiveById } from "./features/getCohorteVAECollectiveById";
-import { getCommanditaireVaeCollectiveByGestionnaireAccountId } from "./features/getCommanditaireVaeCollectiveByGestionnaireAccountId";
 import { getCommanditaireVaeCollectiveById } from "./features/getCommanditaireVaeCollectiveById";
+import { getCommanditaireVaeCollectiveForAccountId } from "./features/getCommanditaireVaeCollectiveForAccountId";
 import { getCommanditaireVaeCollectives } from "./features/getCommanditaireVaeCollectives";
 import { getMetabaseDashboardIframeUrlVaeCollective } from "./features/getMetabaseDashboardIframeUrlVaeCollective";
 import { getRolesSpecificToSousCompteAndCohorteVaeCollective } from "./features/getRolesSpecificToSousCompteAndCohorteVaeCollective";
@@ -40,13 +40,9 @@ import { hasVaeCollectivePermission } from "./security/hasVaeCollectivePermissio
 
 const unsafeResolvers = {
   Account: {
-    commanditaireVaeCollective: async ({
-      id: gestionnaireAccountId,
-    }: {
-      id: string;
-    }) =>
-      getCommanditaireVaeCollectiveByGestionnaireAccountId({
-        gestionnaireAccountId,
+    commanditaireVaeCollective: async ({ id: accountId }: { id: string }) =>
+      getCommanditaireVaeCollectiveForAccountId({
+        accountId,
       }),
   },
   CohorteVaeCollective: {
