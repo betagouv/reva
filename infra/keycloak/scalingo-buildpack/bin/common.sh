@@ -341,8 +341,6 @@ function add_templates() {
       echo "copy keycloak themes: ${cp_keycloak_themes}"
     fi
   else
-    if [ -n "$BUILDPACK_DEBUG" ]; then
-      echo "KEYCLOAK_TEMPLATES_DIR defined and ${keycloak_templates_dir} dir does not exist!!!"
-    fi
+    echo "KEYCLOAK_TEMPLATES_DIR defined and ${keycloak_templates_dir} dir does not exist!!!"
   fi
 }

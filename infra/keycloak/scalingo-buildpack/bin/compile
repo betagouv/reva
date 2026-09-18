@@ -95,7 +95,10 @@ fi
 
 step "Adding templates"
 if [[ -f "${ENV_DIR}/KEYCLOAK_TEMPLATES_DIR" ]]; then
-  KEYCLOAK_TEMPLATES_DIR=$(cat "${ENV_DIR}/KEYCLOAK_TEMPLATES_DIR")
+  # use full path for the templates directory / required after keycloak 26.7.4
+  KEYCLOAK_TEMPLATES_DIR="$BUILD_DIR/$KEYCLOAK_TEMPLATES_DIR"
+  # use relative path for the templates directory / worked before keycloak 26.7.4
+  # KEYCLOAK_TEMPLATES_DIR=$(cat "${ENV_DIR}/KEYCLOAK_TEMPLATES_DIR")
   add_templates "${KEYCLOAK_TEMPLATES_DIR}" "${KEYCLOAK_PATH}"
 fi
 
