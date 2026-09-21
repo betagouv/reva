@@ -94,6 +94,15 @@ const keycloakPluginMock: FastifyPluginAsync = async (
             },
           };
           break;
+        case "sous_compte_vae_collective":
+          userInfo = {
+            sub,
+            email,
+            realm_access: {
+              roles: ["sous_compte_vae_collective"],
+            },
+          };
+          break;
       }
       req.auth = {
         hasRole: (role: KeyCloakUserRole) => {
