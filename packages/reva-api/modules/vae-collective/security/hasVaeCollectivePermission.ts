@@ -33,7 +33,7 @@ const SOUS_COMPTE_SCOPED_PERMISSIONS: ReadonlySet<PermissionVaeCollective> =
 export const hasVaeCollectivePermission = (
   permission: PermissionVaeCollective,
 ) => [
-  hasRole(["admin", "manage_vae_collective"]),
+  hasRole(["admin", "manage_vae_collective", "sous_compte_vae_collective"]),
 
   // Dans le cas d'un profil gestionnaire
   // Si la permission est portée sur une cohorte, on vérifie que l'utilisateur
@@ -55,6 +55,7 @@ export const hasVaeCollectivePermission = (
       : isGestionnaireOfCommanditaireVaeCollective,
   ),
   whenHasRole("manage_vae_collective", checkUserPermission(permission)),
+  whenHasRole("sous_compte_vae_collective", checkUserPermission(permission)),
 ];
 
 const checkUserPermission =

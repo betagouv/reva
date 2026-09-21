@@ -2,6 +2,7 @@ import { PermissionVaeCollective } from "@prisma/client";
 import { IFieldResolver, MercuriusContext } from "mercurius";
 
 import { NOT_AUTHORIZED_RESOURCE_ACCESS } from "@/modules/shared/security/messages";
+import { createAccountHelper } from "@/test/helpers/entities/create-account-helper";
 import { createSousCompteVaeCollectiveHelper } from "@/test/helpers/entities/create-sous-compte-vae-collective-helper";
 import { createCohorteVaeCollectiveHelper } from "@/test/helpers/entities/create-vae-collective-helper";
 
@@ -41,8 +42,18 @@ const runPolicy = async (
   return chain({}, args, context, {} as any);
 };
 
+const createSousCompteUserKeycloakId = async () => {
+  const cohorte = await createCohorteVaeCollectiveHelper();
+  const account = await createAccountHelper();
+  await createSousCompteVaeCollectiveHelper({
+    commanditaireVaeCollectiveId: cohorte.commanditaireVaeCollectiveId,
+    accountId: account.id,
+  });
+  return account.keycloakId;
+};
+
 describe("hasVaeCollectivePermission", () => {
-  test("denies access when the user has neither the admin nor the manage_vae_collective role", async () => {
+  test("denies access when the user has none of the admin, manage_vae_collective or sous_compte_vae_collective roles", async () => {
     const policy = hasVaeCollectivePermission(
       PermissionVaeCollective.CREER_COHORTE,
     );
@@ -64,6 +75,38 @@ describe("hasVaeCollectivePermission", () => {
       "resolved",
     );
     expect(finalResolver).toHaveBeenCalledOnce();
+  });
+
+  test("lets a sous_compte_vae_collective user through when their role grants the required permission", async () => {
+    const policy = hasVaeCollectivePermission(
+      PermissionVaeCollective.VOIR_LISTE_COHORTES,
+    );
+    const context = makeContext({
+      roles: ["sous_compte_vae_collective"],
+      keycloakId: await createSousCompteUserKeycloakId(),
+    });
+    const finalResolver = vi.fn().mockResolvedValue("resolved");
+
+    await expect(runPolicy(policy, {}, context, finalResolver)).resolves.toBe(
+      "resolved",
+    );
+    expect(finalResolver).toHaveBeenCalledOnce();
+  });
+
+  test("denies a sous_compte_vae_collective user when their role does not grant the required permission", async () => {
+    const policy = hasVaeCollectivePermission(
+      PermissionVaeCollective.CREER_COHORTE,
+    );
+    const context = makeContext({
+      roles: ["sous_compte_vae_collective"],
+      keycloakId: await createSousCompteUserKeycloakId(),
+    });
+    const finalResolver = vi.fn();
+
+    await expect(runPolicy(policy, {}, context, finalResolver)).rejects.toThrow(
+      NOT_AUTHORIZED_RESOURCE_ACCESS,
+    );
+    expect(finalResolver).not.toHaveBeenCalled();
   });
 
   test("lets a manage_vae_collective gestionnaire through when they hold the required permission for their own commanditaire", async () => {
