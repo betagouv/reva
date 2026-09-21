@@ -6,7 +6,8 @@ declare type KeyCloakUserRole =
   | "manage_certification_authority_local_account"
   | "manage_certification_registry"
   | "manage_vae_collective"
-  | "candidate";
+  | "candidate"
+  | "sous_compte_vae_collective";
 
 declare type KeyCloakGroup =
   | "admin"
