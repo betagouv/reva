@@ -101,7 +101,9 @@ type Query {
     commanditaireVaeCollectiveId: ID!
     cohorteVaeCollectiveId: ID!
   ): CohorteVaeCollective!
-  vaeCollective_getUserPermissions: [PermissionVaeCollective!]!
+  vaeCollective_getUserPermissions(
+    cohorteVaeCollectiveId: ID
+  ): [PermissionVaeCollective!]!
   vaeCollective_getSousCompteVaeCollective(
     commanditaireVaeCollectiveId: ID!
     sousCompteVaeCollectiveId: ID!

@@ -182,12 +182,13 @@ const unsafeResolvers = {
     ) => getCommanditaireVaeCollectives({ offset, limit, searchFilter }),
     vaeCollective_getUserPermissions: async (
       _parent: unknown,
-      _args: unknown,
+      args: { cohorteVaeCollectiveId?: string },
       context: GraphqlContext,
     ) =>
       getUserPermissions({
         userKeycloakId: context.auth.userInfo?.sub || "",
         userKeycloakRoles: context.auth.userInfo?.realm_access?.roles || [],
+        cohorteVaeCollectiveId: args.cohorteVaeCollectiveId,
       }),
     vaeCollective_getSousCompteVaeCollective: async (
       _parent: unknown,
