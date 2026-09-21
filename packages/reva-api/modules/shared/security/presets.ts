@@ -165,7 +165,7 @@ export const isAdminOrGestionnaireOfCommanditaireVaeCollective = [
 ];
 
 export const isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective = [
-  hasRole(["admin", "manage_vae_collective"]),
+  hasRole(["admin", "manage_vae_collective", "sous_compte_vae_collective"]),
   whenHasRole(
     "manage_vae_collective",
     isGestionnaireOrSousCompteOfCommanditaireVaeCollective,
