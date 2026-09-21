@@ -2,6 +2,7 @@ import { PermissionVaeCollective } from "@prisma/client";
 import { IFieldResolver, MercuriusContext } from "mercurius";
 
 import { NOT_AUTHORIZED_RESOURCE_ACCESS } from "@/modules/shared/security/messages";
+import { prismaClient } from "@/prisma/client";
 import { createAccountHelper } from "@/test/helpers/entities/create-account-helper";
 import { createSousCompteVaeCollectiveHelper } from "@/test/helpers/entities/create-sous-compte-vae-collective-helper";
 import { createCohorteVaeCollectiveHelper } from "@/test/helpers/entities/create-vae-collective-helper";
@@ -297,5 +298,77 @@ describe("hasVaeCollectivePermission", () => {
         context,
       ),
     ).rejects.toThrow(NOT_AUTHORIZED_RESOURCE_ACCESS);
+  });
+
+  describe("sous_compte_vae_collective with a role specific to a cohorte", () => {
+    const setup = async () => {
+      const cohorte = await createCohorteVaeCollectiveHelper();
+      const otherCohorte = await createCohorteVaeCollectiveHelper({
+        commanditaireVaeCollective: {
+          connect: { id: cohorte.commanditaireVaeCollectiveId },
+        },
+      });
+      const account = await createAccountHelper();
+      const sousCompte = await createSousCompteVaeCollectiveHelper({
+        commanditaireVaeCollectiveId: cohorte.commanditaireVaeCollectiveId,
+        accountId: account.id,
+      });
+      await prismaClient.roleSpecificToSousCompteAndCohorteVaeCollective.create(
+        {
+          data: {
+            sousCompteVaeCollectiveId: sousCompte.id,
+            cohorteVaeCollectiveId: cohorte.id,
+            role: "EDITEUR_COHORTE",
+          },
+        },
+      );
+      const context = makeContext({
+        roles: ["sous_compte_vae_collective"],
+        keycloakId: account.keycloakId,
+      });
+      return { cohorte, otherCohorte, context };
+    };
+
+    const policy = hasVaeCollectivePermission(
+      PermissionVaeCollective.MODIFIER_COHORTE,
+    );
+
+    test("lets the user through when the role is granted on the targeted cohorte", async () => {
+      const { cohorte, context } = await setup();
+      const finalResolver = vi.fn().mockResolvedValue("resolved");
+
+      await expect(
+        runPolicy(
+          policy,
+          { cohorteVaeCollectiveId: cohorte.id },
+          context,
+          finalResolver,
+        ),
+      ).resolves.toBe("resolved");
+      expect(finalResolver).toHaveBeenCalledOnce();
+    });
+
+    test("denies the user when the role is granted on a different cohorte than the targeted one", async () => {
+      const { otherCohorte, context } = await setup();
+      const finalResolver = vi.fn();
+
+      await expect(
+        runPolicy(
+          policy,
+          { cohorteVaeCollectiveId: otherCohorte.id },
+          context,
+          finalResolver,
+        ),
+      ).rejects.toThrow(NOT_AUTHORIZED_RESOURCE_ACCESS);
+      expect(finalResolver).not.toHaveBeenCalled();
+    });
+
+    test("denies the user when no cohorte is targeted", async () => {
+      const { context } = await setup();
+
+      await expect(runPolicy(policy, {}, context)).rejects.toThrow(
+        NOT_AUTHORIZED_RESOURCE_ACCESS,
+      );
+    });
   });
 });

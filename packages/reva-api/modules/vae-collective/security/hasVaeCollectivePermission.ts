@@ -69,10 +69,12 @@ const checkUserPermission =
   ) => {
     const userKeycloakId = context.auth?.userInfo?.sub || "";
     const userKeycloakRoles = context.auth?.userInfo?.realm_access?.roles || [];
+    const cohorteVaeCollectiveId = args.cohorteVaeCollectiveId || "";
 
     const userPermissions = await getUserPermissions({
       userKeycloakId,
       userKeycloakRoles,
+      cohorteVaeCollectiveId,
     });
     const hasPermission = userPermissions.includes(permission);
 
