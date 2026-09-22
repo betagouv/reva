@@ -95,8 +95,12 @@ export default async function CohortesPage({
     redirect(`/commanditaires/${commanditaireId}/cohortes/aucune-cohorte/`);
   }
 
-  const canCreateCohorte = await hasPermission("CREER_COHORTE");
-  const canViewCohorte = await hasPermission("VOIR_COHORTE");
+  const canCreateCohorte = await hasPermission({
+    permission: "CREER_COHORTE",
+  });
+  const canViewCohorte = await hasPermission({
+    permission: "VOIR_COHORTE",
+  });
 
   const createCohorteButtonProps = canCreateCohorte
     ? {

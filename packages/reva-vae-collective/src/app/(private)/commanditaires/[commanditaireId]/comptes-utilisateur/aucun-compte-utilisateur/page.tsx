@@ -6,7 +6,9 @@ import { hasPermission } from "@/components/auth/actions";
 import ecosystemPolygon from "./assets/ecosystem-polygon.svg";
 
 export default async function AucunCompteUtilisateurPage() {
-  const canCreateSousCompte = await hasPermission("CREER_SOUS_COMPTE");
+  const canCreateSousCompte = await hasPermission({
+    permission: "CREER_SOUS_COMPTE",
+  });
 
   const createSousCompteButtonProps = canCreateSousCompte
     ? {

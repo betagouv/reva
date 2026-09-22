@@ -17,7 +17,9 @@ export async function PrivateHeader() {
   // sur toutes les pages privées, pas seulement celles d'un commanditaire.
   let canViewStatistiques = false;
   try {
-    canViewStatistiques = await hasPermission("VOIR_STATISTIQUES");
+    canViewStatistiques = await hasPermission({
+      permission: "VOIR_STATISTIQUES",
+    });
   } catch (error) {
     console.error("Failed to fetch user permissions:", error);
   }
@@ -29,7 +31,9 @@ export async function PrivateHeader() {
   // sur toutes les pages privées, pas seulement celles d'un commanditaire.
   let canAccessAccountsPage = false;
   try {
-    canAccessAccountsPage = await hasPermission("VOIR_LISTE_SOUS_COMPTES");
+    canAccessAccountsPage = await hasPermission({
+      permission: "VOIR_LISTE_SOUS_COMPTES",
+    });
   } catch (error) {
     console.error("Failed to fetch user permissions:", error);
   }

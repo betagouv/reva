@@ -12,12 +12,18 @@ import { PermissionVaeCollective } from "@/graphql/generated/graphql";
 import { UserRole } from "./types";
 
 const getUserPermissionsQuery = graphql(`
-  query vaeCollective_getUserPermissions {
-    vaeCollective_getUserPermissions
+  query vaeCollective_getUserPermissions($cohorteVaeCollectiveId: ID) {
+    vaeCollective_getUserPermissions(
+      cohorteVaeCollectiveId: $cohorteVaeCollectiveId
+    )
   }
 `);
 
-const getUserPermissions = async () => {
+const getUserPermissions = async ({
+  cohorteVaeCollectiveId,
+}: {
+  cohorteVaeCollectiveId?: string;
+}) => {
   const accessToken = await getAccessTokenFromCookie();
 
   if (!accessToken) {
@@ -27,7 +33,7 @@ const getUserPermissions = async () => {
   const result = throwUrqlErrors(
     await client.query(
       getUserPermissionsQuery,
-      {},
+      { cohorteVaeCollectiveId },
       {
         fetchOptions: {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -55,13 +61,19 @@ const isUserInAdminRole = async () => {
   return isAdmin;
 };
 
-export const hasPermission = async (permission: PermissionVaeCollective) => {
+export const hasPermission = async ({
+  permission,
+  cohorteVaeCollectiveId,
+}: {
+  permission: PermissionVaeCollective;
+  cohorteVaeCollectiveId?: string;
+}) => {
   let userHasPermission = false;
   const isAdmin = await isUserInAdminRole();
   if (isAdmin) {
     userHasPermission = true;
   } else {
-    const permissions = await getUserPermissions();
+    const permissions = await getUserPermissions({ cohorteVaeCollectiveId });
     userHasPermission = permissions.includes(permission);
   }
   return userHasPermission;

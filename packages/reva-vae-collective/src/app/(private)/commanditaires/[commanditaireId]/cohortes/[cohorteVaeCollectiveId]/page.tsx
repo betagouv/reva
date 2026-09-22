@@ -98,8 +98,14 @@ export default async function CohortePage({
   const certificationSelected = certifications.length > 0;
   const organismSelected = !!organism;
 
-  const canModifyCohorte = await hasPermission("MODIFIER_COHORTE");
-  const canDeleteCohorte = await hasPermission("SUPPRIMER_COHORTE");
+  const canModifyCohorte = await hasPermission({
+    permission: "MODIFIER_COHORTE",
+    cohorteVaeCollectiveId,
+  });
+  const canDeleteCohorte = await hasPermission({
+    permission: "SUPPRIMER_COHORTE",
+    cohorteVaeCollectiveId,
+  });
 
   const modifierIntituleButtonProps = canModifyCohorte
     ? {
@@ -121,9 +127,10 @@ export default async function CohortePage({
     "VAE_COLLECTIVE_ACCOUNTS",
   );
 
-  const hasAccessRightsPermission = await hasPermission(
-    "MODIFIER_DROITS_ACCES_COHORTE",
-  );
+  const hasAccessRightsPermission = await hasPermission({
+    permission: "MODIFIER_DROITS_ACCES_COHORTE",
+    cohorteVaeCollectiveId,
+  });
 
   const showAccessRightsCard =
     isVaeCollectiveAccountsFeatureActive && hasAccessRightsPermission;

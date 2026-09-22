@@ -7,7 +7,9 @@ import { hasPermission } from "@/components/auth/actions";
 import applicationPolygon from "./assets/application-polygon.svg";
 
 export default async function AucuneCohortePage() {
-  const canCreateCohorte = await hasPermission("CREER_COHORTE");
+  const canCreateCohorte = await hasPermission({
+    permission: "CREER_COHORTE",
+  });
 
   const createCohorteButtonProps = canCreateCohorte
     ? {
