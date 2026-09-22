@@ -98,9 +98,6 @@ export default async function CohortesPage({
   const canCreateCohorte = await hasPermission({
     permission: "CREER_COHORTE",
   });
-  const canViewCohorte = await hasPermission({
-    permission: "VOIR_COHORTE",
-  });
 
   const createCohorteButtonProps = canCreateCohorte
     ? {
@@ -135,14 +132,10 @@ export default async function CohortesPage({
             <li key={cohorte.id}>
               <Card
                 data-testid="cohorte-card"
-                {...(canViewCohorte
-                  ? {
-                      enlargeLink: true as const,
-                      linkProps: {
-                        href: `/commanditaires/${commanditaireId}/cohortes/${cohorte.id}`,
-                      },
-                    }
-                  : { enlargeLink: false as const })}
+                enlargeLink
+                linkProps={{
+                  href: `/commanditaires/${commanditaireId}/cohortes/${cohorte.id}`,
+                }}
                 size="small"
                 title={cohorte.nom}
                 classes={{ end: "mt-3" }}
