@@ -114,6 +114,51 @@ describe("get commanditaire vae collective", () => {
     ).rejects.toThrowError(NOT_AUTHORIZED_RESOURCE_ACCESS);
   });
 
+  test("should let a user with the sous_compte_vae_collective role get the commanditaire vae collective it belongs to", async () => {
+    const cohorteVaeCollective = await createCohorteVaeCollectiveHelper();
+    const commanditaireVaeCollectiveId =
+      cohorteVaeCollective.commanditaireVaeCollectiveId;
+    const sousCompteAccount = await createAccountHelper();
+    await createSousCompteVaeCollectiveHelper({
+      commanditaireVaeCollectiveId,
+      accountId: sousCompteAccount.id,
+    });
+
+    const res = await getCommanditaireVaeCollective(
+      commanditaireVaeCollectiveId,
+      "sous_compte_vae_collective",
+      sousCompteAccount.keycloakId,
+    );
+
+    expect(res).toMatchObject({
+      vaeCollective_getCommanditaireVaeCollective: {
+        id: commanditaireVaeCollectiveId,
+        raisonSociale:
+          cohorteVaeCollective.commanditaireVaeCollective?.raisonSociale,
+      },
+    });
+  });
+
+  test("should not let a user with the sous_compte_vae_collective role get a commanditaire vae collective it doesn't belong to", async () => {
+    const cohorteVaeCollective = await createCohorteVaeCollectiveHelper();
+    const anotherCohorteVaeCollective =
+      await createCohorteVaeCollectiveHelper();
+    const sousCompteAccount = await createAccountHelper();
+    await createSousCompteVaeCollectiveHelper({
+      commanditaireVaeCollectiveId:
+        cohorteVaeCollective.commanditaireVaeCollectiveId,
+      accountId: sousCompteAccount.id,
+    });
+
+    await expect(
+      getCommanditaireVaeCollective(
+        anotherCohorteVaeCollective.commanditaireVaeCollectiveId,
+        "sous_compte_vae_collective",
+        sousCompteAccount.keycloakId,
+      ),
+    ).rejects.toThrowError(NOT_AUTHORIZED_RESOURCE_ACCESS);
+  });
+
   test("should let an admin get any commanditaire vae collective", async () => {
     const cohorteVaeCollective = await createCohorteVaeCollectiveHelper();
     const commanditaireVaeCollectiveId =
