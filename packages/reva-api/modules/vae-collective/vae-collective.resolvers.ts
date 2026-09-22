@@ -107,11 +107,14 @@ const unsafeResolvers = {
         id: string;
       },
       { offset, limit }: { offset: number; limit: number },
+      context: GraphqlContext,
     ) =>
       getCohortesVaeCollectivesByCommanditaireVaeCollectiveId({
         commanditaireVaeCollectiveId,
         offset,
         limit,
+        userKeycloakId: context.auth.userInfo?.sub || "",
+        userKeycloakRoles: context.auth.userInfo?.realm_access?.roles || [],
       }),
     metabaseDashboardIframeUrl: async ({
       id: commanditaireVaeCollectiveId,
