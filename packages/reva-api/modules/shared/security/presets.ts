@@ -18,7 +18,6 @@ import { isCertificationAuthorityOwner } from "./middlewares/isCertificationAuth
 import { isCertificationRegistryManagerOfCertification } from "./middlewares/isCertificationRegistryManagerOfCertification.security";
 import { isExperienceOfCandidacy } from "./middlewares/isExperienceOfCandidacy";
 import { isFeasibilityManager } from "./middlewares/isFeasibilityManager";
-import { isGestionnaireOfCommanditaireVaeCollective } from "./middlewares/isGestionnaireOfCommanditaireVaeCollective";
 import { isGestionnaireOrSousCompteOfCommanditaireVaeCollective } from "./middlewares/isGestionnaireOrSousCompteOfCommanditaireVaeCollective";
 import { isUserOwnerOfCandidate } from "./middlewares/isUserOwnerOfCandidate";
 
@@ -153,14 +152,6 @@ export const isAdminOrIsCertificationAuthorityStructureMember = [
   whenHasRole(
     "manage_certification_registry",
     getIsCertificationAuthorityStructureMember,
-  ),
-];
-
-export const isAdminOrGestionnaireOfCommanditaireVaeCollective = [
-  hasRole(["admin", "manage_vae_collective"]),
-  whenHasRole(
-    "manage_vae_collective",
-    isGestionnaireOfCommanditaireVaeCollective,
   ),
 ];
 
