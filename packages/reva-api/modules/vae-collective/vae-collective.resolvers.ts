@@ -214,10 +214,13 @@ const unsafeResolvers = {
         commanditaireVaeCollectiveId: string;
         nomCohorteVaeCollective: string;
       },
+      context: GraphqlContext,
     ) =>
       createCohorteVaeCollective({
         commanditaireVaeCollectiveId,
         nomCohorteVaeCollective,
+        userKeycloakId: context.auth.userInfo?.sub || "",
+        userKeycloakRoles: context.auth.userInfo?.realm_access?.roles || [],
       }),
     vaeCollective_updateNomCohorteVaeCollective: async (
       _parent: unknown,

@@ -4,6 +4,7 @@ import {
 } from "@/modules/shared/security/messages";
 import { prismaClient } from "@/prisma/client";
 import { authorizationHeaderForUser } from "@/test/helpers/authorization-helper";
+import { createSousCompteVaeCollectiveHelper } from "@/test/helpers/entities/create-sous-compte-vae-collective-helper";
 import { createCohorteVaeCollectiveHelper } from "@/test/helpers/entities/create-vae-collective-helper";
 import { getGraphQLClient } from "@/test/test-graphql-client";
 
@@ -142,6 +143,108 @@ describe("create cohorte vae collective", () => {
         nomCohorteVaeCollective: "Cohorte interdite",
       }),
     ).rejects.toThrowError(NOT_AUTHORIZED_RESOURCE_ACCESS);
+  });
+
+  test("should let a sous compte with the CREER_COHORTE permission create a cohorte and grant them the EDITEUR_COHORTE role on it", async () => {
+    const cohorteVaeCollective = await createCohorteVaeCollectiveHelper();
+    const commanditaireVaeCollectiveId =
+      cohorteVaeCollective.commanditaireVaeCollectiveId;
+
+    const sousCompteVaeCollective = await createSousCompteVaeCollectiveHelper({
+      commanditaireVaeCollectiveId,
+    });
+    await prismaClient.roleSpecificToSousCompteVaeCollective.create({
+      data: {
+        sousCompteVaeCollectiveId: sousCompteVaeCollective.id,
+        role: "CREATEUR_COHORTE",
+      },
+    });
+
+    const account = await prismaClient.account.findUniqueOrThrow({
+      where: { id: sousCompteVaeCollective.accountId },
+    });
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "sous_compte_vae_collective",
+          keycloakId: account.keycloakId,
+        }),
+      },
+    });
+
+    const res = await graphqlClient.request(
+      vaeCollective_createCohorteVaeCollective,
+      {
+        commanditaireVaeCollectiveId,
+        nomCohorteVaeCollective: "Cohorte créée par un sous-compte",
+      },
+    );
+
+    expect(res).toMatchObject({
+      vaeCollective_createCohorteVaeCollective: {
+        nom: "Cohorte créée par un sous-compte",
+        status: "BROUILLON",
+        commanditaireVaeCollective: {
+          id: commanditaireVaeCollectiveId,
+        },
+      },
+    });
+
+    const roleSpecificToCohorte =
+      await prismaClient.roleSpecificToSousCompteAndCohorteVaeCollective.findFirst(
+        {
+          where: {
+            sousCompteVaeCollectiveId: sousCompteVaeCollective.id,
+            cohorteVaeCollectiveId:
+              res.vaeCollective_createCohorteVaeCollective.id,
+          },
+        },
+      );
+
+    expect(roleSpecificToCohorte).toMatchObject({ role: "EDITEUR_COHORTE" });
+  });
+
+  test("should not grant an EDITEUR_COHORTE role when a gestionnaire creates a cohorte", async () => {
+    const cohorteVaeCollective = await createCohorteVaeCollectiveHelper();
+
+    const commanditaireVaeCollectiveId =
+      cohorteVaeCollective.commanditaireVaeCollectiveId;
+    const userKeycloakId =
+      cohorteVaeCollective.commanditaireVaeCollective?.gestionnaire?.keycloakId;
+
+    if (!userKeycloakId) {
+      throw new Error("Compte gestionnaire non trouvé");
+    }
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "manage_vae_collective",
+          keycloakId: userKeycloakId,
+        }),
+      },
+    });
+
+    const res = await graphqlClient.request(
+      vaeCollective_createCohorteVaeCollective,
+      {
+        commanditaireVaeCollectiveId,
+        nomCohorteVaeCollective: "Cohorte créée par un gestionnaire",
+      },
+    );
+
+    const rolesSpecificToCohorte =
+      await prismaClient.roleSpecificToSousCompteAndCohorteVaeCollective.findMany(
+        {
+          where: {
+            cohorteVaeCollectiveId:
+              res.vaeCollective_createCohorteVaeCollective.id,
+          },
+        },
+      );
+
+    expect(rolesSpecificToCohorte).toHaveLength(0);
   });
 
   test("should not let a user without an authorized role create a cohorte", async () => {
