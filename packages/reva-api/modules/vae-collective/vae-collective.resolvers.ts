@@ -2,7 +2,6 @@ import { RoleVaeCollective } from "@prisma/client";
 
 import {
   isAdmin,
-  isAdminOrGestionnaireOfCommanditaireVaeCollective,
   isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
   isAnyone,
 } from "@/modules/shared/security/presets";
@@ -355,7 +354,7 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     // individuellement, voir le bloc CommanditaireVaeCollective plus bas.
     commanditaireVaeCollective: isAnyone,
     certificationCohorteVaeCollectives:
-      isAdminOrGestionnaireOfCommanditaireVaeCollective,
+      isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
     organism: isAnyone,
   },
   CertificationCohorteVaeCollective: {
