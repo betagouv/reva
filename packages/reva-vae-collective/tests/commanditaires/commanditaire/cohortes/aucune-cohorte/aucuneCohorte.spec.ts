@@ -69,7 +69,7 @@ test.describe("Commanditaire without CREER_COHORTE permission", () => {
     ],
   });
 
-  test("it should disable the create cohorte button when the user lacks the CREER_COHORTE permission", async ({
+  test("it should not show the create cohorte button and should explain why when the user lacks the CREER_COHORTE permission", async ({
     page,
   }) => {
     await login({ page, role: "gestionnaireVaeCollective" });
@@ -79,7 +79,16 @@ test.describe("Commanditaire without CREER_COHORTE permission", () => {
     );
 
     await expect(
+      page.getByRole("link", { name: "Créer une cohorte" }),
+    ).not.toBeVisible();
+    await expect(
       page.getByRole("button", { name: "Créer une cohorte" }),
-    ).toBeDisabled();
+    ).not.toBeVisible();
+
+    await expect(
+      page.getByText(
+        "Vous n’avez pas la possibilité de créer de cohortes. Cette option est actionnable par votre administrateur à la création de votre compte.",
+      ),
+    ).toBeVisible();
   });
 });
