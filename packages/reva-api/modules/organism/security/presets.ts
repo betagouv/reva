@@ -26,8 +26,8 @@ export const isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganism = [
   ),
 ];
 
-export const isAdminOrGestionnaireVaeCollective = [
-  hasRole(["admin", "manage_vae_collective"]),
+export const isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective = [
+  hasRole(["admin", "manage_vae_collective", "sous_compte_vae_collective"]),
 ];
 
 // Pour `organism_getOrganism(id:)`. Reproduit les branches de l'inline qu'il remplace : l'admin

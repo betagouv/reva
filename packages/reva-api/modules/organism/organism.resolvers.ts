@@ -95,7 +95,7 @@ import {
   isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganism,
   isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganismByIdArg,
   isAdminOrGestionnaireOfMaisonMereAAPOrOwnerOfAccount,
-  isAdminOrGestionnaireVaeCollective,
+  isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
 } from "./security/presets";
 
 const unsafeResolvers = {
@@ -803,7 +803,8 @@ export const organismResolvers = withPolicies(unsafeResolvers, {
   },
   Query: {
     organism_getMaisonMereAAPById: isAdminOrGestionnaireOfMaisonMereAAP,
-    organism_searchOrganisms: isAdminOrGestionnaireVaeCollective,
+    organism_searchOrganisms:
+      isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
     organism_getCompteCollaborateurById:
       isAdminOrGestionnaireOfMaisonMereAAPOrOwnerOfAccount,
     organism_getMaisonMereAAPs: isAdmin,
