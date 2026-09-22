@@ -11,7 +11,7 @@ export const getUserPermissions = async ({
   cohorteVaeCollectiveId,
 }: {
   userKeycloakId: string;
-  userKeycloakRoles: string[];
+  userKeycloakRoles: KeyCloakUserRole[];
   cohorteVaeCollectiveId?: string;
 }) => {
   const permissions = [];

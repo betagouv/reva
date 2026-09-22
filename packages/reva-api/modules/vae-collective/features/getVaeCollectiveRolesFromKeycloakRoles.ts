@@ -3,7 +3,7 @@ import { prismaClient } from "@/prisma/client";
 export const getVaeCollectiveRolesFromKeycloakRoles = async ({
   userKeycloakRoles,
 }: {
-  userKeycloakRoles: string[];
+  userKeycloakRoles: KeyCloakUserRole[];
 }) => {
   const rolesOnKeycloakRoles =
     await prismaClient.keycloakRoleOnRoleVaeCollective.findMany({

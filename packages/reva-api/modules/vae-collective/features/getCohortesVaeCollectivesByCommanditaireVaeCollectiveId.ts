@@ -14,7 +14,7 @@ export const getCohortesVaeCollectivesByCommanditaireVaeCollectiveId = async ({
   offset: number;
   limit: number;
   userKeycloakId: string;
-  userKeycloakRoles: string[];
+  userKeycloakRoles: KeyCloakUserRole[];
 }) => {
   const isSousCompte = userKeycloakRoles.includes("sous_compte_vae_collective");
   const cohorteWhereClause: Prisma.CohorteVaeCollectiveWhereInput = {};
