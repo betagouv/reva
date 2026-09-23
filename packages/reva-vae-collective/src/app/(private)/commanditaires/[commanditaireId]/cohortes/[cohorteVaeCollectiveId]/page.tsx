@@ -135,6 +135,9 @@ export default async function CohortePage({
   const showAccessRightsCard =
     isVaeCollectiveAccountsFeatureActive && hasAccessRightsPermission;
 
+  const certificationCardreadonly =
+    cohorte.status === "PUBLIE" || !canModifyCohorte;
+
   return (
     <div className="flex flex-col w-full">
       <RoleDependentBreadcrumb
@@ -167,10 +170,9 @@ export default async function CohortePage({
       </p>
       <CertificationsCard
         numberOfCertifications={certifications.length}
-        cohorteStatus={cohorte.status}
+        readonly={certificationCardreadonly}
         certificationsSelectionneesHref={`/commanditaires/${commanditaireId}/cohortes/${cohorteVaeCollectiveId}/certifications-selectionnees`}
         selectCertificationsHref={`/commanditaires/${commanditaireId}/cohortes/${cohorteVaeCollectiveId}/selection-certifications`}
-        disabled={!canModifyCohorte}
       />
       <OrganismCard
         className="mt-8"

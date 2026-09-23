@@ -180,6 +180,106 @@ test.describe("certifications card", () => {
       });
 
       test.describe("when the user lacks the MODIFIER_COHORTE permission", () => {
+        test.describe("when there is a certification already selected", () => {
+          test.use({
+            mswHandlers: [
+              [
+                fvae.query("getCohorteByIdForCohortePage", () => {
+                  return HttpResponse.json({
+                    data: {
+                      vaeCollective_getCohorteVaeCollectiveById: {
+                        id: "0eda2cbf-78ae-47af-9f28-34d05f972712",
+                        nom: "macohorte",
+                        status: "BROUILLON",
+                        certificationCohorteVaeCollectives: [
+                          {
+                            id: "0eda2cbf-78ae-47af-9f28-34d05f972712",
+                            certification: {
+                              id: "0eda2cbf-78ae-47af-9f28-34d05f972712",
+                              certification: {
+                                label: "Certification 1",
+                                codeRncp: "123456",
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  });
+                }),
+                mockQueryActiveFeatures(["VAE_COLLECTIVE_MULTI_CERTIFICATION"]),
+                mockQueryGetUserPermissions(),
+              ],
+              { scope: "test" },
+            ],
+          });
+
+          test("the card should be readonly and show a 'Visualiser' link instead of 'Modifier'", async ({
+            page,
+          }) => {
+            await login({ page, role: "gestionnaireVaeCollective" });
+
+            await page.goto(
+              "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes/0eda2cbf-78ae-47af-9f28-34d05f972712",
+            );
+
+            const certificationsCard = page.getByTestId("certifications-card");
+            await expect(
+              certificationsCard.getByRole("link", { name: "Visualiser" }),
+            ).toBeVisible();
+            await expect(
+              certificationsCard.getByRole("button", { name: "Modifier" }),
+            ).not.toBeVisible();
+          });
+        });
+
+        test.describe("when there are no certifications selected", () => {
+          test.use({
+            mswHandlers: [
+              [
+                fvae.query("getCohorteByIdForCohortePage", () => {
+                  return HttpResponse.json({
+                    data: {
+                      vaeCollective_getCohorteVaeCollectiveById: {
+                        id: "0eda2cbf-78ae-47af-9f28-34d05f972712",
+                        nom: "macohorte",
+                        status: "BROUILLON",
+                        certificationCohorteVaeCollectives: [],
+                      },
+                    },
+                  });
+                }),
+                mockQueryActiveFeatures(["VAE_COLLECTIVE_MULTI_CERTIFICATION"]),
+                mockQueryGetUserPermissions(),
+              ],
+              { scope: "test" },
+            ],
+          });
+
+          test("the card should be readonly and show no action button", async ({
+            page,
+          }) => {
+            await login({ page, role: "gestionnaireVaeCollective" });
+
+            await page.goto(
+              "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes/0eda2cbf-78ae-47af-9f28-34d05f972712",
+            );
+
+            const certificationsCard = page.getByTestId("certifications-card");
+            await expect(certificationsCard).toBeVisible();
+            await expect(
+              certificationsCard.getByRole("link", { name: "Visualiser" }),
+            ).not.toBeVisible();
+            await expect(
+              certificationsCard.getByRole("link", { name: "Compléter" }),
+            ).not.toBeVisible();
+          });
+        });
+      });
+    });
+
+    test.describe("when the cohorte status is 'PUBLIE'", () => {
+      test.describe("when the user has the MODIFIER_COHORTE permission", () => {
         test.use({
           mswHandlers: [
             [
@@ -189,7 +289,7 @@ test.describe("certifications card", () => {
                     vaeCollective_getCohorteVaeCollectiveById: {
                       id: "0eda2cbf-78ae-47af-9f28-34d05f972712",
                       nom: "macohorte",
-                      status: "BROUILLON",
+                      status: "PUBLIE",
                       certificationCohorteVaeCollectives: [
                         {
                           id: "0eda2cbf-78ae-47af-9f28-34d05f972712",
@@ -207,24 +307,28 @@ test.describe("certifications card", () => {
                 });
               }),
               mockQueryActiveFeatures(["VAE_COLLECTIVE_MULTI_CERTIFICATION"]),
-              mockQueryGetUserPermissions(),
+              mockQueryGetUserPermissions(["MODIFIER_COHORTE"]),
             ],
             { scope: "test" },
           ],
         });
 
-        test("the 'Modifier' button should be disabled", async ({ page }) => {
+        test("the card should still be readonly because the cohorte is published", async ({
+          page,
+        }) => {
           await login({ page, role: "gestionnaireVaeCollective" });
 
           await page.goto(
             "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes/0eda2cbf-78ae-47af-9f28-34d05f972712",
           );
 
+          const certificationsCard = page.getByTestId("certifications-card");
           await expect(
-            page
-              .getByTestId("certifications-card")
-              .getByRole("button", { name: "Modifier" }),
-          ).toBeDisabled();
+            certificationsCard.getByRole("link", { name: "Visualiser" }),
+          ).toBeVisible();
+          await expect(
+            certificationsCard.getByRole("button", { name: "Modifier" }),
+          ).not.toBeVisible();
         });
       });
     });
