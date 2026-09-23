@@ -198,13 +198,13 @@ export default async function CohortePage({
             aapLabel={organism?.label ?? ""}
             disabled={!organismSelected || !canModifyCohorte}
           />
-
-          <DeleteCohorteButton
-            commanditaireId={commanditaireId}
-            cohorteVaeCollectiveId={cohorteVaeCollectiveId}
-            nomCohorte={cohorte.nom}
-            disabled={!canDeleteCohorte}
-          />
+          {canDeleteCohorte && (
+            <DeleteCohorteButton
+              commanditaireId={commanditaireId}
+              cohorteVaeCollectiveId={cohorteVaeCollectiveId}
+              nomCohorte={cohorte.nom}
+            />
+          )}
         </>
       )}
       {cohorte.status === "PUBLIE" && (

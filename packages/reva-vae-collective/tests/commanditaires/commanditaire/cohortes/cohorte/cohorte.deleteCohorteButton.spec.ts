@@ -163,7 +163,7 @@ test.describe("delete cohorte button", () => {
         ],
       });
 
-      test("the delete button should be disabled", async ({ page }) => {
+      test("the delete button should not be displayed", async ({ page }) => {
         await login({ page, role: "gestionnaireVaeCollective" });
 
         await page.goto(
@@ -172,7 +172,7 @@ test.describe("delete cohorte button", () => {
 
         await expect(
           page.getByRole("button", { name: "Supprimer cette cohorte" }),
-        ).toBeDisabled();
+        ).toBeHidden();
       });
     });
   });
