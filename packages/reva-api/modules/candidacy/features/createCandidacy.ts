@@ -36,6 +36,20 @@ export const createCandidacy = async ({
       ? "DEMATERIALIZED"
       : "UPLOADED_PDF";
 
+  // If a certification is provided, we need to check if it exists
+  let certification;
+
+  if (certificationId) {
+    certification = await prismaClient.certification.findUnique({
+      where: { id: certificationId },
+    });
+
+    if (!certification) {
+      throw new Error("Certification non trouvée");
+    }
+  }
+
+  // If a cohorte VAE collective is provided, we need to check if it exists
   let cohorteVaeCollective;
 
   if (cohorteVaeCollectiveId) {
@@ -44,7 +58,24 @@ export const createCandidacy = async ({
     });
 
     if (!cohorteVaeCollective) {
-      throw new Error("Cohorte VAÉ collective non trouvée");
+      throw new Error("Cohorte VAE collective non trouvée");
+    }
+
+    // If a certification is provided, we need to check if it is associated with the cohorte VAE collective
+    if (certification) {
+      const certificationCohorteVaeCollective =
+        await prismaClient.certificationCohorteVaeCollective.findFirst({
+          where: {
+            cohorteVaeCollectiveId: cohorteVaeCollectiveId,
+            certificationId: certification.id,
+          },
+        });
+
+      if (!certificationCohorteVaeCollective) {
+        throw new Error(
+          "Certification de la cohorte VAE collective non trouvée",
+        );
+      }
     }
   }
 
@@ -55,7 +86,7 @@ export const createCandidacy = async ({
     data: {
       typeAccompagnement: resolvedTypeAccompagnement,
       candidateId,
-      certificationId,
+      certificationId: certification?.id,
       admissibility: { create: {} },
       examInfo: { create: {} },
       candidacyCandidateInfo: {
@@ -68,7 +99,7 @@ export const createCandidacy = async ({
       },
       status: "PROJET",
       financeModule: "hors_plateforme",
-      cohorteVaeCollectiveId,
+      cohorteVaeCollectiveId: cohorteVaeCollective?.id,
       organismId: cohorteVaeCollective?.organismId,
       feasibilityFormat,
       candidacyStatuses: {

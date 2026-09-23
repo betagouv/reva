@@ -3,6 +3,7 @@ import { RoleVaeCollective } from "@prisma/client";
 import {
   isAdmin,
   isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
+  isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollectiveOrCandidate,
   isAnyone,
 } from "@/modules/shared/security/presets";
 import { withPolicies } from "@/modules/shared/security/withPolicies";
@@ -360,7 +361,7 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     // individuellement, voir le bloc CommanditaireVaeCollective plus bas.
     commanditaireVaeCollective: isAnyone,
     certificationCohorteVaeCollectives:
-      isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
+      isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollectiveOrCandidate,
     organism: isAnyone,
   },
   CertificationCohorteVaeCollective: {

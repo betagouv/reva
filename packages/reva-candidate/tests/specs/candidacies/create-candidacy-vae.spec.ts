@@ -45,6 +45,11 @@ const cohorteVaeCollective = {
     raisonSociale: "Société VAE Collective",
   },
   organism,
+  certificationCohorteVaeCollectives: [
+    {
+      certification,
+    },
+  ],
 };
 
 async function expectCohorteAndOrganismToBeDisplayed(page: Page) {
@@ -72,6 +77,19 @@ async function expectCohorteAndOrganismToBeDisplayed(page: Page) {
   await expect(
     page.getByText(organism.telephone as string, { exact: true }),
   ).toBeVisible();
+}
+
+async function expectCertificationToBeDisplayed(page: Page) {
+  await expect(
+    page.getByRole("heading", { name: cohorteVaeCollective.nom }),
+  ).toBeVisible();
+  if (cohorteVaeCollective.certificationCohorteVaeCollectives.length === 1) {
+    const certification =
+      cohorteVaeCollective.certificationCohorteVaeCollectives[0].certification;
+    await expect(
+      page.getByText(certification.label, { exact: true }),
+    ).toBeVisible();
+  }
 }
 
 function createCandidaciesHandlers() {
@@ -185,6 +203,7 @@ test.describe("create candidacy vae from candidacies page", () => {
     ).toBeVisible();
 
     await expectCohorteAndOrganismToBeDisplayed(page);
+    await expectCertificationToBeDisplayed(page);
 
     const rejoindreCohorteButton = page.getByRole("button", {
       name: "Rejoindre cette cohorte",
@@ -192,9 +211,15 @@ test.describe("create candidacy vae from candidacies page", () => {
     await expect(rejoindreCohorteButton).toBeVisible();
     await rejoindreCohorteButton.click();
 
-    await expect(page).toHaveURL(
-      `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/consent/`,
-    );
+    if (cohorteVaeCollective.certificationCohorteVaeCollectives.length === 1) {
+      await expect(page).toHaveURL(
+        `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/consent/?certificationId=${cohorteVaeCollective.certificationCohorteVaeCollectives[0].certification.id}`,
+      );
+    } else {
+      await expect(page).toHaveURL(
+        `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/consent/`,
+      );
+    }
 
     await expect(
       page.getByRole("heading", { name: "Rejoindre une VAE collective" }),
@@ -225,5 +250,21 @@ test.describe("create candidacy vae from candidacies page", () => {
     ).toBeVisible();
 
     await expectCohorteAndOrganismToBeDisplayed(page);
+  });
+
+  test("displays the certification associated with the cohorte", async ({
+    page,
+  }) => {
+    await loginAndWaitForCandidaciesInitialLoad(page);
+
+    await page.goto(
+      `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/`,
+    );
+
+    await expect(
+      page.getByRole("heading", { name: "Rejoindre cette VAE collective" }),
+    ).toBeVisible();
+
+    await expectCertificationToBeDisplayed(page);
   });
 });

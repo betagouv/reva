@@ -23,6 +23,18 @@ const GET_VAE_COLLECTIVE_COHORT_FOR_CREATE_CANDIDACY = graphql(`
         adresseVille
         telephone
       }
+      certificationCohorteVaeCollectives {
+        id
+        certification {
+          id
+          label
+          codeRncp
+          certificationAuthorityStructure {
+            id
+            label
+          }
+        }
+      }
     }
   }
 `);

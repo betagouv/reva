@@ -2,7 +2,7 @@
 
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 
 import { Panel } from "@/components/layout/Panel";
 import { errorToast } from "@/components/toast/toast";
@@ -18,6 +18,9 @@ const declinedConsentModal = createModal({
 
 export default function DataConsentVaeCollectivePage() {
   const { candidateId } = useParams<{ candidateId: string }>();
+  const searchParams = useSearchParams();
+
+  const certificationId = searchParams.get("certificationId");
 
   const router = useRouter();
 
@@ -32,6 +35,7 @@ export default function DataConsentVaeCollectivePage() {
       candidateId: candidateId,
       data: {
         cohorteVaeCollectiveId: cohorteVaeCollective?.id,
+        certificationId: certificationId,
       },
     });
 

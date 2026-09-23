@@ -167,6 +167,24 @@ export const isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective = [
   ),
 ];
 
+export const isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollectiveOrCandidate =
+  [
+    hasRole([
+      "admin",
+      "manage_vae_collective",
+      "sous_compte_vae_collective",
+      "candidate",
+    ]),
+    whenHasRole(
+      "manage_vae_collective",
+      isGestionnaireOrSousCompteOfCommanditaireVaeCollective,
+    ),
+    whenHasRole(
+      "sous_compte_vae_collective",
+      isGestionnaireOrSousCompteOfCommanditaireVaeCollective,
+    ),
+  ];
+
 export const isAdminOrCertificationAuthorityLocalAccountManagerOrCertificationAuthorityLocalAccountOwner =
   [
     hasRole([

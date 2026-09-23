@@ -1,5 +1,6 @@
 import { CandidateTypology, FeasibilityFormat } from "@prisma/client";
 
+import { prismaClient } from "@/prisma/client";
 import { authorizationHeaderForUser } from "@/test/helpers/authorization-helper";
 import { createCandidacyCCNHelper } from "@/test/helpers/entities/create-candidacy-ccn-helper";
 import { createCandidateHelper } from "@/test/helpers/entities/create-candidate-helper";
@@ -33,6 +34,9 @@ const createCandidacyMutation = graphql(`
         id
       }
       cohorteVaeCollective {
+        id
+      }
+      certification {
         id
       }
       ccnId
@@ -238,5 +242,120 @@ describe("createCandidacy", () => {
 
     expect(result.candidacy_createCandidacy?.ccnId).toBe(candidate.ccnId);
     expect(result.candidacy_createCandidacy?.typology).toBe(candidate.typology);
+  });
+
+  test("should throw when the certification does not exist", async () => {
+    const candidate = await createCandidateHelper();
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "candidate",
+          keycloakId: candidate.keycloakId,
+        }),
+      },
+    });
+
+    await expect(
+      graphqlClient.request(createCandidacyMutation, {
+        candidateId: candidate.id,
+        certificationId: "00000000-0000-4000-8000-000000000000",
+        typeAccompagnement: "ACCOMPAGNE",
+      }),
+    ).rejects.toThrow("Certification non trouvée");
+
+    const candidacies = await prismaClient.candidacy.findMany({
+      where: { candidateId: candidate.id },
+    });
+    expect(candidacies).toHaveLength(0);
+  });
+
+  test("should throw when the cohorte VAE collective does not exist", async () => {
+    const candidate = await createCandidateHelper();
+    const certification = await createCertificationHelper();
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "candidate",
+          keycloakId: candidate.keycloakId,
+        }),
+      },
+    });
+
+    await expect(
+      graphqlClient.request(createCandidacyMutation, {
+        candidateId: candidate.id,
+        certificationId: certification.id,
+        cohorteVaeCollectiveId: "00000000-0000-4000-8000-000000000001",
+      }),
+    ).rejects.toThrow("Cohorte VAE collective non trouvée");
+
+    const candidacies = await prismaClient.candidacy.findMany({
+      where: { candidateId: candidate.id },
+    });
+    expect(candidacies).toHaveLength(0);
+  });
+
+  test("should throw when the certification does not belong to the cohorte VAE collective", async () => {
+    const candidate = await createCandidateHelper();
+    const certification = await createCertificationHelper();
+    const cohorte = await createCohorteVaeCollectiveHelper();
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "candidate",
+          keycloakId: candidate.keycloakId,
+        }),
+      },
+    });
+
+    await expect(
+      graphqlClient.request(createCandidacyMutation, {
+        candidateId: candidate.id,
+        certificationId: certification.id,
+        cohorteVaeCollectiveId: cohorte.id,
+      }),
+    ).rejects.toThrow("Certification de la cohorte VAE collective non trouvée");
+
+    const candidacies = await prismaClient.candidacy.findMany({
+      where: { candidateId: candidate.id },
+    });
+    expect(candidacies).toHaveLength(0);
+  });
+
+  test("should create the candidacy when the certification belongs to the cohorte VAE collective", async () => {
+    const candidate = await createCandidateHelper();
+    const certification = await createCertificationHelper();
+    const cohorte = await createCohorteVaeCollectiveHelper({
+      certificationCohorteVaeCollectives: {
+        create: {
+          certification: { connect: { id: certification.id } },
+        },
+      },
+    });
+
+    const graphqlClient = getGraphQLClient({
+      headers: {
+        authorization: authorizationHeaderForUser({
+          role: "candidate",
+          keycloakId: candidate.keycloakId,
+        }),
+      },
+    });
+
+    const result = await graphqlClient.request(createCandidacyMutation, {
+      candidateId: candidate.id,
+      certificationId: certification.id,
+      cohorteVaeCollectiveId: cohorte.id,
+    });
+
+    expect(result.candidacy_createCandidacy?.certification?.id).toBe(
+      certification.id,
+    );
+    expect(result.candidacy_createCandidacy?.cohorteVaeCollective?.id).toBe(
+      cohorte.id,
+    );
   });
 });

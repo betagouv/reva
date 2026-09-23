@@ -14,6 +14,9 @@ export default function RejoindreVaeCollectivePage() {
   const { cohorteVaeCollective, isLoading: isLoadingCohortVaeCollective } =
     useGetVaeCollectiveCohort();
 
+  const defaultCertification =
+    cohorteVaeCollective?.certificationCohorteVaeCollectives[0]?.certification;
+
   return (
     <div className="px-4 lg:px-6 pb-6">
       <Breadcrumb
@@ -91,6 +94,29 @@ export default function RejoindreVaeCollectivePage() {
                 content: "p-0",
               }}
             />
+
+            {cohorteVaeCollective?.certificationCohorteVaeCollectives.length ===
+              1 &&
+              defaultCertification && (
+                <Card
+                  size="small"
+                  title={defaultCertification.label}
+                  detail={`RNCP ${defaultCertification.codeRncp}`}
+                  desc={
+                    defaultCertification.certificationAuthorityStructure?.label
+                  }
+                  endDetail={<span>Consulter</span>}
+                  key={defaultCertification.id}
+                  linkProps={{
+                    href: `${process.env.NEXT_PUBLIC_WEBSITE_BASE_URL}/certifications/${defaultCertification.id}`,
+                    target: "_blank",
+                  }}
+                  enlargeLink
+                  classes={{
+                    detail: "mt-2",
+                  }}
+                />
+              )}
           </>
         )}
 
@@ -98,7 +124,11 @@ export default function RejoindreVaeCollectivePage() {
           <Button
             disabled={isLoadingCohortVaeCollective || !cohorteVaeCollective}
             className="justify-center w-[100%]  md:w-fit"
-            onClick={() => router.push("./consent")}
+            onClick={() =>
+              router.push(
+                `./consent?certificationId=${defaultCertification?.id}`,
+              )
+            }
           >
             Rejoindre cette cohorte
           </Button>
