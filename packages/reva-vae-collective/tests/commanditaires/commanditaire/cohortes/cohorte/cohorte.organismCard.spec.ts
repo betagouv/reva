@@ -95,9 +95,7 @@ test.describe("organism card", () => {
 
         await expect(
           await page.getByTestId("empty-organism-card"),
-        ).toContainText(
-          "Liste accessible une fois la certification sélectionnée.",
-        );
+        ).toContainText("Non renseigné");
       });
     });
   });
@@ -200,7 +198,7 @@ test.describe("organism card", () => {
           ],
         });
 
-        test("when i access the page, the empty organism card should be disabled and display the correct text", async ({
+        test("when i access the page, the empty organism card should be readonly and display the correct text", async ({
           page,
         }) => {
           await login({ page, role: "gestionnaireVaeCollective" });
@@ -211,7 +209,7 @@ test.describe("organism card", () => {
 
           await expect(
             await page.getByTestId("empty-organism-card").locator("button"),
-          ).toBeDisabled();
+          ).toHaveCount(0);
 
           await expect(
             await page.getByTestId("empty-organism-card"),
@@ -341,7 +339,7 @@ test.describe("organism card", () => {
           ],
         });
 
-        test("when i access the page, the filled organism card should be disabled", async ({
+        test("when i access the page, the filled organism card should be readonly", async ({
           page,
         }) => {
           await login({ page, role: "gestionnaireVaeCollective" });
@@ -351,8 +349,16 @@ test.describe("organism card", () => {
           );
 
           await expect(
-            page.getByTestId("filled-organism-card").getByRole("button"),
-          ).toBeDisabled();
+            await page.getByTestId("filled-organism-card"),
+          ).toBeEnabled();
+
+          await expect(
+            await page.getByTestId("filled-organism-card").locator("a"),
+          ).toHaveCount(0);
+
+          await expect(
+            await page.getByTestId("filled-organism-card"),
+          ).not.toContainText("Changer d'AAP");
         });
       });
 
@@ -415,6 +421,10 @@ test.describe("organism card", () => {
           await expect(
             await page.getByTestId("filled-organism-card").locator("a"),
           ).toHaveCount(0);
+
+          await expect(
+            await page.getByTestId("filled-organism-card"),
+          ).not.toContainText("Changer d'AAP");
         });
       });
     });

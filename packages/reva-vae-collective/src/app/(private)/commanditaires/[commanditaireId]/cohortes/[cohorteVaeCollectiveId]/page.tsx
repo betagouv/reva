@@ -115,12 +115,19 @@ export default async function CohortePage({
       }
     : { disabled: true };
 
-  //disabled si aucune certification n'est sélectionnée, si la cohorte est publiée et aucun organisme n'est sélectionnée
-  //  (ce cas n'est pas sensé se produire aujourd'hui dans l'interface), ou si l'utilisateur n'a pas la permission de modifier la cohorte
+  // carte certification readonly si la cohorte est publiée ou si l'utilisateur n'a pas la permission de modifier la cohorte
+  const certificationCardreadonly =
+    cohorte.status === "PUBLIE" || !canModifyCohorte;
+
+  // carte organisme disabled si aucune certification n'est sélectionnée, si la cohorte est publiée et aucun organisme n'est sélectionnée
+  //  (ce cas n'est pas sensé se produire aujourd'hui dans l'interface)
   const organismCardDisabled =
     !certificationSelected ||
-    (cohorte.status !== "BROUILLON" && !organismSelected) ||
-    !canModifyCohorte;
+    (cohorte.status === "PUBLIE" && !organismSelected);
+
+  // carte organisme readonly si la cohorte est publiée ou si l'utilisateur n'a pas la permission de modifier la cohorte
+  const organismCardreadonly = cohorte.status === "PUBLIE" || !canModifyCohorte;
+
   const { isFeatureActive } = await getActiveFeatures();
 
   const isVaeCollectiveAccountsFeatureActive = isFeatureActive(
@@ -134,9 +141,6 @@ export default async function CohortePage({
 
   const showAccessRightsCard =
     isVaeCollectiveAccountsFeatureActive && hasAccessRightsPermission;
-
-  const certificationCardreadonly =
-    cohorte.status === "PUBLIE" || !canModifyCohorte;
 
   return (
     <div className="flex flex-col w-full">
@@ -180,8 +184,7 @@ export default async function CohortePage({
         cohorteVaeCollectiveId={cohorteVaeCollectiveId}
         organism={organism}
         disabled={organismCardDisabled}
-        //readonly si la cohorte est publiée
-        readonly={cohorte.status !== "BROUILLON"}
+        readonly={organismCardreadonly}
         certificationSelected={certificationSelected}
       />
       {showAccessRightsCard && (

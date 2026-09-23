@@ -25,60 +25,82 @@ export const OrganismCard = ({
   organism?: Organism | null;
   certificationSelected?: boolean;
   disabled: boolean;
-  readonly?: boolean;
+  readonly: boolean;
   className?: string;
-}) =>
-  organism ? (
-    <FilledOrganismCard
-      commanditaireId={commanditaireId}
-      cohorteVaeCollectiveId={cohorteVaeCollectiveId}
-      organism={organism}
-      disabled={disabled}
-      readonly={readonly}
-      className={className}
-    />
-  ) : (
+}) => {
+  if (organism) {
+    return (
+      <FilledOrganismCard
+        commanditaireId={commanditaireId}
+        cohorteVaeCollectiveId={cohorteVaeCollectiveId}
+        organism={organism}
+        disabled={disabled}
+        readonly={readonly}
+        className={className}
+      />
+    );
+  }
+
+  return (
     <EmptyOrganismCard
       commanditaireId={commanditaireId}
       cohorteVaeCollectiveId={cohorteVaeCollectiveId}
       disabled={disabled}
+      readonly={readonly}
       certificationSelected={certificationSelected}
       className={className}
     />
   );
+};
 
 const EmptyOrganismCard = ({
   commanditaireId,
   cohorteVaeCollectiveId,
   disabled,
+  readonly,
   certificationSelected,
   className,
 }: {
   commanditaireId: string;
   cohorteVaeCollectiveId: string;
   disabled: boolean;
+  readonly: boolean;
   certificationSelected?: boolean;
   className?: string;
 }) => {
-  const additionalProps = disabled
-    ? { disabled: true, buttonProps: { disabled: true } }
-    : {
-        enlargeLinkOrButton: true,
-        linkProps: {
-          href: `/commanditaires/${commanditaireId}/cohortes/${cohorteVaeCollectiveId}/aaps`,
-        },
-      };
+  const getAdditionalProps = () => {
+    if (readonly) {
+      return {};
+    }
+    if (disabled) {
+      return { disabled: true, buttonProps: { disabled: true } };
+    }
+    return {
+      enlargeLinkOrButton: true,
+      linkProps: {
+        href: `/commanditaires/${commanditaireId}/cohortes/${cohorteVaeCollectiveId}/aaps`,
+      },
+    };
+  };
+
+  const additionalProps = getAdditionalProps();
+
+  const getDetail = () => {
+    if (certificationSelected) {
+      return "Choisir un AAP qui sera en charge de cette cohorte.";
+    }
+    if (readonly) {
+      return "Non renseigné";
+    }
+    return "Liste accessible une fois la certification sélectionnée.";
+  };
 
   return (
     <Tile
       data-testid="empty-organism-card"
       className={className || ""}
       title="Architecte Accompagnateur de parcours"
-      detail={
-        certificationSelected
-          ? "Choisir un AAP qui sera en charge de cette cohorte."
-          : "Liste accessible une fois la certification sélectionnée."
-      }
+      detail={getDetail()}
       small
       orientation="horizontal"
       {...additionalProps}
@@ -156,7 +178,7 @@ const FilledOrganismCard = ({
             ))}
         </>
       }
-      detail="Changer d'AAP"
+      detail={readonly ? undefined : "Changer d'AAP"}
       small
       orientation="horizontal"
       {...additionalProps}
