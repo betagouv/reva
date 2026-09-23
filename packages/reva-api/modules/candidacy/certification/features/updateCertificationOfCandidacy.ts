@@ -1,5 +1,9 @@
 import { CandidacyStatusStep } from "@prisma/client";
 
+import {
+  resetAccompagnementToBrouillon,
+  updateCurrentAccompagnementParcours,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
 import { logCandidacyAuditEvent } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
 import { refreshCertificationAuthorityOfCandidacy } from "@/modules/certification-authority/features/refreshCertificationAuthorityOfCandidacy";
 import { getCertificationById } from "@/modules/referential/features/getCertificationById";
@@ -119,6 +123,17 @@ export const updateCertificationOfCandidacy = async ({
         firstAppointmentOccuredAt: null,
       },
     });
+
+    const currentAccompagnement = await updateCurrentAccompagnementParcours({
+      candidacyId,
+      data: { firstAppointmentOccuredAt: null },
+    });
+
+    if (currentAccompagnement) {
+      await resetAccompagnementToBrouillon({
+        accompagnementId: currentAccompagnement.id,
+      });
+    }
 
     await refreshCertificationAuthorityOfCandidacy({
       candidacyId,

@@ -1,4 +1,5 @@
 import {
+  AccompagnementStatus,
   Candidacy,
   CandidacyStatusStep,
   CandidateTypology,
@@ -51,12 +52,20 @@ export const createCandidacyHelper = async (args?: {
     })
   ).id;
 
-  return prismaClient.candidacy.create({
+  const typeAccompagnement = candidacyArgs?.typeAccompagnement ?? "ACCOMPAGNE";
+  const status = candidacyActiveStatus ?? CandidacyStatusStep.PARCOURS_CONFIRME;
+  const financeModule = candidacyArgs?.financeModule ?? FinanceModule.unifvae;
+  const organismId =
+    candidacyArgs && "organismId" in candidacyArgs
+      ? candidacyArgs.organismId
+      : organism.id;
+
+  const candidacy = await prismaClient.candidacy.create({
     data: {
       typology: CandidateTypology.BENEVOLE,
-      financeModule: FinanceModule.unifvae,
+      financeModule,
       isCertificationPartial: false,
-      status: candidacyActiveStatus ?? CandidacyStatusStep.PARCOURS_CONFIRME,
+      status,
       basicSkills: {
         createMany: {
           data: [
@@ -67,11 +76,10 @@ export const createCandidacyHelper = async (args?: {
       },
       certificationId: certificationId ?? certification.id,
       candidateId: candidate.id,
-      organismId: organism.id,
+      organismId,
       candidacyStatuses: {
         create: {
-          status:
-            candidacyActiveStatus ?? CandidacyStatusStep.PARCOURS_CONFIRME,
+          status,
         },
       },
       ...candidacyArgs,
@@ -105,4 +113,60 @@ export const createCandidacyHelper = async (args?: {
       candidacyStatuses: true,
     },
   });
+
+  const finalTypeAccompagnement =
+    candidacy.typeAccompagnement ?? typeAccompagnement;
+
+  const shouldCreateAccompagnement =
+    status !== CandidacyStatusStep.PROJET &&
+    status !== CandidacyStatusStep.ARCHIVE;
+
+  if (finalTypeAccompagnement === "ACCOMPAGNE" && shouldCreateAccompagnement) {
+    const endConfirmed =
+      candidacy.endAccompagnementStatus === "CONFIRMED_BY_CANDIDATE" ||
+      candidacy.endAccompagnementStatus === "CONFIRMED_BY_ADMIN";
+
+    const accompagnementStatus = endConfirmed
+      ? AccompagnementStatus.TERMINE
+      : candidacy.organismId
+        ? AccompagnementStatus.ACTIF
+        : AccompagnementStatus.BROUILLON;
+
+    const accompagnement = await prismaClient.accompagnement.create({
+      data: {
+        candidacyId: candidacy.id,
+        status: accompagnementStatus,
+        organismId: candidacy.organismId,
+        startedAt:
+          accompagnementStatus === AccompagnementStatus.BROUILLON
+            ? null
+            : (candidacy.sentAt ?? candidacy.createdAt),
+        endedAt: endConfirmed
+          ? (candidacy.endAccompagnementDate ?? new Date())
+          : null,
+        candidacyStatusAtStart: candidacy.status,
+        candidacyStatusAtEnd: endConfirmed ? candidacy.status : null,
+        financeModule: candidacy.financeModule,
+        individualHourCount: candidacy.individualHourCount,
+        collectiveHourCount: candidacy.collectiveHourCount,
+        additionalHourCount: candidacy.additionalHourCount,
+        certificateSkills: candidacy.certificateSkills,
+        otherTraining: candidacy.otherTraining,
+        isCertificationPartial: candidacy.isCertificationPartial,
+        firstAppointmentOccuredAt: candidacy.firstAppointmentOccuredAt,
+        endAccompagnementDate: candidacy.endAccompagnementDate,
+        endAccompagnementStatus: candidacy.endAccompagnementStatus,
+        endAccompagnementReason: candidacy.endAccompagnementReason,
+        endAccompagnementCandidateDropOutReasonId:
+          candidacy.endAccompagnementCandidateDropOutReasonId,
+      },
+    });
+
+    await prismaClient.basicSkillOnCandidacies.updateMany({
+      where: { candidacyId: candidacy.id },
+      data: { accompagnementId: accompagnement.id },
+    });
+  }
+
+  return candidacy;
 };

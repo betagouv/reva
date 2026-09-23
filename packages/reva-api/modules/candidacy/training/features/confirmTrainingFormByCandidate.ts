@@ -1,6 +1,10 @@
 import { FeasibilityFormat } from "@prisma/client";
 
 import {
+  activateAccompagnement,
+  getCurrentAccompagnement,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
+import {
   CandidacyAuditLogUserInfo,
   logCandidacyAuditEvent,
 } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
@@ -81,6 +85,18 @@ export const confirmTrainingFormByCandidate = async ({
     candidacyId,
     status: "PARCOURS_CONFIRME",
   });
+
+  const currentAccompagnement = await getCurrentAccompagnement({
+    candidacyId,
+  });
+
+  if (currentAccompagnement && currentAccompagnement.organismId) {
+    await activateAccompagnement({
+      accompagnementId: currentAccompagnement.id,
+      organismId: currentAccompagnement.organismId,
+    });
+  }
+
   await logCandidacyAuditEvent({
     candidacyId,
     eventType: "TRAINING_FORM_CONFIRMED",

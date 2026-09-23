@@ -185,7 +185,7 @@ test("le passage à 'autonome' doit archiver un DF dématérialisé actif non re
 test("candidate should be able to change it's type_accompagnement to 'accompagne' when the candidacy status is 'PROJET'", async () => {
   const candidacy = await createCandidacyHelper({
     candidacyActiveStatus: "PROJET",
-    candidacyArgs: { typeAccompagnement: "AUTONOME" },
+    candidacyArgs: { typeAccompagnement: "AUTONOME", organismId: null },
   });
   const candidateKeycloakId = candidacy.candidate?.keycloakId;
 
@@ -267,7 +267,7 @@ test("candidate should NOT be able to change it's type_accompagnement to 'autono
 test("candidate should NOT be able to change it's type_accompagnement to 'accompagne' when the candidacy status is equal to 'DOSSIER_FAISABILITE_ENVOYE'", async () => {
   const candidacy = await createCandidacyHelper({
     candidacyActiveStatus: CandidacyStatusStep.DOSSIER_FAISABILITE_ENVOYE,
-    candidacyArgs: { typeAccompagnement: "AUTONOME" },
+    candidacyArgs: { typeAccompagnement: "AUTONOME", organismId: null },
   });
   const candidateKeycloakId = candidacy.candidate?.keycloakId;
 

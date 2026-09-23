@@ -1,5 +1,6 @@
 import { EndAccompagnementReason } from "@prisma/client";
 
+import { updateCurrentAccompagnementEndFields } from "@/modules/accompagnement/features/accompagnement.helpers";
 import { logCandidacyAuditEvent } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
 import { getCandidateLoginUrl } from "@/modules/candidate/utils/candidate.url.helpers";
 import { CANDIDATURE_NON_TROUVEE } from "@/modules/shared/errors/messages";
@@ -44,16 +45,27 @@ export const submitEndAccompagnement = async ({
       jury.isActive && JURY_FULL_SUCCESS_RESULT.includes(jury.result || ""),
   );
 
+  const endAccompagnementStatus = juryHasFullSuccess
+    ? "CONFIRMED_BY_ADMIN"
+    : "PENDING";
+
   const updatedCandidacy = await prismaClient.candidacy.update({
     where: { id: candidacyId },
     data: {
       endAccompagnementDate,
-      endAccompagnementStatus: juryHasFullSuccess
-        ? "CONFIRMED_BY_ADMIN"
-        : "PENDING",
+      endAccompagnementStatus,
       endAccompagnementReason,
       endAccompagnementCandidateDropOutReasonId,
     },
+  });
+
+  await updateCurrentAccompagnementEndFields({
+    candidacyId,
+    endAccompagnementDate,
+    endAccompagnementStatus,
+    endAccompagnementReason,
+    endAccompagnementCandidateDropOutReasonId:
+      endAccompagnementCandidateDropOutReasonId ?? null,
   });
 
   await logCandidacyAuditEvent({

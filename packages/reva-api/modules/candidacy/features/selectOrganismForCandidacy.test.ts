@@ -155,6 +155,17 @@ test("should reset the status to validation when selecting a new organism and st
   expect(candidacyUpdated).toMatchObject({
     status: CandidacyStatusStep.VALIDATION,
   });
+
+  const accompagnement = await prismaClient.accompagnement.findFirst({
+    where: {
+      candidacyId,
+      status: { in: ["BROUILLON", "ACTIF"] },
+    },
+  });
+  expect(accompagnement).toMatchObject({
+    status: "BROUILLON",
+    organismId: organism.id,
+  });
 });
 
 test("should reset the training and update the status when selecting a new organism", async () => {

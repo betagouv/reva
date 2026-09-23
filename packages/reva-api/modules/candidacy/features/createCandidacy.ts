@@ -4,6 +4,7 @@ import {
   CandidateTypology,
 } from "@prisma/client";
 
+// import { createAccompagnement } from "@/modules/accompagnement/features/accompagnement.helpers";
 import { refreshCertificationAuthorityOfCandidacy } from "@/modules/certification-authority/features/refreshCertificationAuthorityOfCandidacy";
 import { prismaClient } from "@/prisma/client";
 
@@ -26,9 +27,11 @@ export const createCandidacy = async ({
     where: { key: "DF_DEMAT_AUTONOME", isActive: true },
   });
 
+  const resolvedTypeAccompagnement = typeAccompagnement ?? "ACCOMPAGNE";
+
   const feasibilityFormat =
     isDfDematAutonomeActive ||
-    typeAccompagnement === "ACCOMPAGNE" ||
+    resolvedTypeAccompagnement === "ACCOMPAGNE" ||
     cohorteVaeCollectiveId
       ? "DEMATERIALIZED"
       : "UPLOADED_PDF";
@@ -50,7 +53,7 @@ export const createCandidacy = async ({
   await prismaClient.$queryRaw`SELECT id FROM candidate WHERE id = ${candidateId}::uuid FOR UPDATE NOWAIT`;
   const candidacy = await prismaClient.candidacy.create({
     data: {
-      typeAccompagnement,
+      typeAccompagnement: resolvedTypeAccompagnement,
       candidateId,
       certificationId,
       admissibility: { create: {} },
@@ -74,19 +77,28 @@ export const createCandidacy = async ({
         },
       },
       ccnId:
-        isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
+        isDfDematAutonomeActive || resolvedTypeAccompagnement === "ACCOMPAGNE"
           ? candidate?.ccnId
           : null,
       typology:
-        isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
+        isDfDematAutonomeActive || resolvedTypeAccompagnement === "ACCOMPAGNE"
           ? (candidate?.typology ?? CandidateTypology.NON_SPECIFIE)
           : CandidateTypology.NON_SPECIFIE,
       typologyAdditional:
-        isDfDematAutonomeActive || typeAccompagnement === "ACCOMPAGNE"
+        isDfDematAutonomeActive || resolvedTypeAccompagnement === "ACCOMPAGNE"
           ? candidate?.typologyAdditional
           : null,
     },
   });
+
+  // if (resolvedTypeAccompagnement === "ACCOMPAGNE") {
+  //   await createAccompagnement({
+  //     candidacyId: candidacy.id,
+  //     organismId: cohorteVaeCollective?.organismId,
+  //     candidacyStatusAtStart: CandidacyStatusStep.PROJET,
+  //     financeModule: "hors_plateforme",
+  //   });
+  // }
 
   await refreshCertificationAuthorityOfCandidacy({ candidacyId: candidacy.id });
 

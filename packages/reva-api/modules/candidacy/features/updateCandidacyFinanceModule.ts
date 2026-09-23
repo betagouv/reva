@@ -1,5 +1,6 @@
 import { FinanceModule } from "@prisma/client";
 
+import { updateCurrentAccompagnementFinanceModule } from "@/modules/accompagnement/features/accompagnement.helpers";
 import {
   CandidacyAuditLogUserInfo,
   logCandidacyAuditEvent,
@@ -32,6 +33,11 @@ export const updateCandidacyFinanceModule = async ({
   const result = await prismaClient.candidacy.update({
     where: { id: candidacyId },
     data: { financeModule },
+  });
+
+  await updateCurrentAccompagnementFinanceModule({
+    candidacyId,
+    financeModule,
   });
 
   await logCandidacyAuditEvent({

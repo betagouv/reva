@@ -1,5 +1,10 @@
 import { format } from "date-fns";
 
+import {
+  getCurrentAccompagnement,
+  terminateAccompagnement,
+  updateCurrentAccompagnementEndFields,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
 import { logCandidacyAuditEvent } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
 import { getBackofficeUrl } from "@/modules/shared/email/backoffice.url.helpers";
 import { CANDIDATURE_NON_TROUVEE } from "@/modules/shared/errors/messages";
@@ -47,6 +52,20 @@ export const updateCandidacyEndAccompagnementDecision = async ({
 
   if (endAccompagnement) {
     if (!feasibility || feasibility?.decision === "DRAFT") {
+      const current = await getCurrentAccompagnement({ candidacyId });
+      if (current) {
+        await terminateAccompagnement({
+          accompagnementId: current.id,
+          endedAt: endAccompagnementDate,
+          candidacyStatusAtEnd: candidacy.status,
+          endAccompagnementDate,
+          endAccompagnementStatus: "NOT_REQUESTED",
+          endAccompagnementReason: candidacy.endAccompagnementReason,
+          endAccompagnementCandidateDropOutReasonId:
+            candidacy.endAccompagnementCandidateDropOutReasonId,
+        });
+      }
+
       await prismaClient.candidacy.update({
         where: { id: candidacyId },
         data: {
@@ -67,6 +86,20 @@ export const updateCandidacyEndAccompagnementDecision = async ({
         },
       });
     } else {
+      const current = await getCurrentAccompagnement({ candidacyId });
+      if (current) {
+        await terminateAccompagnement({
+          accompagnementId: current.id,
+          endedAt: endAccompagnementDate,
+          candidacyStatusAtEnd: candidacy.status,
+          endAccompagnementDate,
+          endAccompagnementStatus: "CONFIRMED_BY_CANDIDATE",
+          endAccompagnementReason: candidacy.endAccompagnementReason,
+          endAccompagnementCandidateDropOutReasonId:
+            candidacy.endAccompagnementCandidateDropOutReasonId,
+        });
+      }
+
       await prismaClient.candidacy.update({
         where: { id: candidacyId },
         data: {
@@ -83,6 +116,14 @@ export const updateCandidacyEndAccompagnementDecision = async ({
         endAccompagnementReason: null,
         endAccompagnementCandidateDropOutReasonId: null,
       },
+    });
+
+    await updateCurrentAccompagnementEndFields({
+      candidacyId,
+      endAccompagnementStatus: "NOT_REQUESTED",
+      endAccompagnementDate: null,
+      endAccompagnementReason: null,
+      endAccompagnementCandidateDropOutReasonId: null,
     });
   }
 

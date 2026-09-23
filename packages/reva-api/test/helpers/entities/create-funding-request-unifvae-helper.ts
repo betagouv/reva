@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { Prisma } from "@prisma/client";
 
+import { getCurrentAccompagnement } from "@/modules/accompagnement/features/accompagnement.helpers";
 import { prismaClient } from "@/prisma/client";
 
 import { createCandidacyHelper } from "./create-candidacy-helper";
@@ -14,9 +15,12 @@ export const createFundingRequestUnifvaeHelper = async (
     candidacyId = candidacy.id;
   }
 
+  const currentAccompagnement = await getCurrentAccompagnement({ candidacyId });
+
   return prismaClient.fundingRequestUnifvae.create({
     data: {
       candidacyId,
+      accompagnementId: args?.accompagnementId ?? currentAccompagnement?.id,
       numAction: faker.string.uuid(),
       individualHourCount: 0,
       individualCost: 0,

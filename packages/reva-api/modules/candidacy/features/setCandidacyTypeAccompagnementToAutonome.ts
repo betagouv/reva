@@ -1,5 +1,9 @@
 import { Candidacy, CandidacyStatusStep } from "@prisma/client";
 
+import {
+  getCurrentAccompagnement,
+  terminateAccompagnement,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
 import { getActiveFeasibilityByCandidacyid } from "@/modules/feasibility/feasibility.features";
 import { CANDIDATURE_NON_TROUVEE } from "@/modules/shared/errors/messages";
 import { prismaClient } from "@/prisma/client";
@@ -21,6 +25,28 @@ const convertToValidAutonomeStatus = (status: CandidacyStatusStep) => {
       return "PROJET";
     default:
       return status;
+  }
+};
+
+const terminateCurrentAccompagnement = async ({
+  candidacyId,
+  candidacyStatusAtEnd,
+  tx,
+}: {
+  candidacyId: string;
+  candidacyStatusAtEnd: CandidacyStatusStep;
+  tx: Parameters<typeof getCurrentAccompagnement>[0]["tx"];
+}) => {
+  const currentAccompagnement = await getCurrentAccompagnement({
+    candidacyId,
+    tx,
+  });
+  if (currentAccompagnement) {
+    await terminateAccompagnement({
+      accompagnementId: currentAccompagnement.id,
+      candidacyStatusAtEnd,
+      tx,
+    });
   }
 };
 
@@ -71,6 +97,11 @@ export const setCandidacyTypeAccompagnementToAutonome = async ({
             tx,
           });
         }
+        await terminateCurrentAccompagnement({
+          candidacyId,
+          candidacyStatusAtEnd: validStatus,
+          tx,
+        });
         return tx.candidacy.update({
           where: { id: candidacyId },
           data: {
@@ -95,6 +126,11 @@ export const setCandidacyTypeAccompagnementToAutonome = async ({
         tx,
       });
     }
+    await terminateCurrentAccompagnement({
+      candidacyId,
+      candidacyStatusAtEnd: validStatus,
+      tx,
+    });
     return tx.candidacy.update({
       where: { id: candidacyId },
       data: {

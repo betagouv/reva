@@ -1,5 +1,10 @@
 import { CandidacyStatusStep } from "@prisma/client";
 
+import {
+  createAccompagnement,
+  getCurrentAccompagnement,
+  terminateAccompagnement,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
 import { logCandidacyAuditEvent } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
 import { getOrganismById } from "@/modules/organism/features/getOrganism";
 import {
@@ -114,6 +119,30 @@ export const selectOrganismForCandidacy = async ({
       certification &&
       isValidStatus
     ) {
+      const currentAccompagnement = await getCurrentAccompagnement({
+        candidacyId,
+      });
+      if (currentAccompagnement) {
+        await terminateAccompagnement({
+          accompagnementId: currentAccompagnement?.id,
+          endedAt: new Date(),
+          candidacyStatusAtEnd: candidacy.status,
+          endAccompagnementDate: null,
+          endAccompagnementStatus: "NOT_REQUESTED",
+          endAccompagnementReason: null,
+          endAccompagnementCandidateDropOutReasonId: null,
+        });
+        await createAccompagnement({
+          candidacyId,
+          organismId,
+          candidacyStatusAtStart:
+            candidacy.status === CandidacyStatusStep.PARCOURS_ENVOYE ||
+            candidacy.status === CandidacyStatusStep.PRISE_EN_CHARGE
+              ? "VALIDATION"
+              : candidacy.status,
+          firstAppointmentOccuredAt: null,
+        });
+      }
       await sendPreviousOrganismCandidateChangeOrganismEmail({
         email: organism.contactAdministrativeEmail,
         candidateFullName: `${candidate.firstname} ${candidate.lastname}`,

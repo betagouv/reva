@@ -4,6 +4,10 @@ import {
   CandidateTypology,
 } from "@prisma/client";
 
+import {
+  getCurrentAccompagnement,
+  terminateAccompagnement,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
 import { isCandidacyStatusEqualOrAboveGivenStatus } from "@/modules/candidacy-menu/features/isCandidacyStatusEqualOrAboveGivenStatus";
 import { getCertificationById } from "@/modules/referential/features/getCertificationById";
 import { CANDIDATURE_NON_TROUVEE } from "@/modules/shared/errors/messages";
@@ -79,6 +83,20 @@ export const updateCandidacyTypeAccompagnement = async ({
         },
         data: { isActive: false },
       });
+    }
+
+    if (typeAccompagnement === "AUTONOME") {
+      const currentAccompagnement = await getCurrentAccompagnement({
+        candidacyId,
+        tx,
+      });
+      if (currentAccompagnement) {
+        await terminateAccompagnement({
+          accompagnementId: currentAccompagnement.id,
+          candidacyStatusAtEnd: candidacy.status,
+          tx,
+        });
+      }
     }
 
     return tx.candidacy.update({

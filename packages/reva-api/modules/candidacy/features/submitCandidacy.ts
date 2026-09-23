@@ -1,5 +1,6 @@
 import { CandidacyStatusStep } from "@prisma/client";
 
+import { createAccompagnement } from "@/modules/accompagnement/features/accompagnement.helpers";
 import { getCandidateById } from "@/modules/candidate/features/getCandidateById";
 import { isFeatureActiveForUser } from "@/modules/feature-flipping/feature-flipping.features";
 import { CANDIDATURE_NON_TROUVEE } from "@/modules/shared/errors/messages";
@@ -59,6 +60,14 @@ export const submitCandidacy = async ({
       `Impossible de trouver l'organisme pour la candidature ${candidacy.id}`,
     );
   }
+
+  await createAccompagnement({
+    candidacyId,
+    organismId: organism.id,
+    candidacyStatusAtStart: CandidacyStatusStep.VALIDATION,
+    firstAppointmentOccuredAt: null,
+  });
+
   await sendNewCandidacyEmail({
     email: organism.emailContact || organism.contactAdministrativeEmail,
     candidacyId: candidacy.id,

@@ -1,5 +1,6 @@
 import { CandidacyStatusStep } from "@prisma/client";
 
+import { updateCurrentAccompagnementParcours } from "@/modules/accompagnement/features/accompagnement.helpers";
 import { logCandidacyAuditEvent } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
 import { CANDIDATURE_NON_TROUVEE } from "@/modules/shared/errors/messages";
 import { prismaClient } from "@/prisma/client";
@@ -66,6 +67,19 @@ export const resetTrainingInformation = async ({
         additionalHourCount: null,
         isCertificationPartial: null,
       },
+    });
+
+    await updateCurrentAccompagnementParcours({
+      candidacyId,
+      data: {
+        certificateSkills: null,
+        otherTraining: null,
+        individualHourCount: null,
+        collectiveHourCount: null,
+        additionalHourCount: null,
+        isCertificationPartial: null,
+      },
+      tx,
     });
 
     if (updateStatusToValidation) {

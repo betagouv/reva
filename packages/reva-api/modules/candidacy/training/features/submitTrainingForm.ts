@@ -1,6 +1,10 @@
 import { CandidateTypology } from "@prisma/client";
 
 import {
+  getCurrentAccompagnement,
+  updateCurrentAccompagnementParcours,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
+import {
   CandidacyAuditLogUserInfo,
   logCandidacyAuditEvent,
 } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
@@ -157,6 +161,12 @@ const updateTrainingInformations = async (params: {
   };
 }) =>
   prismaClient.$transaction(async (tx) => {
+    const currentAccompagnement = await getCurrentAccompagnement({
+      candidacyId: params.candidacyId,
+      tx,
+    });
+    const accompagnementId = currentAccompagnement?.id ?? null;
+
     await tx.basicSkillOnCandidacies.deleteMany({
       where: {
         candidacyId: params.candidacyId,
@@ -166,6 +176,7 @@ const updateTrainingInformations = async (params: {
       data: params.training.basicSkillIds.map((id) => ({
         candidacyId: params.candidacyId,
         basicSkillId: id,
+        accompagnementId,
       })),
     });
     await tx.trainingOnCandidacies.deleteMany({
@@ -177,6 +188,7 @@ const updateTrainingInformations = async (params: {
       data: params.training.mandatoryTrainingIds.map((id) => ({
         candidacyId: params.candidacyId,
         trainingId: id,
+        accompagnementId,
       })),
     });
 
@@ -191,6 +203,7 @@ const updateTrainingInformations = async (params: {
         candidacyFinancingMethodId: cfm.candidacyFinancingMethodId,
         amount: cfm.amount,
         additionalInformation: cfm.additionalInformation,
+        accompagnementId,
       })),
     });
 
@@ -206,5 +219,18 @@ const updateTrainingInformations = async (params: {
         additionalHourCount: params.training.additionalHourCount,
         isCertificationPartial: params.training.isCertificationPartial,
       },
+    });
+
+    await updateCurrentAccompagnementParcours({
+      candidacyId: params.candidacyId,
+      data: {
+        certificateSkills: params.training.certificateSkills,
+        otherTraining: params.training.otherTraining,
+        individualHourCount: params.training.individualHourCount,
+        collectiveHourCount: params.training.collectiveHourCount,
+        additionalHourCount: params.training.additionalHourCount,
+        isCertificationPartial: params.training.isCertificationPartial,
+      },
+      tx,
     });
   });

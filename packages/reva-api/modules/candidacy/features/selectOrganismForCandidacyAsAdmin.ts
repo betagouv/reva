@@ -1,3 +1,8 @@
+import {
+  createAccompagnement,
+  getCurrentAccompagnement,
+  terminateAccompagnement,
+} from "@/modules/accompagnement/features/accompagnement.helpers";
 import { logCandidacyAuditEvent } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
 import { getOrganismById } from "@/modules/organism/features/getOrganism";
 import { getBackofficeUrl } from "@/modules/shared/email/backoffice.url.helpers";
@@ -33,6 +38,7 @@ export const selectOrganismForCandidacyAsAdmin = async ({
     where: { id: candidacyId },
     select: {
       financeModule: true,
+      status: true,
       candidate: {
         select: {
           firstname: true,
@@ -65,6 +71,31 @@ export const selectOrganismForCandidacyAsAdmin = async ({
       candidacyId,
       organismId,
     });
+
+    const currentAccompagnement = await getCurrentAccompagnement({
+      candidacyId,
+    });
+
+    if (
+      currentAccompagnement &&
+      currentAccompagnement.organismId !== organismId
+    ) {
+      await terminateAccompagnement({
+        accompagnementId: currentAccompagnement?.id,
+        endedAt: new Date(),
+        candidacyStatusAtEnd: candidacy.status,
+        endAccompagnementDate: null,
+        endAccompagnementStatus: "NOT_REQUESTED",
+        endAccompagnementReason: null,
+        endAccompagnementCandidateDropOutReasonId: null,
+      });
+      await createAccompagnement({
+        candidacyId,
+        organismId,
+        candidacyStatusAtStart: candidacy.status,
+        firstAppointmentOccuredAt: null,
+      });
+    }
 
     const newAapEmail =
       organism.emailContact || organism.contactAdministrativeEmail;

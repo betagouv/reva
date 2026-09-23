@@ -1,6 +1,7 @@
 import { Decimal } from "@prisma/client/runtime/library";
 import { isAfter, isBefore, sub } from "date-fns";
 
+import { getCurrentAccompagnement } from "@/modules/accompagnement/features/accompagnement.helpers";
 import { logCandidacyAuditEvent } from "@/modules/candidacy-log/features/logCandidacyAuditEvent";
 import {
   DATE_LIMITE_DEMANDE_PAIEMENT_DEPASSEE_CANDIDATURE,
@@ -209,15 +210,21 @@ export const createOrUpdatePaymentRequestUnifvae = async ({
     throw new Error(businessErrors[0]);
   }
 
+  const currentAccompagnement = await getCurrentAccompagnement({ candidacyId });
+
   const result = await prismaClient.paymentRequestUnifvae.upsert({
     where: { candidacyId },
     create: {
       candidacyId,
+      accompagnementId: currentAccompagnement?.id,
       ...paymentRequest,
       invoiceNumber: paymentRequest.invoiceNumber || "",
     },
     update: {
       ...paymentRequest,
+      ...(currentAccompagnement?.id
+        ? { accompagnementId: currentAccompagnement.id }
+        : {}),
     },
   });
 

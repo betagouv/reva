@@ -278,12 +278,59 @@ model Candidacy {
   certificationAuthorityId                      String?                                         @map("certification_authority_id") @db.Uuid
   feasibilityFileDematAutonomeResourceHiddenAt  DateTime?                                       @map("feasibility_file_demat_autonome_resource_hidden_at") @db.Timestamptz(6)
   feasibilityFileDematAutonomeFirstOpeningAt    DateTime?                                       @map("feasibility_file_demat_autonome_first_opening_at") @db.Timestamptz(6)
+  accompagnements                               Accompagnement[]
 
   @@index([organismId])
   @@index([candidateId])
   @@index([certificationId])
   @@index([status, createdAt(sort: Desc)])
   @@map("candidacy")
+}
+
+enum AccompagnementStatus {
+  BROUILLON
+  ACTIF
+  TERMINE
+}
+
+model Accompagnement {
+  id                                        String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  candidacy                                 Candidacy                    @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
+  candidacyId                               String                       @map("candidacy_id") @db.Uuid
+  status                                    AccompagnementStatus         @default(BROUILLON)
+  startedAt                                 DateTime?                    @map("started_at") @db.Timestamptz(6)
+  endedAt                                   DateTime?                    @map("ended_at") @db.Timestamptz(6)
+  candidacyStatusAtStart                    CandidacyStatusStep?         @map("candidacy_status_at_start")
+  candidacyStatusAtEnd                      CandidacyStatusStep?         @map("candidacy_status_at_end")
+  organism                                  Organism?                    @relation(fields: [organismId], references: [id])
+  organismId                                String?                      @map("organism_id") @db.Uuid
+  individualHourCount                       Int?                         @map("individual_hour_count")
+  collectiveHourCount                       Int?                         @map("collective_hour_count")
+  additionalHourCount                       Int?                         @map("additional_hour_count")
+  certificateSkills                         String?                      @map("certificate_skills")
+  otherTraining                             String?                      @map("other_training")
+  isCertificationPartial                    Boolean?                     @map("is_certification_partial")
+  firstAppointmentOccuredAt                 DateTime?                    @map("first_appointment_occured_at") @db.Date
+  financeModule                             FinanceModule                @default(hors_plateforme) @map("finance_module")
+  endAccompagnementDate                     DateTime?                    @map("end_accompagnement_date") @db.Timestamptz(6)
+  endAccompagnementStatus                   EndAccompagnementStatus      @default(NOT_REQUESTED) @map("end_accompagnement_status")
+  endAccompagnementReason                   EndAccompagnementReason?     @map("end_accompagnement_reason")
+  endAccompagnementCandidateDropOutReason   DropOutReason?               @relation(fields: [endAccompagnementCandidateDropOutReasonId], references: [id], name: "accompagnement_end_accompagnement_candidate_drop_out_reason")
+  endAccompagnementCandidateDropOutReasonId String?                      @map("end_accompagnement_candidate_drop_out_reason_id") @db.Uuid
+  createdAt                                 DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                                 DateTime?                    @map("updated_at") @db.Timestamptz(6)
+  FundingRequest                            FundingRequest?
+  fundingRequestUnifvae                     FundingRequestUnifvae?
+  paymentRequest                            PaymentRequest?
+  paymentRequestUnifvae                     PaymentRequestUnifvae?
+  trainings                                 TrainingOnCandidacies[]
+  basicSkills                               BasicSkillOnCandidacies[]
+  candidacyOnCandidacyFinancingMethod       CandidacyOnCandidacyFinancingMethod[]
+
+  @@index([candidacyId])
+  @@index([candidacyId, status])
+  @@index([organismId])
+  @@map("accompagnement")
 }
 
 enum EndAccompagnementReason {
@@ -576,6 +623,7 @@ model Organism {
   contactAdministrativePhone     String?                          @map("contact_administrative_phone") @db.VarChar(50)
   siret                          String
   candidacies                    Candidacy[]
+  accompagnements                Accompagnement[]
   accounts                       Account[]
   createdAt                      DateTime                         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                      DateTime?                        @map("updated_at") @db.Timestamptz(6)
@@ -689,14 +737,17 @@ model Training {
 }
 
 model TrainingOnCandidacies {
-  training    Training  @relation(fields: [trainingId], references: [id])
-  trainingId  String    @map("training_id") @db.Uuid
-  candidacy   Candidacy @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
-  candidacyId String    @map("candidacy_id") @db.Uuid
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime? @map("updated_at") @db.Timestamptz(6)
+  training         Training        @relation(fields: [trainingId], references: [id])
+  trainingId       String          @map("training_id") @db.Uuid
+  candidacy        Candidacy       @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
+  candidacyId      String          @map("candidacy_id") @db.Uuid
+  accompagnement   Accompagnement? @relation(fields: [accompagnementId], references: [id], onDelete: SetNull)
+  accompagnementId String?         @map("accompagnement_id") @db.Uuid
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime?       @map("updated_at") @db.Timestamptz(6)
 
   @@id([trainingId, candidacyId])
+  @@index([accompagnementId])
   @@map("training_candidacy")
 }
 
@@ -713,14 +764,17 @@ model BasicSkill {
 }
 
 model BasicSkillOnCandidacies {
-  basicSkill   BasicSkill @relation(fields: [basicSkillId], references: [id])
-  basicSkillId String     @map("basic_skill_id") @db.Uuid
-  candidacy    Candidacy  @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
-  candidacyId  String     @map("candidacy_id") @db.Uuid
-  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime?  @map("updated_at") @db.Timestamptz(6)
+  basicSkill       BasicSkill      @relation(fields: [basicSkillId], references: [id])
+  basicSkillId     String          @map("basic_skill_id") @db.Uuid
+  candidacy        Candidacy       @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
+  candidacyId      String          @map("candidacy_id") @db.Uuid
+  accompagnement   Accompagnement? @relation(fields: [accompagnementId], references: [id], onDelete: SetNull)
+  accompagnementId String?         @map("accompagnement_id") @db.Uuid
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime?       @map("updated_at") @db.Timestamptz(6)
 
   @@id([basicSkillId, candidacyId])
+  @@index([accompagnementId])
   @@map("basic_skill_candidacy")
 }
 
@@ -777,6 +831,8 @@ model FundingRequest {
   id                          String                        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   candidacy                   Candidacy                     @relation(fields: [candidacyId], references: [id])
   candidacyId                 String                        @unique @map("candidacy_id") @db.Uuid
+  accompagnement              Accompagnement?               @relation(fields: [accompagnementId], references: [id], onDelete: SetNull)
+  accompagnementId            String?                       @unique @map("accompagnement_id") @db.Uuid
   companion                   Organism?                     @relation(fields: [companionId], references: [id], onDelete: Cascade)
   companionId                 String?                       @map("companion_id") @db.Uuid
   diagnosisHourCount          Int                           @map("diagnosis_hour_count")
@@ -844,13 +900,14 @@ model FundingRequestBatch {
 }
 
 model DropOutReason {
-  id                           String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  label                        String             @unique @db.VarChar(255)
-  candidacies                  CandidacyDropOut[] @relation()
-  isActive                     Boolean            @default(true) @map("is_active")
-  createdAt                    DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                    DateTime?          @map("updated_at") @db.Timestamptz(6)
-  endAccompagnementCandidacies Candidacy[]        @relation("end_accompagnement_candidate_drop_out_reason")
+  id                               String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  label                            String             @unique @db.VarChar(255)
+  candidacies                      CandidacyDropOut[] @relation()
+  isActive                         Boolean            @default(true) @map("is_active")
+  createdAt                        DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                        DateTime?          @map("updated_at") @db.Timestamptz(6)
+  endAccompagnementCandidacies     Candidacy[]        @relation("end_accompagnement_candidate_drop_out_reason")
+  endAccompagnementAccompagnements Accompagnement[]   @relation("accompagnement_end_accompagnement_candidate_drop_out_reason")
 
   @@map("drop_out_reason")
 }
@@ -934,6 +991,8 @@ model PaymentRequest {
   id                                   String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   candidacy                            Candidacy            @relation(fields: [candidacyId], references: [id])
   candidacyId                          String               @unique @map("candidacy_id") @db.Uuid
+  accompagnement                       Accompagnement?      @relation(fields: [accompagnementId], references: [id], onDelete: SetNull)
+  accompagnementId                     String?              @unique @map("accompagnement_id") @db.Uuid
   diagnosisEffectiveHourCount          Int                  @map("diagnosis_effective_hour_count")
   diagnosisEffectiveCost               Decimal              @map("diagnosis_effective_cost") @db.Decimal(10, 2)
   postExamEffectiveHourCount           Int                  @map("post_exam_effective_hour_count")
@@ -987,6 +1046,8 @@ model PaymentRequestUnifvae {
   id                                   String                      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   candidacy                            Candidacy                   @relation(fields: [candidacyId], references: [id])
   candidacyId                          String                      @unique @map("candidacy_id") @db.Uuid
+  accompagnement                       Accompagnement?             @relation(fields: [accompagnementId], references: [id], onDelete: SetNull)
+  accompagnementId                     String?                     @unique @map("accompagnement_id") @db.Uuid
   individualEffectiveHourCount         Decimal                     @map("individual_effective_hour_count") @db.Decimal(10, 2)
   individualEffectiveCost              Decimal                     @map("individual_effective_cost") @db.Decimal(10, 2)
   collectiveEffectiveHourCount         Decimal                     @map("collective_effective_hour_count") @db.Decimal(10, 2)
@@ -1486,6 +1547,8 @@ model FundingRequestUnifvae {
   id                          String                               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   candidacy                   Candidacy                            @relation(fields: [candidacyId], references: [id])
   candidacyId                 String                               @unique @map("candidacy_id") @db.Uuid
+  accompagnement              Accompagnement?                      @relation(fields: [accompagnementId], references: [id], onDelete: SetNull)
+  accompagnementId            String?                              @unique @map("accompagnement_id") @db.Uuid
   numAction                   String                               @default("TO_MIGRATE") @map("num_action")
   isPartialCertification      Boolean                              @default(false)
   candidateFirstname          String                               @default("") @map("candidate_firstname")
@@ -2007,6 +2070,8 @@ model CandidacyOnCandidacyFinancingMethod {
   id                         String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   candidacyId                String                   @map("candidacy_id") @db.Uuid
   candidacy                  Candidacy                @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
+  accompagnementId           String?                  @map("accompagnement_id") @db.Uuid
+  accompagnement             Accompagnement?          @relation(fields: [accompagnementId], references: [id], onDelete: SetNull)
   candidacyFinancingMethodId String                   @map("candidacy_financing_method") @db.Uuid
   candidacyFinancingMethod   CandidacyFinancingMethod @relation(fields: [candidacyFinancingMethodId], references: [id], onDelete: Cascade)
   additionalInformation      String?                  @map("additional_information")
@@ -2015,6 +2080,7 @@ model CandidacyOnCandidacyFinancingMethod {
   updatedAt                  DateTime?                @map("updated_at") @db.Timestamptz(6)
 
   @@unique([candidacyId, candidacyFinancingMethodId])
+  @@index([accompagnementId])
   @@map("candidacy_on_candidacy_financing_method")
 }
 
