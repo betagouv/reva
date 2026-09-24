@@ -1,10 +1,15 @@
-import { hasPermission } from "@/components/auth/actions";
+import { hasPermission, isUserInRole } from "@/components/auth/actions";
 import { getActiveFeatures } from "@/helpers/get-actives-features";
 
 import { PrivateHeaderClient } from "./PrivateHeaderClient";
 
 export async function PrivateHeader() {
   const { isFeatureActive } = await getActiveFeatures();
+
+  const isSousCompteVaeCollective = await isUserInRole(
+    "sous_compte_vae_collective",
+  );
+
   const isMetabaseDashboardActive = isFeatureActive(
     "SHOW_METABASE_DASHBOARD_VAE_COLLECTIVE",
   );
@@ -41,10 +46,13 @@ export async function PrivateHeader() {
   const showAccountsPage =
     isVaeCollectiveAccountsFeatureActive && canAccessAccountsPage;
 
+  const showParametersPage = isSousCompteVaeCollective;
+
   return (
     <PrivateHeaderClient
       showMetabaseDashboard={showMetabaseDashboard}
       showAccountsPage={showAccountsPage}
+      showParametersPage={showParametersPage}
     />
   );
 }

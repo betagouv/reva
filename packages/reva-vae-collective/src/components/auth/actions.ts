@@ -45,20 +45,21 @@ const getUserPermissions = async ({
   return result.data?.vaeCollective_getUserPermissions ?? [];
 };
 
-const isUserInAdminRole = async () => {
+export const isUserInRole = async (role: UserRole) => {
   const accessToken = await getAccessTokenFromCookie();
-  let isAdmin = false;
 
-  if (accessToken) {
-    const decodedToken = jwtDecode<{
-      resource_access?: { "reva-vae-collective"?: { roles: string[] } };
-    }>(accessToken);
-
-    const roles = (decodedToken?.resource_access?.["reva-vae-collective"]
-      ?.roles || []) as UserRole[];
-    isAdmin = roles.includes("admin");
+  if (!accessToken) {
+    return false;
   }
-  return isAdmin;
+
+  const decodedToken = jwtDecode<{
+    resource_access?: { "reva-vae-collective"?: { roles: string[] } };
+  }>(accessToken);
+
+  const roles = (decodedToken?.resource_access?.["reva-vae-collective"]
+    ?.roles || []) as UserRole[];
+
+  return roles.includes(role);
 };
 
 export const hasPermission = async ({
@@ -69,7 +70,7 @@ export const hasPermission = async ({
   cohorteVaeCollectiveId?: string;
 }) => {
   let userHasPermission = false;
-  const isAdmin = await isUserInAdminRole();
+  const isAdmin = await isUserInRole("admin");
   if (isAdmin) {
     userHasPermission = true;
   } else {

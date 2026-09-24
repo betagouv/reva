@@ -9,12 +9,14 @@ const PATHS = {
   COHORTES: "/cohortes",
   DASHBOARD: "/dashboard",
   ACCOUNTS: "/comptes-utilisateur",
+  PARAMETERS: "/parametres",
 } as const;
 
 const LABELS = {
   COHORTES: "Cohortes",
   DASHBOARD: "Pilotage",
   ACCOUNTS: "Gestion des comptes",
+  PARAMETERS: "Paramètres",
 } as const;
 
 const createTab = ({
@@ -36,9 +38,11 @@ const createTab = ({
 export const PrivateHeaderClient = ({
   showMetabaseDashboard,
   showAccountsPage,
+  showParametersPage,
 }: {
   showMetabaseDashboard: boolean;
   showAccountsPage: boolean;
+  showParametersPage: boolean;
 }) => {
   const { logout, authenticated } = useKeycloakContext();
 
@@ -50,7 +54,7 @@ export const PrivateHeaderClient = ({
 
   const showTabs =
     authenticated &&
-    (showMetabaseDashboard || showAccountsPage) &&
+    (showMetabaseDashboard || showAccountsPage || showParametersPage) &&
     isCommanditairePath;
 
   const navigation = showTabs
@@ -75,6 +79,15 @@ export const PrivateHeaderClient = ({
                 text: LABELS.ACCOUNTS,
                 href: `/commanditaires/${commanditaireId}${PATHS.ACCOUNTS}`,
                 isActive: currentPathname.includes(PATHS.ACCOUNTS),
+              }),
+            ]
+          : []),
+        ...(showParametersPage
+          ? [
+              createTab({
+                text: LABELS.PARAMETERS,
+                href: `/commanditaires/${commanditaireId}${PATHS.PARAMETERS}`,
+                isActive: currentPathname.includes(PATHS.PARAMETERS),
               }),
             ]
           : []),

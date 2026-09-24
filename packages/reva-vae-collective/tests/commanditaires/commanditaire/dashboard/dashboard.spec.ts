@@ -182,3 +182,59 @@ test.describe("Gestion des comptes navigation tab", () => {
     });
   });
 });
+
+test.describe("Paramètres navigation tab", () => {
+  test.describe("when the user is a sous compte", () => {
+    test.use({
+      mswHandlers: [
+        [
+          mockCommanditaireVaeCollectiveForCohortesPage(),
+          mockQueryActiveFeatures(),
+          mockQueryGetUserPermissions(),
+        ],
+        { scope: "test" },
+      ],
+    });
+
+    test("the Paramètres tab should be visible", async ({ page }) => {
+      await login({ page, role: "sousCompteVaeCollective" });
+
+      await page.goto(
+        "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes",
+      );
+
+      await expect(
+        page.getByRole("link", { name: "Paramètres" }),
+      ).toBeVisible();
+    });
+  });
+
+  test.describe("when the user is not a sous compte", () => {
+    test.use({
+      mswHandlers: [
+        [
+          mockCommanditaireVaeCollectiveForCohortesPage(),
+          mockQueryActiveFeatures(),
+          mockQueryGetUserPermissions(),
+        ],
+        { scope: "test" },
+      ],
+    });
+
+    test("the Paramètres tab should not be displayed", async ({ page }) => {
+      await login({ page, role: "gestionnaireVaeCollective" });
+
+      await page.goto(
+        "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes",
+      );
+
+      await expect(
+        page.getByRole("button", { name: "Se déconnecter" }),
+      ).toBeVisible();
+
+      await expect(page.getByRole("link", { name: "Paramètres" })).toHaveCount(
+        0,
+      );
+    });
+  });
+});
