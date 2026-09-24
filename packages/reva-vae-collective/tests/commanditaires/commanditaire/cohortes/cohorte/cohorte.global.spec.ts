@@ -101,15 +101,24 @@ test.describe("when the user lacks the MODIFIER_COHORTE permission", () => {
     ],
   });
 
-  test("the edit cohorte name button should be disabled", async ({ page }) => {
+  test("the edit cohorte name button should not be displayed", async ({
+    page,
+  }) => {
     await login({ page, role: "gestionnaireVaeCollective" });
 
     await page.goto(
       "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes/0eda2cbf-78ae-47af-9f28-34d05f972712",
     );
 
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "macohorte",
+    );
+
     await expect(
       page.getByRole("button", { name: "Modifier l’intitulé" }),
-    ).toBeDisabled();
+    ).toBeHidden();
+    await expect(
+      page.getByRole("link", { name: "Modifier l’intitulé" }),
+    ).toBeHidden();
   });
 });

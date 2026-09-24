@@ -106,14 +106,6 @@ export default async function CohortePage({
     cohorteVaeCollectiveId,
   });
 
-  const modifierIntituleButtonProps = canModifyCohorte
-    ? {
-        linkProps: {
-          href: `/commanditaires/${commanditaireId}/cohortes/${cohorteVaeCollectiveId}/modifier-intitule`,
-        },
-      }
-    : { disabled: true };
-
   // carte certification readonly si la cohorte est publiée ou si l'utilisateur n'a pas la permission de modifier la cohorte
   const certificationCardreadonly =
     cohorte.status === "PUBLIE" || !canModifyCohorte;
@@ -160,15 +152,19 @@ export default async function CohortePage({
       />
       <div className="flex justify-between items-center">
         <h1>{cohorte.nom}</h1>
-        <Button
-          className="mb-6"
-          priority="tertiary no outline"
-          iconId="fr-icon-edit-line"
-          size="small"
-          {...modifierIntituleButtonProps}
-        >
-          Modifier l’intitulé
-        </Button>
+        {canModifyCohorte && (
+          <Button
+            className="mb-6"
+            priority="tertiary no outline"
+            iconId="fr-icon-edit-line"
+            size="small"
+            linkProps={{
+              href: `/commanditaires/${commanditaireId}/cohortes/${cohorteVaeCollectiveId}/modifier-intitule`,
+            }}
+          >
+            Modifier l’intitulé
+          </Button>
+        )}
       </div>
       <p className="text-xl mb-12">
         Paramétrez votre cohorte, afin de générer un code unique à transmettre
