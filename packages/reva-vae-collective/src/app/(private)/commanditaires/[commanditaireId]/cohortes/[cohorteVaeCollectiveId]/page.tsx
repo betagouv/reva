@@ -12,9 +12,8 @@ import { graphql } from "@/graphql/generated";
 import { AccessRightsCard } from "./_components/access-rights-card/AccessRightsCard";
 import { CertificationsCard } from "./_components/certifications-card/CertificationsCard";
 import { DeleteCohorteButton } from "./_components/delete-cohorte-button/DeleteCohorteButton";
-import { GenerateCohorteCodeInscriptionButton } from "./_components/generate-cohorte-code-inscription-button/GenerateCohorteCodeInscriptionButton";
 import { OrganismCard } from "./_components/organism-card/OrganismCard";
-import { RegistrationCodeDisplay } from "./_components/registration-code-display/RegistrationCodeDisplay";
+import { RegistrationCodeCard } from "./_components/registration-code-card/RegistrationCodeCard";
 
 const getCohorteById = async (
   commanditaireVaeCollectiveId: string,
@@ -194,59 +193,22 @@ export default async function CohortePage({
         />
       )}
       <hr className="mt-8 mb-2" />
-      {cohorte.status === "BROUILLON" && (
-        <>
-          <GenerateCohorteCodeInscriptionButton
-            commanditaireId={commanditaireId}
-            cohorteVaeCollectiveId={cohorteVaeCollectiveId}
-            nomCohorte={cohorte.nom}
-            aapLabel={organism?.label ?? ""}
-            disabled={!organismSelected || !canModifyCohorte}
-          />
-          {canDeleteCohorte && (
-            <DeleteCohorteButton
-              commanditaireId={commanditaireId}
-              cohorteVaeCollectiveId={cohorteVaeCollectiveId}
-              nomCohorte={cohorte.nom}
-            />
-          )}
-        </>
+      <RegistrationCodeCard
+        codeInscription={cohorte.codeInscription}
+        commanditaireId={commanditaireId}
+        cohorteVaeCollectiveId={cohorteVaeCollectiveId}
+        nomCohorte={cohorte.nom}
+        aapLabel={organism?.label ?? ""}
+        disabled={!organismSelected || !canModifyCohorte}
+      />
+      {cohorte.status === "BROUILLON" && canDeleteCohorte && (
+        <DeleteCohorteButton
+          commanditaireId={commanditaireId}
+          cohorteVaeCollectiveId={cohorteVaeCollectiveId}
+          nomCohorte={cohorte.nom}
+        />
       )}
-      {cohorte.status === "PUBLIE" && (
-        <div className="flex flex-col gap-4">
-          <p className="text-lg mb-0">
-            Afin de permettre à vos candidats de s’inscrire à cette cohorte,
-            nous vous invitons à leur transmettre ce code. Ils pourront le
-            renseigner sur la page de création de candidature en VAE collective
-            :
-          </p>
-          <RegistrationCodeDisplay
-            registrationCode={cohorte.codeInscription || ""}
-          />
-          <p className="text-lg mb-0">
-            Il sera alors orienté vers les certifications sélectionnées et l’AAP
-            en charge de cette cohorte.
-          </p>
 
-          <p className="text-lg mt-4 mb-0">
-            Vous pouvez aussi transmettre ce code à l'accompagnateur en charge
-            de la cohorte. Il pourra l’utiliser afin de guider les candidats de
-            cette cohorte dans leur création de candidature en VAE collective.
-            <br />
-            Des{" "}
-            <a
-              className="fr-link text-lg"
-              href="https://www.notion.so/francevae/Comment-transmettre-le-code-d-inscription-d-une-cohorte-2ea100b69ece81a3992ee4a6998c4bb3?source=copy_link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              modèles de mails
-            </a>{" "}
-            sont mis à votre disposition pour informer votre accompagnateur et
-            les candidats concernés.
-          </p>
-        </div>
-      )}
       <Button
         className="mt-12"
         priority="secondary"
