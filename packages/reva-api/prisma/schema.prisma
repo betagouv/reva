@@ -294,31 +294,31 @@ enum AccompagnementStatus {
 }
 
 model Accompagnement {
-  id                                        String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  candidacy                                 Candidacy                    @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
-  candidacyId                               String                       @map("candidacy_id") @db.Uuid
-  status                                    AccompagnementStatus         @default(BROUILLON)
-  startedAt                                 DateTime?                    @map("started_at") @db.Timestamptz(6)
-  endedAt                                   DateTime?                    @map("ended_at") @db.Timestamptz(6)
-  candidacyStatusAtStart                    CandidacyStatusStep?         @map("candidacy_status_at_start")
-  candidacyStatusAtEnd                      CandidacyStatusStep?         @map("candidacy_status_at_end")
-  organism                                  Organism?                    @relation(fields: [organismId], references: [id])
-  organismId                                String?                      @map("organism_id") @db.Uuid
-  individualHourCount                       Int?                         @map("individual_hour_count")
-  collectiveHourCount                       Int?                         @map("collective_hour_count")
-  additionalHourCount                       Int?                         @map("additional_hour_count")
-  certificateSkills                         String?                      @map("certificate_skills")
-  otherTraining                             String?                      @map("other_training")
-  isCertificationPartial                    Boolean?                     @map("is_certification_partial")
-  firstAppointmentOccuredAt                 DateTime?                    @map("first_appointment_occured_at") @db.Date
-  financeModule                             FinanceModule                @default(hors_plateforme) @map("finance_module")
-  endAccompagnementDate                     DateTime?                    @map("end_accompagnement_date") @db.Timestamptz(6)
-  endAccompagnementStatus                   EndAccompagnementStatus      @default(NOT_REQUESTED) @map("end_accompagnement_status")
-  endAccompagnementReason                   EndAccompagnementReason?     @map("end_accompagnement_reason")
-  endAccompagnementCandidateDropOutReason   DropOutReason?               @relation(fields: [endAccompagnementCandidateDropOutReasonId], references: [id], name: "accompagnement_end_accompagnement_candidate_drop_out_reason")
-  endAccompagnementCandidateDropOutReasonId String?                      @map("end_accompagnement_candidate_drop_out_reason_id") @db.Uuid
-  createdAt                                 DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                                 DateTime?                    @map("updated_at") @db.Timestamptz(6)
+  id                                        String                                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  candidacy                                 Candidacy                             @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
+  candidacyId                               String                                @map("candidacy_id") @db.Uuid
+  status                                    AccompagnementStatus                  @default(BROUILLON)
+  startedAt                                 DateTime?                             @map("started_at") @db.Timestamptz(6)
+  endedAt                                   DateTime?                             @map("ended_at") @db.Timestamptz(6)
+  candidacyStatusAtStart                    CandidacyStatusStep?                  @map("candidacy_status_at_start")
+  candidacyStatusAtEnd                      CandidacyStatusStep?                  @map("candidacy_status_at_end")
+  organism                                  Organism?                             @relation(fields: [organismId], references: [id])
+  organismId                                String?                               @map("organism_id") @db.Uuid
+  individualHourCount                       Int?                                  @map("individual_hour_count")
+  collectiveHourCount                       Int?                                  @map("collective_hour_count")
+  additionalHourCount                       Int?                                  @map("additional_hour_count")
+  certificateSkills                         String?                               @map("certificate_skills")
+  otherTraining                             String?                               @map("other_training")
+  isCertificationPartial                    Boolean?                              @map("is_certification_partial")
+  firstAppointmentOccuredAt                 DateTime?                             @map("first_appointment_occured_at") @db.Date
+  financeModule                             FinanceModule                         @default(hors_plateforme) @map("finance_module")
+  endAccompagnementDate                     DateTime?                             @map("end_accompagnement_date") @db.Timestamptz(6)
+  endAccompagnementStatus                   EndAccompagnementStatus               @default(NOT_REQUESTED) @map("end_accompagnement_status")
+  endAccompagnementReason                   EndAccompagnementReason?              @map("end_accompagnement_reason")
+  endAccompagnementCandidateDropOutReason   DropOutReason?                        @relation(fields: [endAccompagnementCandidateDropOutReasonId], references: [id], name: "accompagnement_end_accompagnement_candidate_drop_out_reason")
+  endAccompagnementCandidateDropOutReasonId String?                               @map("end_accompagnement_candidate_drop_out_reason_id") @db.Uuid
+  createdAt                                 DateTime                              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                                 DateTime?                             @map("updated_at") @db.Timestamptz(6)
   FundingRequest                            FundingRequest?
   fundingRequestUnifvae                     FundingRequestUnifvae?
   paymentRequest                            PaymentRequest?
@@ -2282,7 +2282,7 @@ model RoleSpecificToSousCompteAndCohorteVaeCollective {
   role                      RoleVaeCollective       @map("role")
   sousCompteVaeCollective   SousCompteVaeCollective @relation(fields: [sousCompteVaeCollectiveId], references: [id])
   sousCompteVaeCollectiveId String                  @map("sous_compte_vae_collective_id") @db.Uuid
-  cohorteVaeCollective      CohorteVaeCollective    @relation(fields: [cohorteVaeCollectiveId], references: [id])
+  cohorteVaeCollective      CohorteVaeCollective    @relation(fields: [cohorteVaeCollectiveId], references: [id], onDelete: Cascade)
   cohorteVaeCollectiveId    String                  @db.Uuid
   createdAt                 DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                 DateTime?               @map("updated_at") @db.Timestamptz(6)
