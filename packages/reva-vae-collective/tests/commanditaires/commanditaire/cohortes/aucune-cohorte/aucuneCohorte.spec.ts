@@ -10,23 +10,26 @@ import { mockQueryActiveFeatures } from "../../../../shared/utils/mockActiveFeat
 import { mockQueryGetUserPermissions } from "../../../../shared/utils/mockGetUserPermissions";
 const fvae = graphql.link("https://reva-api/api/graphql");
 
-const mockCommanditaireWithNoCohorte = () =>
-  fvae.query("commanditaireVaeCollectiveForCohortesPage", () => {
-    return HttpResponse.json({
-      data: {
-        vaeCollective_getCommanditaireVaeCollective: {
-          id: "115c2693-b625-491b-8b91-c7b3875d86a0",
-          raisonSociale: "moncommanditaire",
-          cohorteVaeCollectives: {
-            rows: [],
-            info: {
-              totalRows: 0,
+const mockCommanditaireCohortesCount = (totalRows: number) =>
+  fvae.query(
+    "commanditaireVaeCollectiveCohortesCountForAucuneCohortePage",
+    () => {
+      return HttpResponse.json({
+        data: {
+          vaeCollective_getCommanditaireVaeCollective: {
+            id: "115c2693-b625-491b-8b91-c7b3875d86a0",
+            cohorteVaeCollectives: {
+              info: {
+                totalRows,
+              },
             },
           },
         },
-      },
-    });
-  });
+      });
+    },
+  );
+
+const mockCommanditaireWithNoCohorte = () => mockCommanditaireCohortesCount(0);
 
 test.describe("Commanditaire with CREER_COHORTE permission", () => {
   test.use({
@@ -90,5 +93,52 @@ test.describe("Commanditaire without CREER_COHORTE permission", () => {
         "Vous n’avez pas la possibilité de créer de cohortes. Cette option est actionnable par votre administrateur à la création de votre compte.",
       ),
     ).toBeVisible();
+  });
+});
+
+test.describe("Commanditaire that got a cohorte since the last visit", () => {
+  test.use({
+    mswHandlers: [
+      [
+        mockCommanditaireCohortesCount(1),
+        fvae.query("commanditaireVaeCollectiveForCohortesPage", () =>
+          HttpResponse.json({
+            data: {
+              vaeCollective_getCommanditaireVaeCollective: {
+                id: "115c2693-b625-491b-8b91-c7b3875d86a0",
+                raisonSociale: "moncommanditaire",
+                cohorteVaeCollectives: {
+                  rows: [
+                    {
+                      id: "cohorte-1",
+                      nom: "Ma cohorte",
+                      status: "BROUILLON",
+                      createdAt: 1700000000000,
+                      organism: null,
+                    },
+                  ],
+                  info: { totalRows: 1 },
+                },
+              },
+            },
+          }),
+        ),
+        mockQueryActiveFeatures(),
+        mockQueryGetUserPermissions(),
+      ],
+      { scope: "test" },
+    ],
+  });
+
+  test("it should redirect to the cohortes page", async ({ page }) => {
+    await login({ page, role: "gestionnaireVaeCollective" });
+
+    await page.goto(
+      "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes/aucune-cohorte",
+    );
+
+    await expect(page).toHaveURL(
+      "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes",
+    );
   });
 });

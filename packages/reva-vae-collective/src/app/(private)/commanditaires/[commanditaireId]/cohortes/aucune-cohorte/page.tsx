@@ -1,12 +1,62 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
 import { AapSelectionAdvice } from "@/components/aap-selection-advice/AapSelectionAdvice";
 import { hasPermission } from "@/components/auth/actions";
+import { getAccessTokenFromCookie } from "@/helpers/auth/get-access-token-from-cookie/getAccessTokenFromCookie";
+import { throwUrqlErrors } from "@/helpers/graphql/throw-urql-errors/throwUrqlErrors";
+import { client } from "@/helpers/graphql/urql-client/urqlClient";
+
+import { graphql } from "@/graphql/generated";
 
 import applicationPolygon from "./assets/application-polygon.svg";
 
-export default async function AucuneCohortePage() {
+const getCohortesTotalRows = async (commanditaireVaeCollectiveId: string) => {
+  const accessToken = await getAccessTokenFromCookie();
+
+  const result = throwUrqlErrors(
+    await client.query(
+      graphql(`
+        query commanditaireVaeCollectiveCohortesCountForAucuneCohortePage(
+          $commanditaireVaeCollectiveId: ID!
+        ) {
+          vaeCollective_getCommanditaireVaeCollective(
+            commanditaireVaeCollectiveId: $commanditaireVaeCollectiveId
+          ) {
+            id
+            cohorteVaeCollectives(offset: 0, limit: 1) {
+              info {
+                totalRows
+              }
+            }
+          }
+        }
+      `),
+      { commanditaireVaeCollectiveId },
+      {
+        fetchOptions: { headers: { Authorization: `Bearer ${accessToken}` } },
+      },
+    ),
+  );
+
+  return (
+    result.data?.vaeCollective_getCommanditaireVaeCollective
+      ?.cohorteVaeCollectives.info.totalRows ?? 0
+  );
+};
+
+export default async function AucuneCohortePage({
+  params,
+}: {
+  params: Promise<{ commanditaireId: string }>;
+}) {
+  const { commanditaireId } = await params;
+
+  if ((await getCohortesTotalRows(commanditaireId)) > 0) {
+    redirect(`/commanditaires/${commanditaireId}/cohortes/`);
+  }
+
   const canCreateCohorte = await hasPermission({
     permission: "CREER_COHORTE",
   });
