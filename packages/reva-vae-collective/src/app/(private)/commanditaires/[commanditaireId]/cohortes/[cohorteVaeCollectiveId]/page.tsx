@@ -127,6 +127,9 @@ export default async function CohortePage({
   // carte organisme readonly si la cohorte est publiée ou si l'utilisateur n'a pas la permission de modifier la cohorte
   const organismCardreadonly = cohorte.status === "PUBLIE" || !canModifyCohorte;
 
+  const registrationCodeCardreadonly =
+    cohorte.status === "PUBLIE" || !canModifyCohorte;
+
   const { isFeatureActive } = await getActiveFeatures();
 
   const isVaeCollectiveAccountsFeatureActive = isFeatureActive(
@@ -199,7 +202,8 @@ export default async function CohortePage({
         cohorteVaeCollectiveId={cohorteVaeCollectiveId}
         nomCohorte={cohorte.nom}
         aapLabel={organism?.label ?? ""}
-        disabled={!organismSelected || !canModifyCohorte}
+        disabled={!organismSelected}
+        readonly={registrationCodeCardreadonly}
       />
       {cohorte.status === "BROUILLON" && canDeleteCohorte && (
         <DeleteCohorteButton

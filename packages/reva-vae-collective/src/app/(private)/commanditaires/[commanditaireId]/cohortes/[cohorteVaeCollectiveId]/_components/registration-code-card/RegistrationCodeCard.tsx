@@ -1,5 +1,6 @@
 import { GenerateCohorteCodeInscriptionButton } from "./generate-cohorte-code-inscription-button/GenerateCohorteCodeInscriptionButton";
 import { RegistrationCodeDisplay } from "./registration-code-display/RegistrationCodeDisplay";
+import { RegistrationCodeNotGeneratedWarning } from "./registration-code-not-generated-warning/RegistrationCodeNotGeneratedWarning";
 
 export const RegistrationCodeCard = ({
   codeInscription,
@@ -8,6 +9,7 @@ export const RegistrationCodeCard = ({
   nomCohorte,
   aapLabel,
   disabled,
+  readonly,
 }: {
   codeInscription?: string | null;
   commanditaireId: string;
@@ -15,8 +17,9 @@ export const RegistrationCodeCard = ({
   nomCohorte: string;
   aapLabel: string;
   disabled?: boolean;
+  readonly?: boolean;
 }) => {
-  if (codeInscription) {
+  if (codeInscription || readonly) {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-lg mb-0">
@@ -24,7 +27,11 @@ export const RegistrationCodeCard = ({
           vous invitons à leur transmettre ce code. Ils pourront le renseigner
           sur la page de création de candidature en VAE collective :
         </p>
-        <RegistrationCodeDisplay registrationCode={codeInscription || ""} />
+        {codeInscription ? (
+          <RegistrationCodeDisplay registrationCode={codeInscription || ""} />
+        ) : (
+          <RegistrationCodeNotGeneratedWarning />
+        )}
         <p className="text-lg mb-0">
           Il sera alors orienté vers les certifications sélectionnées et l’AAP
           en charge de cette cohorte.
