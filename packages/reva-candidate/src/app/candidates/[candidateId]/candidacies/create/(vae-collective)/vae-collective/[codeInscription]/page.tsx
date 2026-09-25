@@ -4,7 +4,10 @@ import { Breadcrumb } from "@codegouvfr/react-dsfr/Breadcrumb";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Card } from "@codegouvfr/react-dsfr/Card";
 import { Tile } from "@codegouvfr/react-dsfr/Tile";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+
+import { EnhancedSectionCard } from "@/components/card/enhanced-section-card/EnhancedSectionCard";
 
 import { useGetVaeCollectiveCohort } from "./getVaeCollective.hook";
 
@@ -16,6 +19,31 @@ export default function RejoindreVaeCollectivePage() {
 
   const defaultCertification =
     cohorteVaeCollective?.certificationCohorteVaeCollectives[0]?.certification;
+
+  const selectedCertificationIdParams =
+    useSearchParams().get("certificationId");
+
+  const selectedCertificationId = useMemo(() => {
+    if (cohorteVaeCollective?.certificationCohorteVaeCollectives.length === 1) {
+      return cohorteVaeCollective?.certificationCohorteVaeCollectives[0]
+        ?.certification?.id;
+    }
+
+    return selectedCertificationIdParams;
+  }, [
+    selectedCertificationIdParams,
+    cohorteVaeCollective?.certificationCohorteVaeCollectives,
+  ]);
+
+  const selectCertification = useMemo(() => {
+    return cohorteVaeCollective?.certificationCohorteVaeCollectives.find(
+      (certification) =>
+        certification.certification?.id === selectedCertificationId,
+    )?.certification;
+  }, [
+    selectedCertificationId,
+    cohorteVaeCollective?.certificationCohorteVaeCollectives,
+  ]);
 
   return (
     <div className="px-4 lg:px-6 pb-6">
@@ -97,18 +125,18 @@ export default function RejoindreVaeCollectivePage() {
 
             {cohorteVaeCollective?.certificationCohorteVaeCollectives.length ===
               1 &&
-              defaultCertification && (
+              selectCertification && (
                 <Card
                   size="small"
-                  title={defaultCertification.label}
-                  detail={`RNCP ${defaultCertification.codeRncp}`}
+                  title={selectCertification.label}
+                  detail={`RNCP ${selectCertification.codeRncp}`}
                   desc={
-                    defaultCertification.certificationAuthorityStructure?.label
+                    selectCertification.certificationAuthorityStructure?.label
                   }
                   endDetail={<span>Consulter</span>}
-                  key={defaultCertification.id}
+                  key={selectCertification.id}
                   linkProps={{
-                    href: `${process.env.NEXT_PUBLIC_WEBSITE_BASE_URL}/certifications/${defaultCertification.id}`,
+                    href: `${process.env.NEXT_PUBLIC_WEBSITE_BASE_URL}/certifications/${selectCertification.id}`,
                     target: "_blank",
                   }}
                   enlargeLink
@@ -117,6 +145,51 @@ export default function RejoindreVaeCollectivePage() {
                   }}
                 />
               )}
+
+            {cohorteVaeCollective?.certificationCohorteVaeCollectives.length >
+              1 && (
+              <>
+                {selectCertification ? (
+                  <Card
+                    size="small"
+                    title={selectCertification.label}
+                    detail={`RNCP ${selectCertification.codeRncp}`}
+                    desc={
+                      selectCertification.certificationAuthorityStructure?.label
+                    }
+                    endDetail={<span>Consulter</span>}
+                    key={selectCertification.id}
+                    linkProps={{
+                      href: `${process.env.NEXT_PUBLIC_WEBSITE_BASE_URL}/certifications/${selectCertification.id}`,
+                      target: "_blank",
+                    }}
+                    enlargeLink
+                    classes={{
+                      detail: "mt-2",
+                    }}
+                  />
+                ) : (
+                  <div className="border border-gray-200 shadow">
+                    <EnhancedSectionCard
+                      title="Certification visée"
+                      titleIconClass="fr-icon-award-fill"
+                      isEditable
+                      status={"TO_COMPLETE"}
+                      buttonOnClickHref={`./search-certification`}
+                      data-testid="certification-section"
+                      CustomBadge={<></>}
+                    >
+                      <p className="text-md mb-2 ml-10 w-[60%]">
+                        Si votre cohorte a plusieurs certifications, la
+                        certification que vous visez reste modifiable au début
+                        du parcours. Votre accompagnateur est là pour vous aider
+                        à faire votre choix.
+                      </p>
+                    </EnhancedSectionCard>
+                  </div>
+                )}
+              </>
+            )}
           </>
         )}
 
@@ -126,7 +199,7 @@ export default function RejoindreVaeCollectivePage() {
             className="justify-center w-[100%]  md:w-fit"
             onClick={() =>
               router.push(
-                `./consent?certificationId=${defaultCertification?.id}`,
+                `./consent?certificationId=${selectedCertificationId ?? defaultCertification?.id}`,
               )
             }
           >

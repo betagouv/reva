@@ -24,6 +24,11 @@ const certification = createCertificationEntity({
   label: "Certification 1",
   codeRncp: "RNCP0001",
 });
+const certification2 = createCertificationEntity({
+  id: "cert-2",
+  label: "Certification 2",
+  codeRncp: "RNCP0002",
+});
 const candidacy = createCandidacyEntity({
   candidate,
   certification,
@@ -49,6 +54,13 @@ const cohorteVaeCollective = {
     {
       certification,
     },
+  ],
+};
+const cohorteWithSeveralCertifications = {
+  ...cohorteVaeCollective,
+  certificationCohorteVaeCollectives: [
+    { certification },
+    { certification: certification2 },
   ],
 };
 
@@ -92,7 +104,13 @@ async function expectCertificationToBeDisplayed(page: Page) {
   }
 }
 
-function createCandidaciesHandlers() {
+function createCandidaciesHandlers(
+  cohorte: typeof cohorteVaeCollective = cohorteVaeCollective,
+) {
+  const certifications = cohorte.certificationCohorteVaeCollectives.map(
+    (certificationCohorte) => certificationCohorte.certification,
+  );
+
   return [
     ...createCandidaciesGuardsHandlers({ candidate }),
     fvae.query(
@@ -107,7 +125,30 @@ function createCandidaciesHandlers() {
     fvae.query(
       "getVaeCollectiveCohortForCreateCandidacy",
       graphQLResolver({
-        cohorteVaeCollective,
+        cohorteVaeCollective: cohorte,
+      }),
+    ),
+    fvae.query(
+      "getVaeCollectiveCohortForSearchCertification",
+      graphQLResolver({
+        cohorteVaeCollective: {
+          id: cohorte.id,
+          nom: cohorte.nom,
+        },
+      }),
+    ),
+    fvae.query(
+      "searchCertificationsForCandidateVaeCollective",
+      graphQLResolver({
+        searchCertificationsForCandidate: {
+          rows: certifications,
+          info: {
+            totalRows: certifications.length,
+            currentPage: 1,
+            totalPages: 1,
+            pageLength: 10,
+          },
+        },
       }),
     ),
     fvae.mutation(
@@ -266,5 +307,109 @@ test.describe("create candidacy vae from candidacies page", () => {
     ).toBeVisible();
 
     await expectCertificationToBeDisplayed(page);
+  });
+
+  test.describe("when the cohorte has several certifications", () => {
+    test.use({
+      mswHandlers: [
+        createCandidaciesHandlers(cohorteWithSeveralCertifications),
+        { scope: "test" },
+      ],
+    });
+
+    test("asks to choose a certification", async ({ page }) => {
+      await loginAndWaitForCandidaciesInitialLoad(page);
+
+      await page.goto(
+        `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/`,
+      );
+
+      await expect(
+        page.getByRole("heading", { name: "Rejoindre cette VAE collective" }),
+      ).toBeVisible();
+
+      await expectCohorteAndOrganismToBeDisplayed(page);
+
+      await expect(
+        page.getByTestId("certification-section").getByRole("heading", {
+          name: "Certification visée",
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByText(
+          "Si votre cohorte a plusieurs certifications, la certification que vous visez reste modifiable au début du parcours.",
+        ),
+      ).toBeVisible();
+      await expect(
+        page.getByText(certification.label, { exact: true }),
+      ).toBeHidden();
+      await expect(
+        page.getByText(certification2.label, { exact: true }),
+      ).toBeHidden();
+
+      await page.getByRole("button", { name: "Compléter" }).click();
+
+      await expect(page).toHaveURL(
+        `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/search-certification/`,
+      );
+    });
+
+    test("selects a certification then joins the cohorte", async ({ page }) => {
+      await loginAndWaitForCandidaciesInitialLoad(page);
+
+      await page.goto(
+        `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/`,
+      );
+
+      const searchCertifications = waitGraphQL(
+        page,
+        "searchCertificationsForCandidateVaeCollective",
+      );
+      await page.getByRole("button", { name: "Compléter" }).click();
+      await searchCertifications;
+
+      await expect(
+        page.getByRole("heading", { name: "Choisir un diplôme" }),
+      ).toBeVisible();
+      await expect(
+        page.getByText("Nombre de diplômes disponibles : 2"),
+      ).toBeVisible();
+
+      await page.getByRole("link", { name: certification2.label }).click();
+
+      await expect(page).toHaveURL(
+        `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/?certificationId=${certification2.id}`,
+      );
+
+      await expect(
+        page.getByText(certification2.label, { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByText(`RNCP ${certification2.codeRncp}`, { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Certification visée" }),
+      ).toBeHidden();
+
+      await page
+        .getByRole("button", { name: "Rejoindre cette cohorte" })
+        .click();
+
+      await expect(page).toHaveURL(
+        `candidates/${candidate.id}/candidacies/create/vae-collective/12345678/consent/?certificationId=${certification2.id}`,
+      );
+
+      const acceptConsentButton = page.getByRole("button", {
+        name: "Accepter",
+      });
+      await expect(acceptConsentButton).toBeVisible();
+      const createCandidacy = waitGraphQL(page, "createVaeCollectiveCandidacy");
+      await acceptConsentButton.click();
+      await createCandidacy;
+
+      await expect(page).toHaveURL(
+        `candidates/${candidate.id}/candidacies/${candidacy.id}/`,
+      );
+    });
   });
 });
