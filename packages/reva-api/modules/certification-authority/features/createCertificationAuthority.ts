@@ -66,6 +66,13 @@ export const createCertificationAuthority = async ({
   });
 
   if (!account) {
+    // Rollback if account creation fails
+    await prismaClient.certificationAuthority.delete({
+      where: {
+        id: newCertificationAuthority.id,
+      },
+    });
+
     throw new Error("Erreur pendant la création du compte certificateur");
   }
 
