@@ -71,7 +71,7 @@ export const sendLegalInformationNonConformityEmail = async ({
     to: { email },
     templateId: 734,
     params: {
-      reasons: nonConformityMotives.map(({ label }) => label),
+      reasons: nonConformityMotives.map(({ message }) => message),
       comment,
     },
   });
