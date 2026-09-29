@@ -1,0 +1,2 @@
+-- RenameForeignKey
+ALTER TABLE "accompagnement" RENAME CONSTRAINT "accompagnement_end_accompagnement_candidate_drop_out_reason_fke" TO "accompagnement_end_accompagnement_candidate_drop_out_reaso_fkey";
