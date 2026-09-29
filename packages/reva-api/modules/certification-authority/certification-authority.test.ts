@@ -478,6 +478,63 @@ test("should create a certification authority", async () => {
   ).not.toBeNull();
 });
 
+test("should rollback the certification authority when account creation fails", async () => {
+  vi.spyOn(createAccount, "createAccount").mockImplementation(() =>
+    Promise.resolve(null as unknown as Account),
+  );
+
+  const certificationAuthorityStructure =
+    await createCertificationAuthorityStructureHelper();
+
+  const label = "Autorite de certification a rollback";
+
+  const resp = await injectGraphql({
+    fastify: global.testApp,
+    authorization: authorizationHeaderForUser({
+      role: "admin",
+      keycloakId: "3c6d4571-da18-49a3-90e5-cc83ae7446bf",
+    }),
+    payload: {
+      requestType: "mutation",
+      endpoint: "certification_authority_createCertificationAuthority",
+      arguments: {
+        input: {
+          label,
+          certificationAuthorityStructureId: certificationAuthorityStructure.id,
+          accountEmail: "rollback.test@gmail.com",
+          accountFirstname: "testFirstname",
+          accountLastname: "testLastname",
+          certificationIds: [],
+        },
+      },
+      returnFields: "{id}",
+    },
+  });
+
+  expect(resp.statusCode).toEqual(200);
+  const obj = resp.json();
+  expect(obj.errors[0].message).toBe(
+    "Erreur pendant la création du compte certificateur",
+  );
+  expect(obj.data).toBeNull();
+
+  const certificationAuthority =
+    await prismaClient.certificationAuthority.findFirst({
+      where: { label },
+    });
+  expect(certificationAuthority).toBeNull();
+
+  const structureLink =
+    await prismaClient.certificationAuthorityOnCertificationAuthorityStructure.findFirst(
+      {
+        where: {
+          certificationAuthorityStructureId: certificationAuthorityStructure.id,
+        },
+      },
+    );
+  expect(structureLink).toBeNull();
+});
+
 describe("certification authority certification parcours", () => {
   describe("getParcoursForCertificationAndCertificationAuthority", () => {
     test("should return the parcours certifications for a certification and certification authority", async () => {
