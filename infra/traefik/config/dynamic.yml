@@ -115,7 +115,6 @@ http:
       service: auth-vae-gouv-fr
       middlewares:
         - removeHeader
-        - productionAuthIpWhitelist
 
     metabase-vae-gouv-fr:
       rule: "Host(`metabase.vae.gouv.fr`) && !PathPrefix(`/api/session/reset_password`)"
