@@ -3,6 +3,7 @@ import {
   ADRESSE_ELECTRONIQUE_OU_MOT_PASSE_INCORRECT,
   COMPTE_NON_TROUVE,
 } from "@/modules/shared/errors/messages";
+import { prismaClient } from "@/prisma/client";
 
 import { ClientApp } from "../account.type";
 import {
@@ -75,6 +76,11 @@ export const loginWithCredentials = async ({
     password,
     clientApp,
   );
+
+  await prismaClient.account.update({
+    where: { id: account.id },
+    data: { lastLoginAt: new Date() },
+  });
 
   return {
     tokens,
