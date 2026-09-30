@@ -74,7 +74,7 @@ export default function AppointmentsPage() {
                 linkProps={{
                   href:
                     appointment.type === "JURY"
-                      ? "../jury-session"
+                      ? "../jury-session?fromPage=../appointments"
                       : `./${appointment.id}`,
                 }}
                 data-testid={`future-appointment-${appointment.id}`}
@@ -115,7 +115,12 @@ const PastAppointments = () => {
               detail={<Tag small>{getTagLabel(appointment.type)}</Tag>}
               endDetail="Voir les détails"
               key={appointment.id}
-              linkProps={{ href: `./${appointment.id}` }}
+              linkProps={{
+                href:
+                  appointment.type === "JURY"
+                    ? "../jury-session?fromPage=../appointments"
+                    : `./${appointment.id}`,
+              }}
               data-testid={`past-appointment-${appointment.id}`}
             />
           ))}
