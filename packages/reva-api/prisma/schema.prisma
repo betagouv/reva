@@ -560,6 +560,7 @@ model Account {
   emailOtpEnabled                             Boolean                                      @default(false) @map("email_otp_enabled")
   isApiUser                                   Boolean                                      @default(false) @map("is_api_user")
   sousComptesVaeCollectives                   SousCompteVaeCollective[]
+  lastLoginAt                                 DateTime?                                    @map("last_login_at") @db.Timestamptz(6)
 
   @@index([email])
   @@index([certificationAuthorityId])
