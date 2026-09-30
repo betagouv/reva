@@ -3,7 +3,7 @@ import Breadcrumb from "@codegouvfr/react-dsfr/Breadcrumb";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import Tile from "@codegouvfr/react-dsfr/Tile";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { AddToCalendar } from "@/components/add-to-calendar/AddToCalendar";
 import { useKeycloakContext } from "@/components/auth/keycloak.context";
@@ -57,6 +57,10 @@ export default function JurySessionPage() {
   const { jury } = useJurySession();
   const { accessToken } = useKeycloakContext();
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  const fromPage = searchParams.get("fromPage");
 
   if (!jury) {
     return null;
@@ -120,7 +124,10 @@ export default function JurySessionPage() {
           />
         )}
 
-        <BackButton navigateBack={() => router.push("../")} className="mt-12" />
+        <BackButton
+          navigateBack={() => router.push((fromPage as string) || "../")}
+          className="mt-12"
+        />
       </div>
     </Panel>
   );
