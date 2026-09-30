@@ -37,7 +37,6 @@ import {
   CreateCertificationAuthorityLocalAccountInput,
   UpdateCertificationAuthorityLocalAccountGeneralInformationInput,
 } from "./certification-authority.types";
-import { canUserManageCertificationAuthorityLocalAccount } from "./features/canUserManageCertifiationAuthorityLocalAccount";
 import { certificationAuthorityAcceptCgu } from "./features/certificationAuthorityAcceptCgu";
 import { createCertificationAuthority } from "./features/createCertificationAuthority";
 import { createCertificationAuthorityLocalAccount } from "./features/createCertificationAuthorityLocalAccount";
@@ -358,24 +357,11 @@ const unsafeResolvers = {
       params: {
         certificationAuthorityLocalAccountId: string;
       },
-      context: GraphqlContext,
-    ) => {
-      const canManage = await canUserManageCertificationAuthorityLocalAccount({
+    ) =>
+      deleteCertificationAuthorityLocalAccount({
         certificationAuthorityLocalAccountId:
           params.certificationAuthorityLocalAccountId,
-        userKeycloakId: context.auth.userInfo?.sub || "",
-        userRoles: context.auth.userInfo?.realm_access?.roles || [],
-      });
-      if (!canManage) {
-        throw new Error(
-          "L'utilisateur n'est pas autorisé à modifier ce compte local d'autorité de certification",
-        );
-      }
-      return deleteCertificationAuthorityLocalAccount({
-        certificationAuthorityLocalAccountId:
-          params.certificationAuthorityLocalAccountId,
-      });
-    },
+      }),
 
     certification_authority_updateCertificationAuthorityLocalAccountDepartments:
       async (
@@ -384,23 +370,7 @@ const unsafeResolvers = {
           certificationAuthorityLocalAccountId: string;
           departmentIds: string[];
         },
-        context: GraphqlContext,
-      ) => {
-        const canManage = await canUserManageCertificationAuthorityLocalAccount(
-          {
-            certificationAuthorityLocalAccountId:
-              params.certificationAuthorityLocalAccountId,
-            userKeycloakId: context.auth.userInfo?.sub || "",
-            userRoles: context.auth.userInfo?.realm_access?.roles || [],
-          },
-        );
-        if (!canManage) {
-          throw new Error(
-            "L'utilisateur n'est pas autorisé à modifier ce compte local d'autorité de certification",
-          );
-        }
-        return updateCertificationAuthorityLocalAccountDepartments(params);
-      },
+      ) => updateCertificationAuthorityLocalAccountDepartments(params),
 
     certification_authority_updateCertificationAuthorityLocalAccountCertifications:
       async (
@@ -409,23 +379,7 @@ const unsafeResolvers = {
           certificationAuthorityLocalAccountId: string;
           certificationIds: string[];
         },
-        context: GraphqlContext,
-      ) => {
-        const canManage = await canUserManageCertificationAuthorityLocalAccount(
-          {
-            certificationAuthorityLocalAccountId:
-              params.certificationAuthorityLocalAccountId,
-            userKeycloakId: context.auth.userInfo?.sub || "",
-            userRoles: context.auth.userInfo?.realm_access?.roles || [],
-          },
-        );
-        if (!canManage) {
-          throw new Error(
-            "L'utilisateur n'est pas autorisé à modifier ce compte local d'autorité de certification",
-          );
-        }
-        return updateCertificationAuthorityLocalAccountCertifications(params);
-      },
+      ) => updateCertificationAuthorityLocalAccountCertifications(params),
 
     certification_authority_transferCandidacyToAnotherCertificationAuthority:
       async (
@@ -703,10 +657,11 @@ export const certificationAuthorityResolvers = withPolicies(unsafeResolvers, {
     certification_authority_updateCertificationAuthorityLocalAccountGeneralInformation:
       isAdminOrCertificationAuthorityLocalAccountManagerOrCertificationAuthorityLocalAccountOwner,
     certification_authority_updateCertificationAuthorityLocalAccountDepartments:
-      isAnyone, //security handled in resolver
-    certification_authority_deleteCertificationAuthorityLocalAccount: isAnyone, //security handled in resolver
+      isAdminOrCertificationAuthorityLocalAccountOwner,
+    certification_authority_deleteCertificationAuthorityLocalAccount:
+      isAdminOrCertificationAuthorityLocalAccountOwner,
     certification_authority_updateCertificationAuthorityLocalAccountCertifications:
-      isAnyone, //security handled in resolver
+      isAdminOrCertificationAuthorityLocalAccountOwner,
     certification_authority_transferCandidacyToAnotherCertificationAuthority:
       isAdminOrCertificationAuthority,
     certification_authority_transferCandidacyToCertificationAuthorityLocalAccount:

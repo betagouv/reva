@@ -273,13 +273,9 @@ describe("candidacy resolver read authorization", () => {
     });
 
     test("rejects an unauthenticated request", async () => {
-      // TODO: improve the policy code to return a proper SESSION_EXPIRED
-      await expect(getDeniedCandidacyCountByStatus()).rejects.toMatchObject({
-        response: {
-          errors: expect.any(Array),
-          data: null,
-        },
-      });
+      await expect(getDeniedCandidacyCountByStatus()).rejects.toThrowError(
+        SESSION_EXPIRED,
+      );
     });
   });
 

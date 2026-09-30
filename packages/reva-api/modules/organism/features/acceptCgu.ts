@@ -2,19 +2,14 @@ import {
   CGU_DERNIERE_VERSION_DEJA_ACCEPTEE,
   COMPTE_UTILISATEUR_NON_TROUVE,
 } from "@/modules/shared/errors/messages";
-import { NOT_AUTHORIZED } from "@/modules/shared/security/messages";
 import { prismaClient } from "@/prisma/client";
 
 import { getLastProfessionalCgu } from "./getLastProfessionalCgu";
 
 export const acceptCgu = async (context: {
-  hasRole: (role: string) => boolean;
   keycloakId: string;
 }): Promise<boolean> => {
-  const { hasRole, keycloakId } = context;
-  if (!hasRole("gestion_maison_mere_aap")) {
-    throw new Error(NOT_AUTHORIZED);
-  }
+  const { keycloakId } = context;
 
   const lastProfessionalCgu = await getLastProfessionalCgu();
   if (!lastProfessionalCgu) {

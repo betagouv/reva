@@ -17,7 +17,10 @@ export const isCertificationAuthorityLocalAccountManager =
     log("isCertificationAuthorityLocalAccountManager");
 
     const localAccountId =
-      args.input?.certificationAuthorityLocalAccountId || args.id || root.id;
+      args.input?.certificationAuthorityLocalAccountId ||
+      args.certificationAuthorityLocalAccountId ||
+      args.id ||
+      root.id;
 
     if (!localAccountId) {
       throw new Error('args "localAccountId" is missing');

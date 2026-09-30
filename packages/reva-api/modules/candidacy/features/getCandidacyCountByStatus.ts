@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
 
-import { NOT_AUTHORIZED } from "@/modules/shared/security/messages";
 import { prismaClient } from "@/prisma/client";
 
 import {
@@ -22,10 +21,6 @@ export const getCandidacyCountByStatus = async ({
   maisonMereAAPId?: string;
   cohorteVaeCollectiveId?: string;
 }) => {
-  if (!hasRole("admin") && !hasRole("manage_candidacy")) {
-    throw new Error(NOT_AUTHORIZED);
-  }
-
   //get a count of candidacy by each status of candidacyCountByStatus in the select clause
   //no need to escape query parameters since they are not user inputs
   const selectClause = Prisma.raw(

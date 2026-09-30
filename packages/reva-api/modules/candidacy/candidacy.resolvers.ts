@@ -917,7 +917,7 @@ export const candidacyResolvers = withPolicies(unsafeResolvers, {
       hasRole(["admin", "manage_candidacy", "candidate"]),
     ],
     getRandomOrganismsForCandidacy: isAnyone,
-    candidacy_candidacyCountByStatus: isAnyone,
+    candidacy_candidacyCountByStatus: isAdminOrManager,
   },
   Mutation: {
     candidacy_updateContact: isAdminOrOwnerOfCandidate,

@@ -5,7 +5,6 @@ import {
   CANDIDATURE_NON_TROUVEE,
   CONVENTION_COLLECTIVE_EXISTE_PAS,
 } from "@/modules/shared/errors/messages";
-import { NOT_AUTHORIZED } from "@/modules/shared/security/messages";
 import { prismaClient } from "@/prisma/client";
 
 export const updateCandidacyTypologyAndCcn = async (
@@ -17,11 +16,6 @@ export const updateCandidacyTypologyAndCcn = async (
     ccnId?: string;
   },
 ): Promise<void> => {
-  const { hasRole } = context;
-  if (!(hasRole("admin") || hasRole("manage_candidacy"))) {
-    throw new Error(NOT_AUTHORIZED);
-  }
-
   const { candidacyId, typology, additionalInformation, ccnId } = params;
 
   const candidacy = await prismaClient.candidacy.findUnique({
