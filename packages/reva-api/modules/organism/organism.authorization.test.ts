@@ -392,6 +392,144 @@ describe("organism - autorisation des resolvers", () => {
     });
   });
 
+  describe("organism_updateOrganismDegreesAndFormacodes (admin, gestionnaire de la MM, ou AAP rattaché)", () => {
+    const call = (organismId: string, authorization?: string) =>
+      injectGraphql({
+        fastify: global.testApp,
+        authorization,
+        payload: {
+          requestType: "mutation",
+          endpoint: "organism_updateOrganismDegreesAndFormacodes",
+          arguments: {
+            data: {
+              organismId,
+              degreeIds: [],
+              formacodeIds: [],
+              conventionCollectiveIds: [],
+            },
+          },
+          returnFields: "{ id }",
+        },
+      });
+
+    test("le gestionnaire de la maison mère de l'organisme : autorisé", async () => {
+      const organism = await createOrganismHelper();
+      const resp = await call(
+        organism.id,
+        asRole(
+          "gestion_maison_mere_aap",
+          organism.maisonMereAAP!.gestionnaire.keycloakId,
+        ),
+      );
+      expect(resp.json()).not.toHaveProperty("errors");
+    });
+
+    test("l'AAP rattaché à l'organisme : autorisé", async () => {
+      const organism = await createOrganismHelper();
+      const resp = await call(
+        organism.id,
+        asRole(
+          "manage_candidacy",
+          organism.organismOnAccounts[0].account.keycloakId,
+        ),
+      );
+      expect(resp.json()).not.toHaveProperty("errors");
+    });
+
+    test("l'admin : autorisé", async () => {
+      const organism = await createOrganismHelper();
+      const resp = await call(organism.id, asRole("admin"));
+      expect(resp.json()).not.toHaveProperty("errors");
+    });
+
+    // Non-régression : cette mutation était sur `isAnyone`, sans aucun contrôle propre au
+    // resolver ni à la feature — n'importe quel appelant pouvait réécrire le périmètre
+    // d'accompagnement d'un organisme arbitraire.
+    test("le gestionnaire d'une AUTRE maison mère : refusé", async () => {
+      const organism = await createOrganismHelper();
+      const autreOrganism = await createOrganismHelper();
+      const resp = await call(
+        organism.id,
+        asRole(
+          "gestion_maison_mere_aap",
+          autreOrganism.maisonMereAAP!.gestionnaire.keycloakId,
+        ),
+      );
+      expect(resp.json().errors[0].message).toBe(
+        NOT_AUTHORIZED_ORGANISM_ACCESS,
+      );
+    });
+
+    test("un AAP NON rattaché à l'organisme : refusé", async () => {
+      const organism = await createOrganismHelper();
+      const autreOrganism = await createOrganismHelper();
+      const resp = await call(
+        organism.id,
+        asRole(
+          "manage_candidacy",
+          autreOrganism.organismOnAccounts[0].account.keycloakId,
+        ),
+      );
+      expect(resp.json().errors[0].message).toBe(
+        NOT_AUTHORIZED_ORGANISM_ACCESS,
+      );
+    });
+
+    test("un candidat : refusé", async () => {
+      const organism = await createOrganismHelper();
+      const resp = await call(organism.id, asRole("candidate"));
+      expect(resp.json().errors[0].message).toBe(NOT_AUTHORIZED);
+    });
+
+    test("non authentifié : refusé", async () => {
+      const organism = await createOrganismHelper();
+      const resp = await call(organism.id);
+      expect(resp.json().errors[0].message).toBe(UNAUTHENTICATED);
+    });
+  });
+
+  describe("organism_createLieuAccueilInfo (gestionnaire de maison mère)", () => {
+    // Les cas autorisés sont couverts par `features/createLieuAccueilInfo.test.ts`.
+    const call = (authorization?: string) =>
+      injectGraphql({
+        fastify: global.testApp,
+        authorization,
+        payload: {
+          requestType: "mutation",
+          endpoint: "organism_createLieuAccueilInfo",
+          arguments: {
+            data: {
+              nomPublic: "Agence",
+              adresseNumeroEtNomDeRue: "1 rue de la Paix",
+              adresseCodePostal: "75002",
+              adresseVille: "Paris",
+              emailContact: "agence@example.com",
+              telephone: "0102030405",
+              conformeNormesAccessibilite: "CONFORME",
+            },
+          },
+          enumFields: ["conformeNormesAccessibilite"],
+          returnFields: "",
+        },
+      });
+
+    test("un AAP (manage_candidacy) : refusé", async () => {
+      const organism = await createOrganismHelper();
+      const resp = await call(
+        asRole(
+          "manage_candidacy",
+          organism.organismOnAccounts[0].account.keycloakId,
+        ),
+      );
+      expect(resp.json().errors[0].message).toBe(NOT_AUTHORIZED);
+    });
+
+    test("non authentifié : refusé", async () => {
+      const resp = await call();
+      expect(resp.json().errors[0].message).toBe(UNAUTHENTICATED);
+    });
+  });
+
   describe("organism_updateLegalInformationValidationDecision (admin)", () => {
     // `DEMANDE_DE_PRECISION` sans demande en attente : la décision est enregistrée sans
     // toucher aux informations de la structure.

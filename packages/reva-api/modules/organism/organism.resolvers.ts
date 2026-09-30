@@ -5,10 +5,6 @@ import {
 } from "@prisma/client";
 import mercurius from "mercurius";
 
-import {
-  FunctionalCodeError,
-  FunctionalError,
-} from "@/modules/shared/error/functionalError";
 import { logger } from "@/modules/shared/logger/logger";
 import { NOT_AUTHORIZED } from "@/modules/shared/security/messages";
 import { hasRole } from "@/modules/shared/security/middlewares";
@@ -93,6 +89,7 @@ import { isOwnerOrCanManageOrganism } from "./security/isOwnerOrCanManageOrganis
 import {
   isAdminOrGestionnaireOfMaisonMereAAP,
   isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganism,
+  isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganismByDataArg,
   isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganismByIdArg,
   isAdminOrGestionnaireOfMaisonMereAAPOrOwnerOfAccount,
   isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollective,
@@ -393,20 +390,12 @@ const unsafeResolvers = {
         data: CreateLieuAccueilInfoInput;
       },
       context: GraphqlContext,
-    ) => {
-      if (context.auth.userInfo?.sub == undefined) {
-        throw new FunctionalError(
-          FunctionalCodeError.TECHNICAL_ERROR,
-          "Not authorized",
-        );
-      }
-
-      return createLieuAccueilInfo({
+    ) =>
+      createLieuAccueilInfo({
         params: data,
-        keycloakId: context.auth.userInfo.sub,
+        keycloakId: context.auth.userInfo!.sub,
         userInfo: buildAAPAuditLogUserInfoFromContext(context),
-      });
-    },
+      }),
 
     organism_acceptCgu: async (
       _parent: unknown,
@@ -414,7 +403,6 @@ const unsafeResolvers = {
       context: GraphqlContext,
     ) =>
       acceptCgu({
-        hasRole: context.auth.hasRole,
         keycloakId: context.auth.userInfo?.sub || "",
       }),
     organism_updateOrganismDegreesAndFormacodes: async (
@@ -796,10 +784,11 @@ export const organismResolvers = withPolicies(unsafeResolvers, {
     organism_disableCompteCollaborateur: isAdminOrGestionnaireOfMaisonMereAAP,
     organism_deleteLieuAccueil: isAdminOrGestionnaireOfMaisonMereAAP,
     organism_updateOrganismAccount: isAdminOrGestionnaireOfMaisonMereAAP,
-    organism_updateOrganismDegreesAndFormacodes: isAnyone,
+    organism_updateOrganismDegreesAndFormacodes:
+      isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganismByDataArg,
     organism_updateMaisonMereOrganismsIsActive: isAdmin,
     organism_updateLegalInformationValidationDecision: isAdmin,
-    organism_createLieuAccueilInfo: isAnyone,
+    organism_createLieuAccueilInfo: [hasRole(["gestion_maison_mere_aap"])],
   },
   Query: {
     organism_getMaisonMereAAPById: isAdminOrGestionnaireOfMaisonMereAAP,

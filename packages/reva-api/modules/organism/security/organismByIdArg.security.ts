@@ -9,11 +9,11 @@ type OrganismAccessCheck = (params: {
   organismId: string;
 }) => Promise<boolean>;
 
-// Fabrique un middleware clé sur `args.id` UNIQUEMENT, sans repli : `organism_getOrganism(id:)`
-// n'expose ni `organismId` ni `data.organismId`, donc les middlewares organisme existants ne s'y
-// appliquent pas. Ajouter `args.id` à leur liste de clés changerait le comportement de tous leurs
-// autres consommateurs, d'où ces middlewares dédiés.
-export const organismByIdArg =
+// Fabrique un middleware clé sur UN SEUL argument, sans repli : les middlewares organisme
+// historiques essaient plusieurs clés (`organismId`, `data.organismId`, `root.id`...) et leur
+// ajouter une clé changerait le comportement de tous leurs autres consommateurs.
+const organismFromArg =
+  (getOrganismId: (args: Record<string, any>) => string) =>
   (isAllowed: OrganismAccessCheck) =>
   (next: IFieldResolver<unknown>) =>
   async (
@@ -25,7 +25,7 @@ export const organismByIdArg =
     if (
       !(await isAllowed({
         userRoles: context.auth.userInfo.realm_access?.roles || [],
-        organismId: args.id,
+        organismId: getOrganismId(args),
         userKeycloakId: context.auth.userInfo.sub,
       }))
     ) {
@@ -33,3 +33,11 @@ export const organismByIdArg =
     }
     return next(root, args, context, info);
   };
+
+// Pour `organism_getOrganism(id:)`.
+export const organismByIdArg = organismFromArg((args) => args.id);
+
+// Pour les mutations recevant `data: { organismId }`.
+export const organismByDataOrganismIdArg = organismFromArg(
+  (args) => args.data?.organismId,
+);

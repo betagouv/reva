@@ -4,8 +4,10 @@ import { whenHasRoleButNotOthers } from "@/modules/shared/security/middlewares/w
 import { isOwnerOfAccount } from "../../account/security/isOwnerOfAccount.security";
 
 import { isGestionnaireOfMaisonMereAAP } from "./isGestionnaireOfMaisonMereAAP.security";
+import { isGestionnaireOfMaisonMereAAPOfOrganismByDataArg } from "./isGestionnaireOfMaisonMereAAPOfOrganismByDataArg";
 import { isGestionnaireOfMaisonMereAAPOfOrganismByIdArg } from "./isGestionnaireOfMaisonMereAAPOfOrganismByIdArg";
 import { isOwnerOfOrganism } from "./isOwnerOfOrganism";
+import { isOwnerOfOrganismByDataArg } from "./isOwnerOfOrganismByDataArg";
 import { isOwnerOfOrganismByIdArg } from "./isOwnerOfOrganismByIdArg";
 
 // Règles d'accès composées propres au module organism. Un seul consommateur
@@ -45,6 +47,23 @@ export const isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganismById
       "manage_candidacy",
       ["admin", "gestion_maison_mere_aap"],
       isOwnerOfOrganismByIdArg,
+    ),
+  ];
+
+// Pour les mutations recevant `data: { organismId }` (ex. `organism_updateOrganismDegreesAndFormacodes`) :
+// `isGestionnaireOfMaisonMereAAP` y chercherait un `maisonMereAAPId` absent et refuserait le
+// gestionnaire, on résout donc la maison mère à partir de l'organisme ciblé.
+export const isAdminOrGestionnaireOfMaisonMereAAPOfOrganismOrOwnerOfOrganismByDataArg =
+  [
+    hasRole(["admin", "gestion_maison_mere_aap", "manage_candidacy"]),
+    whenHasRole(
+      "gestion_maison_mere_aap",
+      isGestionnaireOfMaisonMereAAPOfOrganismByDataArg,
+    ),
+    whenHasRoleButNotOthers(
+      "manage_candidacy",
+      ["admin", "gestion_maison_mere_aap"],
+      isOwnerOfOrganismByDataArg,
     ),
   ];
 
