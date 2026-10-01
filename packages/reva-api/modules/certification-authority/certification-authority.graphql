@@ -52,6 +52,7 @@ type CertificationAuthorityLocalAccount {
     searchText: String
   ): CertificationPaginated!
   certificationAuthority: CertificationAuthority!
+  metabaseDashboardIframeUrl: String
 }
 
 type CertificationAuthorityCGU {

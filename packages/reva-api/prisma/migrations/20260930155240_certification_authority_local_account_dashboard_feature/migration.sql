@@ -1,0 +1,2 @@
+INSERT INTO "features" ("key", "label", "description", "is_active")
+VALUES ('SHOW_METABASE_DASHBOARD_FOR_LOCAL_ACCOUNT', 'Tableaux de bord pour les comptes locaux', 'Afficher le tableau de bord Metabase pour les comptes locaux', false);
