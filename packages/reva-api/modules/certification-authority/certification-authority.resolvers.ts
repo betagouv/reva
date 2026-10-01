@@ -15,6 +15,7 @@ import { logger } from "@/modules/shared/logger/logger";
 
 import { buildCandidacyAuditLogUserInfo } from "../candidacy-log/features/logCandidacyAuditEvent";
 import { hasRole } from "../shared/security/middlewares";
+import { isCertificationAuthorityLocalAccountManager } from "../shared/security/middlewares/isCertificationAuthorityLocalAccountManager";
 import {
   isAdmin,
   isAdminCandidacyCompanionOrFeasibilityManagerOrCandidate,
@@ -68,6 +69,7 @@ import { getHumanAccountByCertificationAuthorityId } from "./features/getHumanAc
 import { getHumanAccountByCertificationAuthorityLocalAccountId } from "./features/getHumanAccountByCertificationAuthorityLocalAccountId";
 import { getLastProfessionalCguCertificateur } from "./features/getLastProfessionalCguCertificateur";
 import { getMetabaseIframeUrl } from "./features/getMetabaseIframeUrl";
+import { getMetabaseIframeUrlForLocalAccount } from "./features/getMetabaseIframeUrlForLocalAccount";
 import { getMetabaseIframeUrlForRegistryManager } from "./features/getMetabaseIframeUrlForRegistryManager";
 import { getPaginatedCertifications } from "./features/getPaginatedCertifications";
 import { getParcoursForCertificationAndCertificationAuthority } from "./features/getParcoursForCertificationAndCertificationAuthority";
@@ -181,6 +183,17 @@ const unsafeResolvers = {
         localAccountId: parent.id,
         ...params,
       }),
+    metabaseDashboardIframeUrl: async (
+      {
+        id: certificationAuthorityLocalAccountId,
+      }: CertificationAuthorityLocalAccount,
+      _params: unknown,
+      context: GraphqlContext,
+    ) =>
+      getMetabaseIframeUrlForLocalAccount(
+        certificationAuthorityLocalAccountId,
+        context.auth.userInfo?.sub || "",
+      ),
   },
   Certification: {
     certificationAuthorities: ({
@@ -690,5 +703,7 @@ export const certificationAuthorityResolvers = withPolicies(unsafeResolvers, {
     account:
       isAdminOrIsCertificationAuthorityAccountOrLocalAccountStructureMember,
     paginatedCertifications: isAdminOrCertificationAuthority,
+    metabaseDashboardIframeUrl:
+      isAdminOrIsCertificationAuthorityAccountOrLocalAccountStructureMember,
   },
 });
