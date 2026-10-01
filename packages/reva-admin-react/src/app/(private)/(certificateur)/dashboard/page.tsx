@@ -27,9 +27,22 @@ const getCertificationAuthorityMetabaseUrlForRegistryManagerQuery = graphql(`
     }
   }
 `);
+
+const getCertificationAuthorityLocalAccountMetabaseUrlQuery = graphql(`
+  query getCertificationAuthorityLocalAccountMetabaseUrl {
+    account_getAccountForConnectedUser {
+      certificationAuthorityLocalAccount {
+        metabaseDashboardIframeUrl
+      }
+    }
+  }
+`);
 const CertificationAuthorityDashboard = () => {
   const { graphqlClient } = useGraphQlClient();
-  const { isCertificationRegistryManager } = useAuth();
+  const {
+    isCertificationRegistryManager,
+    isCertificationAuthorityLocalAccount,
+  } = useAuth();
 
   const { data: getCertificationAuthorityMetabaseUrl } = useQuery({
     queryKey: ["certificateur", "getCertificationAuthorityMetabaseUrl"],
@@ -51,13 +64,28 @@ const CertificationAuthorityDashboard = () => {
       enabled: isCertificationRegistryManager,
     });
 
+  const { data: getCertificationAuthorityLocalAccountMetabaseUrl } = useQuery({
+    queryKey: [
+      "certificateur",
+      "getCertificationAuthorityLocalAccountMetabaseUrl",
+    ],
+    queryFn: () =>
+      graphqlClient.request(
+        getCertificationAuthorityLocalAccountMetabaseUrlQuery,
+      ),
+    enabled: isCertificationAuthorityLocalAccount,
+  });
+
   const iframeUrl =
     getCertificationAuthorityMetabaseUrl?.account_getAccountForConnectedUser
       ?.certificationAuthority?.metabaseDashboardIframeUrl ||
     getCertificationAuthorityMetabaseUrlForRegistryManager
       ?.account_getAccountForConnectedUser?.certificationRegistryManager
       ?.certificationAuthorityStructure
-      ?.metabaseDashboardIframeUrlForRegistryManager;
+      ?.metabaseDashboardIframeUrlForRegistryManager ||
+    getCertificationAuthorityLocalAccountMetabaseUrl
+      ?.account_getAccountForConnectedUser?.certificationAuthorityLocalAccount
+      ?.metabaseDashboardIframeUrl;
 
   if (!iframeUrl) {
     return null;

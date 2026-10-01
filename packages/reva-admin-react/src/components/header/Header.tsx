@@ -27,6 +27,7 @@ const getCertificationAuthorityLocalAccountForHeaderQuery = graphql(`
   query getCertificationAuthorityLocalAccountForHeader {
     account_getAccountForConnectedUser {
       certificationAuthorityLocalAccount {
+        metabaseDashboardIframeUrl
         certificationAuthority {
           id
         }
@@ -143,6 +144,7 @@ const getNavigationTabs = ({
   isAdminCertificationAuthority,
   metabaseDashboardIframeUrl,
   metabaseDashboardIframeUrlForRegistryManager,
+  metabaseDashboardIframeUrlForLocalAccount,
   shouldShowAapMetabaseDashboard,
   showAAPVaeCollectivesTab,
   certificationAuthorityId,
@@ -156,6 +158,7 @@ const getNavigationTabs = ({
   isAdminCertificationAuthority: boolean;
   metabaseDashboardIframeUrl?: string | null;
   metabaseDashboardIframeUrlForRegistryManager?: string | null;
+  metabaseDashboardIframeUrlForLocalAccount?: string | null;
   shouldShowAapMetabaseDashboard?: boolean;
   showAAPVaeCollectivesTab: boolean;
   certificationAuthorityId?: string;
@@ -333,6 +336,15 @@ const getNavigationTabs = ({
       href: PATHS.CERTIFICATEUR_HELP,
       isActive: currentPathname.startsWith(PATHS.CERTIFICATEUR_HELP),
     }),
+    ...(metabaseDashboardIframeUrlForLocalAccount
+      ? [
+          createTab({
+            text: LABELS.STATISTIQUES,
+            href: PATHS.STATISTIQUES,
+            isActive: currentPathname.startsWith(PATHS.STATISTIQUES),
+          }),
+        ]
+      : []),
   ];
 
   switch (true) {
@@ -408,6 +420,11 @@ export const Header = () => {
     getCertificationAuthorityForHeader?.account_getAccountForConnectedUser
       ?.certificationAuthority?.metabaseDashboardIframeUrl;
 
+  const metabaseDashboardIframeUrlForLocalAccount =
+    getCertificationAuthorityLocalAccountForHeader
+      ?.account_getAccountForConnectedUser?.certificationAuthorityLocalAccount
+      ?.metabaseDashboardIframeUrl;
+
   const certificationAuthorityId =
     getCertificationAuthorityForHeader?.account_getAccountForConnectedUser
       ?.certificationAuthority?.id ??
@@ -438,6 +455,7 @@ export const Header = () => {
     isAdminCertificationAuthority,
     metabaseDashboardIframeUrl,
     metabaseDashboardIframeUrlForRegistryManager,
+    metabaseDashboardIframeUrlForLocalAccount,
     shouldShowAapMetabaseDashboard,
     showAAPVaeCollectivesTab,
     certificationAuthorityId,
