@@ -15,7 +15,6 @@ import { logger } from "@/modules/shared/logger/logger";
 
 import { buildCandidacyAuditLogUserInfo } from "../candidacy-log/features/logCandidacyAuditEvent";
 import { hasRole } from "../shared/security/middlewares";
-import { isCertificationAuthorityLocalAccountManager } from "../shared/security/middlewares/isCertificationAuthorityLocalAccountManager";
 import {
   isAdmin,
   isAdminCandidacyCompanionOrFeasibilityManagerOrCandidate,
