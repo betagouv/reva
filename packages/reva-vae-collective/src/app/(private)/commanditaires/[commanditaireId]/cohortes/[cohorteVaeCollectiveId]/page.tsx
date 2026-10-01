@@ -10,6 +10,7 @@ import { client } from "@/helpers/graphql/urql-client/urqlClient";
 import { graphql } from "@/graphql/generated";
 
 import { AccessRightsCard } from "./_components/access-rights-card/AccessRightsCard";
+import { CandidacyCountCard } from "./_components/candidacy-count-card/CandidacyCountCard";
 import { CertificationsCard } from "./_components/certifications-card/CertificationsCard";
 import { DeleteCohorteButton } from "./_components/delete-cohorte-button/DeleteCohorteButton";
 import { OrganismCard } from "./_components/organism-card/OrganismCard";
@@ -36,7 +37,6 @@ const getCohorteById = async (
             nom
             status
             codeInscription
-
             certificationCohorteVaeCollectives {
               id
               certification {
@@ -55,6 +55,7 @@ const getCohorteById = async (
               emailContact
               telephone
             }
+            candidacyCount
           }
         }
       `),
@@ -200,6 +201,10 @@ export default async function CohortePage({
         aapLabel={organism?.label ?? ""}
         disabled={!organismSelected}
         readonly={registrationCodeCardreadonly}
+      />
+      <CandidacyCountCard
+        candidacyCount={cohorte.candidacyCount}
+        candidaturesHref={`/commanditaires/${commanditaireId}/cohortes/${cohorteVaeCollectiveId}/candidatures`}
       />
       {cohorte.status === "BROUILLON" && canDeleteCohorte && (
         <DeleteCohorteButton

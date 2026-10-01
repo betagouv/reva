@@ -8,6 +8,7 @@ type CohorteVaeCollective {
   status: CohorteVaeCollectiveStatus!
   organism: Organism
   organismId: ID
+  candidacyCount: Int!
 }
 enum CohorteVaeCollectiveStatus {
   BROUILLON

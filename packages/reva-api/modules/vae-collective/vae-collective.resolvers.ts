@@ -9,6 +9,7 @@ import {
 import { withPolicies } from "@/modules/shared/security/withPolicies";
 
 import { getAccountById } from "../account/features/getAccount";
+import { getCandidacyCountByCohorteId } from "../candidacy/features/getCandidacyCountByCohorteId";
 import { getOrganismById } from "../organism/features/getOrganism";
 import { getCertificationById } from "../referential/features/getCertificationById";
 
@@ -62,6 +63,8 @@ const unsafeResolvers = {
       }),
     organism: async ({ organismId }: { organismId: string }) =>
       getOrganismById({ organismId }),
+    candidacyCount: async ({ id: cohorteVaeCollectiveId }: { id: string }) =>
+      getCandidacyCountByCohorteId({ cohorteVaeCollectiveId }),
   },
   CertificationCohorteVaeCollective: {
     certification: async ({ certificationId }: { certificationId: string }) =>
@@ -363,6 +366,7 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     certificationCohorteVaeCollectives:
       isAdminOrGestionnaireOrSousCompteOfCommanditaireVaeCollectiveOrCandidate,
     organism: isAnyone,
+    candidacyCount: isAnyone,
   },
   CertificationCohorteVaeCollective: {
     // Uniquement accessible via certificationCohorteVaeCollectives, déjà protégé ci-dessus.
