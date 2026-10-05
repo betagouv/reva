@@ -22,8 +22,8 @@ export default async function AucunCompteUtilisateurPage() {
       <div>
         <h1>Gestion des comptes</h1>
         <p className="text-xl leading-loose">
-          Vous souhaitez partager des droits à certains de vos collaborateurs,
-          vous pouvez leur créer des comptes et leur partager les informations
+          Vous souhaitez partager des droits avec vos collaborateurs ou des
+          partenaires ? Créez leur un compte et partagez les informations
           nécessaires.
         </p>
 

@@ -34,7 +34,7 @@ export default function NouveauCompteUtilisateurPage() {
       <h1>Création d’un compte collaborateur</h1>
       <FormOptionalFieldsDisclaimer />
       <p className="text-xl">
-        Le collaborateur ajouté recevra un mail pour finaliser son compte et
+        Le collaborateur ajouté recevra un courriel pour finaliser son compte et
         accéder à son espace.
       </p>
       <h2 className="mt-8">Informations de connexion</h2>
