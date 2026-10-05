@@ -65,6 +65,20 @@ test.describe("candidacy count card", () => {
       mswHandlers: [
         [
           mockGetCohorteByIdForCohortePage(3),
+          fvae.query("getCandidaciesForCandidaciesPage", () =>
+            HttpResponse.json({
+              data: {
+                vaeCollective_getCohorteVaeCollectiveById: {
+                  id: cohorteVaeCollectiveId,
+                  nom: "macohorte",
+                },
+                getCandidacies: {
+                  rows: [],
+                  info: { totalRows: 0, totalPages: 0, currentPage: 1 },
+                },
+              },
+            }),
+          ),
           mockQueryActiveFeatures(),
           mockQueryGetUserPermissions(["MODIFIER_COHORTE"]),
         ],
