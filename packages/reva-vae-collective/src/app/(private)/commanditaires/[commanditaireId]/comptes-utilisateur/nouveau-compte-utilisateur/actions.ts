@@ -13,6 +13,7 @@ type FormState = {
     accountFirstname?: { message: string };
     accountLastname?: { message: string };
     accountEmail?: { message: string };
+    isAAPAccount?: { message: string };
   };
 };
 
@@ -23,6 +24,7 @@ const createSousCompteVaeCollectiveMutation = graphql(`
     $accountLastname: String!
     $accountEmail: String!
     $canCreateCohorteVaeCollective: Boolean!
+    $isAAPAccount: Boolean!
   ) {
     vaeCollective_createSousCompteVaeCollective(
       commanditaireVaeCollectiveId: $commanditaireVaeCollectiveId
@@ -30,6 +32,7 @@ const createSousCompteVaeCollectiveMutation = graphql(`
       accountLastname: $accountLastname
       accountEmail: $accountEmail
       canCreateCohorteVaeCollective: $canCreateCohorteVaeCollective
+      isAAPAccount: $isAAPAccount
     ) {
       id
     }
@@ -48,7 +51,16 @@ export const createSousCompteVaeCollective = async (
     accountEmail,
     commanditaireId,
     canCreateCohorteVaeCollective,
+    isAAPAccount,
   } = Object.fromEntries(formData.entries());
+
+  console.log("isAAPAccount", isAAPAccount);
+  console.log("canCreateCohorteVaeCollective", canCreateCohorteVaeCollective);
+  console.log("commanditaireId", commanditaireId);
+  console.log("accountFirstname", accountFirstname);
+  console.log("accountLastname", accountLastname);
+  console.log("accountEmail", accountEmail);
+  console.log('isAAPAccount === "on"', isAAPAccount === "on");
 
   for (const [fieldName, field] of Object.entries({
     accountLastname,
@@ -81,6 +93,7 @@ export const createSousCompteVaeCollective = async (
         accountLastname: accountLastname.toString(),
         accountEmail: accountEmail.toString(),
         canCreateCohorteVaeCollective: canCreateCohorteVaeCollective === "on",
+        isAAPAccount: isAAPAccount === "on",
       },
       {
         fetchOptions: {
