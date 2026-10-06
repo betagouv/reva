@@ -7,6 +7,10 @@ import { createCertificationHelper } from "@/test/helpers/entities/create-certif
 
 import { setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate } from "./setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate";
 
+vi.mock("./updateCertificationWithRncpExpiresAt", () => ({
+  updateCertificationWithRncpExpiresAt: vi.fn(),
+}));
+
 const createEligibleCertification = () =>
   createCertificationHelper({
     status: CertificationStatus.VALIDE_PAR_CERTIFICATEUR,
