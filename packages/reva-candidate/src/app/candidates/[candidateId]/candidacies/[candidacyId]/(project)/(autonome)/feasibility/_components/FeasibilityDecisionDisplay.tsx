@@ -3,7 +3,7 @@ import Notice from "@codegouvfr/react-dsfr/Notice";
 import { toDate } from "date-fns";
 
 import { FancyPreview } from "@/components/fancy-preview/FancyPreview";
-import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory.component";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 
 import {
   FeasibilityDecision,
@@ -55,10 +55,6 @@ export default function FeasibilityDecisionDisplay({
               </>
             }
           />
-
-          {feasibilityHistory.length > 0 && (
-            <FeasibilityDecisionHistory history={feasibilityHistory} />
-          )}
         </>
       )}
       {decision == "INCOMPLETE" && (
@@ -82,9 +78,6 @@ export default function FeasibilityDecisionDisplay({
               </>
             }
           />
-          {feasibilityHistory.length > 0 && (
-            <FeasibilityDecisionHistory history={feasibilityHistory} />
-          )}
         </>
       )}
       {decision == "PENDING" && (
@@ -149,6 +142,8 @@ export default function FeasibilityDecisionDisplay({
           )}
         </>
       )}
+
+      <FeasibilityDecisionHistory history={feasibilityHistory} />
     </>
   );
 }

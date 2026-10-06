@@ -6,15 +6,6 @@ import { useFeatureflipping } from "@/components/feature-flipping/featureFlippin
 
 import { FeasibilityDecision } from "@/graphql/generated/graphql";
 
-import { FeasibilityDecisionHistory } from "../feasibility-decision-history/FeasibilityDecisionHistory";
-
-type FeasibilityHistory = {
-  id: string;
-  decision: FeasibilityDecision;
-  decisionSentAt?: number | null;
-  decisionComment?: string | null;
-};
-
 const severityMap = {
   ADMISSIBLE: "success",
   COMPLETE: "info",
@@ -26,7 +17,6 @@ export const DecisionSentComponent = ({
   decisionSentAt,
   decision,
   decisionComment,
-  history,
   onRevokeDecision,
   isAdmin = false,
   candidacyStatus,
@@ -34,7 +24,6 @@ export const DecisionSentComponent = ({
   decisionSentAt: Date | null;
   decision: FeasibilityDecision;
   decisionComment?: string | null;
-  history?: FeasibilityHistory[];
   onRevokeDecision?: () => void;
   isAdmin?: boolean;
   candidacyStatus?: string;
@@ -64,7 +53,6 @@ export const DecisionSentComponent = ({
     INCOMPLETE: ["DOSSIER_FAISABILITE_INCOMPLET"],
   };
 
-  const canDisplayHistory = !!history?.length && history.length > 1;
   const canRevokeDfIncomplete = isFeatureActive("ADMIN_REVOKE_DF_INCOMPLETE");
 
   const canRevoke =
@@ -94,13 +82,6 @@ export const DecisionSentComponent = ({
           </div>
         )}
       </div>
-      {canDisplayHistory && (
-        <FeasibilityDecisionHistory
-          className="mb-12"
-          label="Décisions précédentes"
-          decisions={history}
-        />
-      )}
     </>
   );
 };

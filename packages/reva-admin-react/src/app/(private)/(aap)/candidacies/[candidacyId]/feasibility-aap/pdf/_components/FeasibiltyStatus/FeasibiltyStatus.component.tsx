@@ -4,7 +4,7 @@ import { GrayCard } from "@/components/card/gray-card/GrayCard";
 import {
   FeasibilityDecisionHistory,
   FeasibilityDecisionInfo,
-} from "@/components/feasibility-decison-history/FeasibilityDecisionHistory.component";
+} from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 
 import { useHooks } from "./FeasibiltyStatus.hooks";
 
@@ -96,9 +96,7 @@ export const FeasibiltyStatus = (props: Props) => {
         />
       )}
 
-      {feasibility?.history && feasibility.history.length > 0 && (
-        <FeasibilityDecisionHistory history={feasibility?.history} />
-      )}
+      <FeasibilityDecisionHistory history={feasibility?.history} />
     </div>
   );
 };

@@ -26,6 +26,12 @@ const feasibilityWithDematerializedFeasibilityFileSendFileCandidateByCandidacyId
       feasibility_getActiveFeasibilityByCandidacyId(candidacyId: $candidacyId) {
         decision
         decisionSentAt
+        history {
+          id
+          decision
+          decisionComment
+          decisionSentAt
+        }
         dematerializedFeasibilityFile {
           id
           eligibilityCandidateSituation
@@ -224,6 +230,7 @@ export const useSendFileCandidate = () => {
   const candidacy = feasibility?.candidacy;
   const feasibilityIsIncomplete = feasibility?.decision === "INCOMPLETE";
   const decisionSentAt = feasibility?.decisionSentAt;
+  const history = feasibility?.history;
   return {
     dematerializedFeasibilityFileId,
     candidacy,
@@ -231,5 +238,6 @@ export const useSendFileCandidate = () => {
     dematerializedFeasibilityFile,
     feasibilityIsIncomplete,
     decisionSentAt,
+    history,
   };
 };

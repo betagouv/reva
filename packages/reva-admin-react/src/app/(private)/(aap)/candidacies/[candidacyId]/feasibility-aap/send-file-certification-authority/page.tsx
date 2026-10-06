@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 
 import { DecisionSentComponent } from "@/components/alert-decision-sent-feasibility/DecisionSentComponent";
 import { DffSummary } from "@/components/dff-summary/DffSummary";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 import {
   errorToast,
   graphqlErrorToast,
@@ -32,7 +33,7 @@ const HasBeenSentComponent = ({
     description={`Dossier envoyé au certificateur le ${format(sentToCertificationAuthorityAt, "dd/MM/yyyy")}`}
     severity="success"
     title=""
-    className="mb-12"
+    className="mb-6"
   />
 );
 
@@ -130,6 +131,7 @@ export default function SendFileCertificationAuthorityPage() {
     !feasibilityHasBeenSent || feasibilityIsIncomplete;
   const isReadyToBeSentToCertificationAuthority =
     dematerializedFeasibilityFile?.isReadyToBeSentToCertificationAuthority;
+  const history = feasibility?.history;
 
   const handleSendFile = async () => {
     if (!dematerializedFeasibilityFile) {
@@ -168,13 +170,16 @@ export default function SendFileCertificationAuthorityPage() {
         }
         candidacy={candidacy as Candidacy}
         FeasibilityBanner={
-          <FeasibilityBanner
-            feasibilityFileSentAt={feasibilityFileSentAt}
-            feasibilityIsPending={feasibilityIsPending}
-            decisionSentAt={decisionSentAt}
-            decision={decision as FeasibilityDecision}
-            decisionComment={decisionComment}
-          />
+          <>
+            <FeasibilityBanner
+              feasibilityFileSentAt={feasibilityFileSentAt}
+              feasibilityIsPending={feasibilityIsPending}
+              decisionSentAt={decisionSentAt}
+              decision={decision as FeasibilityDecision}
+              decisionComment={decisionComment}
+            />
+            <FeasibilityDecisionHistory className="mb-6" history={history} />
+          </>
         }
       />
       <CertificationAuthoritySection

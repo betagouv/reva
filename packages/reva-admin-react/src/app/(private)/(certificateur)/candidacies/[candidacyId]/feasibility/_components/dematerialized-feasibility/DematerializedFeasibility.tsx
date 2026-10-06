@@ -7,6 +7,7 @@ import { ContactInfosSection } from "@/app/contact-infos-section/ContactInfosSec
 import { DecisionSentComponent } from "@/components/alert-decision-sent-feasibility/DecisionSentComponent";
 import { useAuth } from "@/components/auth/auth";
 import { DffSummary } from "@/components/dff-summary/DffSummary";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { useUrqlClient } from "@/components/urql-client";
 
@@ -14,7 +15,6 @@ import {
   Candidacy,
   DematerializedFeasibilityFile,
   FeasibilityDecision,
-  FeasibilityHistory,
 } from "@/graphql/generated/graphql";
 
 import {
@@ -188,10 +188,13 @@ export const DematerializedFeasibility = () => {
               decisionSentAt={feasibilityDecisionSentAt}
               decision={feasibility?.decision as FeasibilityDecision}
               decisionComment={feasibility?.decisionComment}
-              history={feasibility?.history as FeasibilityHistory[]}
               onRevokeDecision={() => revokeDecisionModal.open()}
               isAdmin={isAdmin}
               candidacyStatus={candidacy.status}
+            />
+            <FeasibilityDecisionHistory
+              className="mb-6"
+              history={feasibility?.history}
             />
           </>
         }

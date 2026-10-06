@@ -2,7 +2,7 @@ import Alert, { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { toDate } from "date-fns";
 
-import { FeasibilityDecisionHistory } from "@/components/feasibility-decison-history/FeasibilityDecisionHistory.component";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 import { useFeatureflipping } from "@/components/feature-flipping/featureFlipping";
 
 import {
@@ -46,9 +46,7 @@ export function FeasibilityBanner({
 }: Props) {
   const { isFeatureActive } = useFeatureflipping();
   if (decision === "PENDING") {
-    return feasibilityHistory.length > 0 ? (
-      <FeasibilityDecisionHistory history={feasibilityHistory} />
-    ) : null;
+    return <FeasibilityDecisionHistory history={feasibilityHistory} />;
   }
 
   const formattedDate = decisionSentAt
@@ -125,9 +123,8 @@ export function FeasibilityBanner({
           </div>
         )}
       </div>
-      {feasibilityHistory.length > 0 && (
-        <FeasibilityDecisionHistory history={feasibilityHistory} />
-      )}
+
+      <FeasibilityDecisionHistory history={feasibilityHistory} />
     </>
   );
 }

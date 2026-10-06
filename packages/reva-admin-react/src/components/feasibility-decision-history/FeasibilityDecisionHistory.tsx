@@ -27,26 +27,35 @@ const Info = ({
 );
 
 export const FeasibilityDecisionHistory = ({
-  label,
-  decisions,
+  history,
   className,
 }: {
-  label: string;
-  decisions: FeasibilityHistory[];
+  history?: FeasibilityHistory[];
   className?: string;
-}) => (
-  <Accordion label={label} className={`${className || ""}`}>
-    <div className="flex flex-col">
-      {decisions.map((d) => (
-        <FeasibilityDecision
-          key={d.id}
-          {...d}
-          className="pt-4 pb-3 first:border-none last:border-t-[1.5px] first:pt-0"
-        />
-      ))}
-    </div>
-  </Accordion>
-);
+}) => {
+  const filteredHistory = history?.filter(
+    (h) =>
+      h.decision == "ADMISSIBLE" ||
+      h.decision == "REJECTED" ||
+      h.decision == "INCOMPLETE",
+  );
+
+  if (!filteredHistory?.length) return null;
+
+  return (
+    <Accordion label="Décisions précédentes" className={`${className || ""}`}>
+      <div className="flex flex-col">
+        {filteredHistory.map((d) => (
+          <FeasibilityDecisionInfo
+            key={d.id}
+            {...d}
+            className="pt-4 pb-3 first:border-none last:border-t-[1.5px] first:pt-0"
+          />
+        ))}
+      </div>
+    </Accordion>
+  );
+};
 
 const titleMap = {
   ADMISSIBLE: `Dossier recevable`,
@@ -54,7 +63,7 @@ const titleMap = {
   REJECTED: `Dossier non recevable`,
 };
 
-const FeasibilityDecision = ({
+export const FeasibilityDecisionInfo = ({
   decisionSentAt,
   decisionComment,
   decision,

@@ -10,7 +10,7 @@ import { z } from "zod";
 import { ContactInfosSection } from "@/app/contact-infos-section/ContactInfosSection";
 import { GrayCard } from "@/components/card/gray-card/GrayCard";
 import { FancyUpload } from "@/components/fancy-upload/FancyUpload";
-import { FeasibilityDecisionHistory } from "@/components/feasibility-decison-history/FeasibilityDecisionHistory.component";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 import { errorToast, graphqlErrorToast } from "@/components/toast/toast";
 
 import { FeasibilityHistory } from "@/graphql/generated/graphql";
@@ -286,9 +286,7 @@ export const SendFeasibilityForm = (props: Props): React.ReactNode => {
           />
         )}
 
-        {feasibilityHistory.length > 0 && (
-          <FeasibilityDecisionHistory history={feasibilityHistory} />
-        )}
+        <FeasibilityDecisionHistory history={feasibilityHistory} />
 
         <fieldset>
           <h4>Avant de finaliser votre envoi</h4>

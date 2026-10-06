@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { DffSummary } from "@/components/dff-summary/DffSummary";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { isSentToCandidateOutdatedAfterIncomplete } from "@/utils/feasibilityIncompleteOutdated.util";
 
@@ -28,13 +29,13 @@ const FeasibilityBanner = ({
         description={`Dossier envoyé au candidat le ${format(sentToCandidateAt, "dd/MM/yyyy")}`}
         severity="success"
         title=""
-        className="mb-12"
+        className="mb-6"
       />
     );
   }
 
   return (
-    <p className="text-xl mb-12">
+    <p className="text-xl mb-6">
       Vérifiez que toutes les informations soient correctes et envoyez le
       dossier de faisabilité au candidat. Il devra vous fournir une attestation
       sur l'honneur pour valider ce dossier.
@@ -51,6 +52,7 @@ export default function SendFileCandidatePage() {
     candidacy,
     feasibilityIsIncomplete,
     decisionSentAt,
+    history,
   } = useSendFileCandidate();
   const router = useRouter();
   const feasibilitySummaryUrl = `/candidacies/${candidacyId}/feasibility-aap`;
@@ -94,7 +96,10 @@ export default function SendFileCandidatePage() {
         }
         candidacy={candidacy as Candidacy}
         FeasibilityBanner={
-          <FeasibilityBanner sentToCandidateAt={sentToCandidateAt} />
+          <>
+            <FeasibilityBanner sentToCandidateAt={sentToCandidateAt} />
+            <FeasibilityDecisionHistory className="mb-6" history={history} />
+          </>
         }
       />
 

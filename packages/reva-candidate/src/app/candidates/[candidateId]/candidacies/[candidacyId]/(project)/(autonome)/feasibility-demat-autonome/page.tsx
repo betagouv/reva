@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { ExperiencesTile } from "@/app/_components/home/dashboard/tiles/ExperiencesTile";
 import { FormationsTile } from "@/app/_components/home/dashboard/tiles/FormationsTile";
 import { GoalsTile } from "@/app/_components/home/dashboard/tiles/GoalsTile";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 import { Panel } from "@/components/layout/Panel";
 import { PdfLink } from "@/components/legacy/organisms/DffSummary/components/PdfLink";
 import { DffSummary } from "@/components/legacy/organisms/DffSummary/DffSummary";
@@ -233,9 +234,13 @@ export default function FeasibilityDematAutonomeResourcesPage() {
           <DecisionIncompleteAlert
             decisionSentAt={decisionSentAt}
             decisionComment={decisionComment || ""}
-            history={history || []}
           />
         )}
+
+        <FeasibilityDecisionHistory
+          className="mb-6"
+          history={history?.slice(1)}
+        />
 
         <div className="grid grid-cols-4">
           <div className="col-span-3 flex flex-col gap-8">

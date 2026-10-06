@@ -6,6 +6,7 @@ import { format, isBefore, toDate } from "date-fns";
 import { useAapFeasibilityPageLogic } from "@/app/(private)/(aap)/candidacies/[candidacyId]/feasibility-aap/aapFeasibilityPageLogic";
 import { DecisionSentComponent } from "@/components/alert-decision-sent-feasibility/DecisionSentComponent";
 import { DffSummary } from "@/components/dff-summary/DffSummary";
+import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 
 import {
   Candidacy,
@@ -16,7 +17,6 @@ import {
   DffAttachment,
   DffCertificationCompetenceBloc,
   FeasibilityDecision,
-  FeasibilityHistory,
   Prerequisite,
 } from "@/graphql/generated/graphql";
 
@@ -36,18 +36,15 @@ const FeasibilityBanner = ({
   decisionSentAt,
   decision,
   decisionComment,
-  history,
 }: {
   decisionSentAt: number | null | undefined;
   decision: FeasibilityDecision;
   decisionComment?: string | null;
-  history?: FeasibilityHistory[];
 }) => (
   <DecisionSentComponent
     decisionSentAt={decisionSentAt ? toDate(decisionSentAt) : null}
     decision={decision}
     decisionComment={decisionComment}
-    history={history}
   />
 );
 
@@ -107,12 +104,17 @@ const AapFeasibilityPage = () => {
         }
         candidacy={candidacy as Candidacy}
         FeasibilityBanner={
-          <FeasibilityBanner
-            decisionSentAt={decisionSentAt}
-            decision={decision as FeasibilityDecision}
-            decisionComment={decisionComment}
-            history={history}
-          />
+          <>
+            <FeasibilityBanner
+              decisionSentAt={decisionSentAt}
+              decision={decision as FeasibilityDecision}
+              decisionComment={decisionComment}
+            />
+            <FeasibilityDecisionHistory
+              className="mb-6"
+              history={history?.slice(1)}
+            />
+          </>
         }
       />
     );
@@ -129,7 +131,7 @@ const AapFeasibilityPage = () => {
       {showCertificationExpiredAlert && (
         <Alert
           data-testid="certification-expired-alert"
-          className="mt-6 mb-12"
+          className="my-6"
           severity="error"
           title="La certification visée a expiré"
           description={
@@ -152,7 +154,7 @@ const AapFeasibilityPage = () => {
       {candidacy.warningOnFeasibilitySubmission ===
         "MAX_SUBMISSIONS_UNIQUE_CERTIFICATION_REACHED" && (
         <Alert
-          className="mt-6 mb-12"
+          className="my-6"
           severity="error"
           title="Une demande de recevabilité existe déjà pour ce diplôme"
           description={`${candidacy.candidate.lastname} ${candidacy.candidate.firstname} a déjà transmis une demande de recevabilité pour la certification ${certification?.label}, visée en totalité, en ${new Date().getFullYear()}. Vous pouvez reprendre la candidature existante si elle a été abandonnée, ou soumettre une nouvelle demande à partir de Janvier ${new Date().getFullYear() + 1}.`}
@@ -162,7 +164,7 @@ const AapFeasibilityPage = () => {
       {candidacy.warningOnFeasibilitySubmission ===
         "MAX_SUBMISSIONS_CROSS_CERTIFICATION_REACHED" && (
         <Alert
-          className="mt-6 mb-12"
+          className="my-6"
           severity="error"
           title="Nombre maximum de demandes de recevabilité atteintes"
           description={`${candidacy.candidate.lastname} ${candidacy.candidate.firstname} a déjà transmis 3 demandes de recevabilité sur des certifications visées en totalité pour l’année ${new Date().getFullYear()}. Vous pourrez soumettre le dossier de faisabilité pour la certification ${certification?.label}, visée en totalité, à partir de Janvier ${new Date().getFullYear() + 1}.`}
@@ -172,7 +174,7 @@ const AapFeasibilityPage = () => {
       {candidacy.warningOnFeasibilitySubmission ===
         "PREVIOUS_FEASIBILITY_ON_CERTIFICATION_REJECTED" && (
         <Alert
-          className="mt-6 mb-12"
+          className="my-6"
           severity="error"
           title="Une demande de recevabilité a été rejetée pour ce diplôme"
           description={`${candidacy.candidate.lastname} ${candidacy.candidate.firstname} a déjà transmis une demande de recevabilité pour la certification ${certification?.label} en ${new Date().getFullYear()}. Cette demande a été rejetée. Vous pouvez soumettre une nouvelle demande de recevabilité partielle dès à présent, ou une demande de recevabilité totale à partir de Janvier ${new Date().getFullYear() + 1}.`}
@@ -183,12 +185,16 @@ const AapFeasibilityPage = () => {
         <DecisionIncompleteAlert
           decisionSentAt={decisionSentAt}
           decisionComment={decisionComment || ""}
-          history={history || []}
         />
       )}
 
+      <FeasibilityDecisionHistory
+        className="mb-6"
+        history={history?.slice(1)}
+      />
+
       {queryStatus === "success" && (
-        <ul className="flex flex-col gap-8">
+        <ul className="p-0 flex flex-col gap-8">
           <EligibilitySection
             eligibilityRequirement={
               dematerializedFeasibilityFile?.eligibilityRequirement
