@@ -2123,6 +2123,7 @@ model SousCompteVaeCollective {
   account                                          Account                                           @relation(fields: [accountId], references: [id])
   createdAt                                        DateTime                                          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                                        DateTime?                                         @map("updated_at") @db.Timestamptz(6)
+  isAAPAccount                                     Boolean                                           @default(false) @map("is_aap_account")
   roleSpecificToSousCompteVaeCollective            RoleSpecificToSousCompteVaeCollective[]
   roleSpecificToSousCompteAndCohorteVaeCollectives RoleSpecificToSousCompteAndCohorteVaeCollective[]
 

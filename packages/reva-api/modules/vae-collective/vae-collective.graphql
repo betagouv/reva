@@ -25,6 +25,7 @@ type SousCompteVaeCollective {
   account: Account!
   canCreateCohorteVaeCollective: Boolean!
   rolesSpecificToCohorte(cohorteVaeCollectiveId: ID!): [RoleVaeCollective!]!
+  isAAPAccount: Boolean!
 }
 
 type SousCompteVaeCollectivePage {
@@ -161,6 +162,7 @@ type Mutation {
     accountLastname: String!
     accountEmail: String!
     canCreateCohorteVaeCollective: Boolean!
+    isAAPAccount: Boolean!
   ): SousCompteVaeCollective!
 
   vaeCollective_updateSousCompteVaeCollective(

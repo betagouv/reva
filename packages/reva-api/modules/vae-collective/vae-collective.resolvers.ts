@@ -298,12 +298,14 @@ const unsafeResolvers = {
         accountLastname,
         accountEmail,
         canCreateCohorteVaeCollective,
+        isAAPAccount,
       }: {
         commanditaireVaeCollectiveId: string;
         accountFirstname: string;
         accountLastname: string;
         accountEmail: string;
         canCreateCohorteVaeCollective: boolean;
+        isAAPAccount: boolean;
       },
     ) =>
       createSousCompteVaeCollective({
@@ -312,6 +314,7 @@ const unsafeResolvers = {
         accountLastname,
         accountEmail,
         canCreateCohorteVaeCollective,
+        isAAPAccount,
       }),
     vaeCollective_updateSousCompteVaeCollective: async (
       _parent: unknown,

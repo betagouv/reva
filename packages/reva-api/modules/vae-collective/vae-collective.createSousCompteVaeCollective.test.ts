@@ -18,6 +18,7 @@ const createSousCompteVaeCollectiveMutation = graphql(`
     $accountLastname: String!
     $accountEmail: String!
     $canCreateCohorteVaeCollective: Boolean!
+    $isAAPAccount: Boolean!
   ) {
     vaeCollective_createSousCompteVaeCollective(
       commanditaireVaeCollectiveId: $commanditaireVaeCollectiveId
@@ -25,8 +26,10 @@ const createSousCompteVaeCollectiveMutation = graphql(`
       accountLastname: $accountLastname
       accountEmail: $accountEmail
       canCreateCohorteVaeCollective: $canCreateCohorteVaeCollective
+      isAAPAccount: $isAAPAccount
     ) {
       id
+      isAAPAccount
       account {
         id
         email
@@ -43,6 +46,7 @@ const createSousCompteVaeCollective = ({
   accountLastname,
   accountEmail,
   canCreateCohorteVaeCollective = false,
+  isAAPAccount = false,
   role,
   keycloakId,
 }: {
@@ -51,6 +55,7 @@ const createSousCompteVaeCollective = ({
   accountLastname: string;
   accountEmail: string;
   canCreateCohorteVaeCollective?: boolean;
+  isAAPAccount?: boolean;
   role: KeyCloakUserRole;
   keycloakId?: string;
 }) => {
@@ -66,6 +71,7 @@ const createSousCompteVaeCollective = ({
     accountLastname,
     accountEmail,
     canCreateCohorteVaeCollective,
+    isAAPAccount,
   });
 };
 
@@ -256,5 +262,26 @@ describe("create sous compte vae collective", () => {
         role: "manage_candidacy",
       }),
     ).rejects.toThrowError(NOT_AUTHORIZED);
+  });
+  test("should create an account with AAP flag when isAAPAccount is true", async () => {
+    mockKeycloakAdmin();
+
+    const cohorteVaeCollective = await createCohorteVaeCollectiveHelper();
+    const commanditaireVaeCollectiveId =
+      cohorteVaeCollective.commanditaireVaeCollectiveId;
+
+    const res = await createSousCompteVaeCollective({
+      commanditaireVaeCollectiveId,
+      accountFirstname: "John",
+      accountLastname: "Doe",
+      accountEmail: "john.doe.aap@example.com",
+      isAAPAccount: true,
+      role: "admin",
+      keycloakId: "1b0e7046-ca61-4259-b716-785f36ab79b2",
+    });
+
+    expect(res.vaeCollective_createSousCompteVaeCollective.isAAPAccount).toBe(
+      true,
+    );
   });
 });

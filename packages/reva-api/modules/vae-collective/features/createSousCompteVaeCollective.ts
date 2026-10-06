@@ -11,12 +11,14 @@ export const createSousCompteVaeCollective = async ({
   accountLastname,
   accountEmail,
   canCreateCohorteVaeCollective,
+  isAAPAccount,
 }: {
   commanditaireVaeCollectiveId: string;
   accountFirstname: string;
   accountLastname: string;
   accountEmail: string;
   canCreateCohorteVaeCollective: boolean;
+  isAAPAccount: boolean;
 }) => {
   const account = await createAccount({
     email: accountEmail,
@@ -27,11 +29,14 @@ export const createSousCompteVaeCollective = async ({
     dontSendKeycloakEmail: true,
   });
 
+  console.log("isAAPAccount", isAAPAccount);
+
   const sousCompteVaeCollective =
     await prismaClient.sousCompteVaeCollective.create({
       data: {
         commanditaireVaeCollectiveId: commanditaireVaeCollectiveId,
         accountId: account.id,
+        isAAPAccount,
       },
     });
 
