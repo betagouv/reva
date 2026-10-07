@@ -69,7 +69,7 @@ export default function NouveauCompteUtilisateurPage() {
             stateRelatedMessage={state.errors?.accountFirstname?.message}
           />
           <Input
-            className="flex-grow basis-1/2"
+            className="flex-grow basis-1/2 mb-6"
             data-testid="account-email-input"
             label="Adresse électronique de connexion"
             nativeInputProps={{

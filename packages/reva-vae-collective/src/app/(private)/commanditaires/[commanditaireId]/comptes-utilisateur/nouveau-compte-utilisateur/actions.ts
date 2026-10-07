@@ -17,6 +17,8 @@ type FormState = {
   };
 };
 
+type FieldErrors = NonNullable<FormState["errors"]>;
+
 const createSousCompteVaeCollectiveMutation = graphql(`
   mutation createSousCompteVaeCollective(
     $commanditaireVaeCollectiveId: ID!
@@ -54,26 +56,26 @@ export const createSousCompteVaeCollective = async (
     isAAPAccount,
   } = Object.fromEntries(formData.entries());
 
+  const errors: Partial<Record<keyof FieldErrors, { message: string }>> = {};
+
   for (const [fieldName, field] of Object.entries({
     accountLastname,
     accountEmail,
-  })) {
+  }) as [keyof FieldErrors, FormDataEntryValue][]) {
     if (!field) {
-      return {
-        errors: {
-          [fieldName]: { message: "Merci de remplir ce champ" },
-        },
-      } as FormState;
+      errors[fieldName] = {
+        message: "Merci de remplir ce champ",
+      };
     }
-    if (field.toString().length < 3) {
-      return {
-        errors: {
-          [fieldName]: {
-            message: "Ce champ doit contenir au moins 3 caractères",
-          },
-        },
-      } as FormState;
+    if (field && field.toString().length < 3) {
+      errors[fieldName] = {
+        message: "Ce champ doit contenir au moins 3 caractères",
+      };
     }
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { errors } as FormState;
   }
 
   try {
