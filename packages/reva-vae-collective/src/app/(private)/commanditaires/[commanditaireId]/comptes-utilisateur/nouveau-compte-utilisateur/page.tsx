@@ -7,7 +7,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { useParams } from "next/navigation";
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
 
 import { FormOptionalFieldsDisclaimer } from "@/components/form-optional-fields-disclaimer/FormOptionalFieldsDisclaimer";
 import { RoleDependentBreadcrumb } from "@/components/role-dependent-breadcrumb/RoleDependentBreadcrumb";
@@ -46,7 +46,14 @@ export default function NouveauCompteUtilisateurPage() {
         accéder à son espace.
       </p>
       <h2 className="mt-8">Informations de connexion</h2>
-      <form action={action} className="flex flex-col">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          startTransition(() => action(formData));
+        }}
+        className="flex flex-col"
+      >
         <div className="flex flex-col md:flex-row md:gap-6">
           <Input
             className="flex-grow basis-1/4"
