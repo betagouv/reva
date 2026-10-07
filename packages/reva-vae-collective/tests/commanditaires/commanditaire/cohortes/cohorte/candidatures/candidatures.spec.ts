@@ -92,10 +92,10 @@ const mockGetCandidacies = ({
         vaeCollective_getCohorteVaeCollectiveById: {
           id: cohorteVaeCollectiveId,
           nom: "macohorte",
-        },
-        getCandidacies: {
-          rows,
-          info: { totalRows, totalPages, currentPage },
+          candidacies: {
+            rows,
+            info: { totalRows, totalPages, currentPage },
+          },
         },
       },
     }),
@@ -281,13 +281,13 @@ test.describe("when there is more than one page of candidacies", () => {
               vaeCollective_getCohorteVaeCollectiveById: {
                 id: cohorteVaeCollectiveId,
                 nom: "macohorte",
-              },
-              getCandidacies: {
-                rows: isFirstPage ? firstPageRows : secondPageRows,
-                info: {
-                  totalRows: 11,
-                  totalPages: 2,
-                  currentPage: isFirstPage ? 1 : 2,
+                candidacies: {
+                  rows: isFirstPage ? firstPageRows : secondPageRows,
+                  info: {
+                    totalRows: 11,
+                    totalPages: 2,
+                    currentPage: isFirstPage ? 1 : 2,
+                  },
                 },
               },
             },

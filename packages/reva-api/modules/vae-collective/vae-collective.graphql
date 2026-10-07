@@ -9,6 +9,7 @@ type CohorteVaeCollective {
   organism: Organism
   organismId: ID
   candidacyCount: Int!
+  candidacies(offset: Int, limit: Int): CandidacyPage!
 }
 enum CohorteVaeCollectiveStatus {
   BROUILLON

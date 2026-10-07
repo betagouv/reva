@@ -34,7 +34,6 @@ const getCandidacies = async ({
           $cohorteVaeCollectiveId: ID!
           $offset: Int
           $limit: Int
-          $searchFilter: String
         ) {
           vaeCollective_getCohorteVaeCollectiveById(
             commanditaireVaeCollectiveId: $commanditaireVaeCollectiveId
@@ -42,71 +41,65 @@ const getCandidacies = async ({
           ) {
             id
             nom
-          }
-          getCandidacies(
-            offset: $offset
-            limit: $limit
-            searchFilter: $searchFilter
-            sortByFilter: DATE_CREATION_DESC
-            cohorteVaeCollectiveId: $cohorteVaeCollectiveId
-          ) {
-            rows {
-              id
-              typeAccompagnement
-              endAccompagnementStatus
-              endAccompagnementDate
-              candidate {
-                firstname
-                lastname
-                givenName
-                firstname2
-                firstname3
-                middleNames
-                department {
-                  code
+            candidacies(offset: $offset, limit: $limit) {
+              rows {
+                id
+                typeAccompagnement
+                endAccompagnementStatus
+                endAccompagnementDate
+                candidate {
+                  firstname
+                  lastname
+                  givenName
+                  firstname2
+                  firstname3
+                  middleNames
+                  department {
+                    code
+                    label
+                  }
+                }
+                feasibility {
+                  decision
+                  decisionSentAt
+                  feasibilityFileSentAt
+                  dematerializedFeasibilityFile {
+                    sentToCandidateAt
+                    candidateConfirmationAt
+                    swornStatementFileId
+                  }
+                }
+                activeDossierDeValidation {
+                  dossierDeValidationSentAt
+                }
+                readyForJuryEstimatedAt
+                jury {
+                  dateOfSession
+                  result
+                }
+                certification {
                   label
+                  codeRncp
                 }
-              }
-              feasibility {
-                decision
-                decisionSentAt
-                feasibilityFileSentAt
-                dematerializedFeasibilityFile {
-                  sentToCandidateAt
-                  candidateConfirmationAt
-                  swornStatementFileId
+                organism {
+                  label
+                  nomPublic
+                  modaliteAccompagnement
                 }
-              }
-              activeDossierDeValidation {
-                dossierDeValidationSentAt
-              }
-              readyForJuryEstimatedAt
-              jury {
-                dateOfSession
-                result
-              }
-              certification {
-                label
-                codeRncp
-              }
-              organism {
-                label
-                nomPublic
-                modaliteAccompagnement
-              }
-              candidacyDropOut {
-                createdAt
-              }
-              status
-              candidacyStatuses {
+                candidacyDropOut {
+                  createdAt
+                }
                 status
-                createdAt
+                candidacyStatuses {
+                  status
+                  createdAt
+                }
               }
-            }
-            info {
-              totalRows
-              totalPages
-              currentPage
+              info {
+                totalRows
+                totalPages
+                currentPage
+              }
             }
           }
         }
@@ -129,7 +122,7 @@ const getCandidacies = async ({
   );
 
   const cohorte = result.data?.vaeCollective_getCohorteVaeCollectiveById;
-  const candidacies = result.data?.getCandidacies;
+  const candidacies = cohorte?.candidacies;
 
   if (!cohorte) {
     throw new Error("Cohorte non trouvée");

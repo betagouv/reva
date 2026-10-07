@@ -71,10 +71,10 @@ test.describe("candidacy count card", () => {
                 vaeCollective_getCohorteVaeCollectiveById: {
                   id: cohorteVaeCollectiveId,
                   nom: "macohorte",
-                },
-                getCandidacies: {
-                  rows: [],
-                  info: { totalRows: 0, totalPages: 0, currentPage: 1 },
+                  candidacies: {
+                    rows: [],
+                    info: { totalRows: 0, totalPages: 0, currentPage: 1 },
+                  },
                 },
               },
             }),
