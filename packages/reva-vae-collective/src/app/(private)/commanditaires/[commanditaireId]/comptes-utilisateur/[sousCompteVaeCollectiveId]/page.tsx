@@ -1,4 +1,5 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Tag } from "@codegouvfr/react-dsfr/Tag";
 
 import { RoleDependentBreadcrumb } from "@/components/role-dependent-breadcrumb/RoleDependentBreadcrumb";
 
@@ -41,6 +42,11 @@ export default async function UpdateCohortNamePage({
       <h1 className="mb-12">
         {sousCompte?.account?.lastname} {sousCompte?.account?.firstname}
       </h1>
+      {sousCompte?.isAAPAccount ? (
+        <Tag className="mb-4" iconId="ri-user-fill">
+          Compte destiné à un Architecte Accompagnateur de Parcours
+        </Tag>
+      ) : undefined}
       <SousCompteVaeCollectiveForm
         commanditaireId={commanditaireId}
         sousCompteVaeCollectiveId={sousCompteVaeCollectiveId}

@@ -122,8 +122,9 @@ export default function NouveauCompteUtilisateurPage() {
             }
           />
         </div>
+        <hr className="mt-6" />
         <ToggleSwitch
-          className="mt-8"
+          className="mt-0"
           labelPosition="left"
           label="Activer la création de cohorte par ce collaborateur"
           inputTitle="Activer la création de cohorte par ce collaborateur"

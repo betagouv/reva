@@ -19,6 +19,7 @@ const getSousCompteVaeCollectiveQuery = graphql(`
     ) {
       id
       canCreateCohorteVaeCollective
+      isAAPAccount
       account {
         firstname
         lastname
