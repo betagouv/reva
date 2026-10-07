@@ -59,24 +59,7 @@ const getCandidacies = async ({
                     label
                   }
                 }
-                feasibility {
-                  decision
-                  decisionSentAt
-                  feasibilityFileSentAt
-                  dematerializedFeasibilityFile {
-                    sentToCandidateAt
-                    candidateConfirmationAt
-                    swornStatementFileId
-                  }
-                }
-                activeDossierDeValidation {
-                  dossierDeValidationSentAt
-                }
                 readyForJuryEstimatedAt
-                jury {
-                  dateOfSession
-                  result
-                }
                 certification {
                   label
                   codeRncp
