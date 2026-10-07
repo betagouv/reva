@@ -6,19 +6,28 @@ export const SousCompteCard = ({
   lastname,
   onClickHref,
   canCreateCohorte,
+  isAAPAccount,
 }: {
   firstname: string;
   lastname: string;
   onClickHref: string;
   canCreateCohorte: boolean;
+  isAAPAccount: boolean;
 }) => (
   <Card
     start={
-      canCreateCohorte ? (
-        <Tag small iconId="ri-checkbox-circle-fill">
-          Création de cohorte activée
-        </Tag>
-      ) : undefined
+      <div className="flex gap-2">
+        {isAAPAccount ? (
+          <Tag small iconId="ri-user-fill">
+            AAP
+          </Tag>
+        ) : undefined}
+        {canCreateCohorte ? (
+          <Tag small iconId="ri-checkbox-circle-fill">
+            Création de cohorte activée
+          </Tag>
+        ) : undefined}
+      </div>
     }
     title={`${lastname} ${firstname}`}
     linkProps={{ href: onClickHref }}
