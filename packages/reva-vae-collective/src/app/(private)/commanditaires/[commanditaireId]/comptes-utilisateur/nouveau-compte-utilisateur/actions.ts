@@ -54,14 +54,6 @@ export const createSousCompteVaeCollective = async (
     isAAPAccount,
   } = Object.fromEntries(formData.entries());
 
-  console.log("isAAPAccount", isAAPAccount);
-  console.log("canCreateCohorteVaeCollective", canCreateCohorteVaeCollective);
-  console.log("commanditaireId", commanditaireId);
-  console.log("accountFirstname", accountFirstname);
-  console.log("accountLastname", accountLastname);
-  console.log("accountEmail", accountEmail);
-  console.log('isAAPAccount === "on"', isAAPAccount === "on");
-
   for (const [fieldName, field] of Object.entries({
     accountLastname,
     accountEmail,
@@ -84,32 +76,46 @@ export const createSousCompteVaeCollective = async (
     }
   }
 
-  const result = throwUrqlErrors(
-    await client.mutation(
-      createSousCompteVaeCollectiveMutation,
-      {
-        commanditaireVaeCollectiveId: commanditaireId.toString(),
-        accountFirstname: accountFirstname.toString(),
-        accountLastname: accountLastname.toString(),
-        accountEmail: accountEmail.toString(),
-        canCreateCohorteVaeCollective: canCreateCohorteVaeCollective === "on",
-        isAAPAccount: isAAPAccount === "on",
-      },
-      {
-        fetchOptions: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+  try {
+    const result = throwUrqlErrors(
+      await client.mutation(
+        createSousCompteVaeCollectiveMutation,
+        {
+          commanditaireVaeCollectiveId: commanditaireId.toString(),
+          accountFirstname: accountFirstname.toString(),
+          accountLastname: accountLastname.toString(),
+          accountEmail: accountEmail.toString(),
+          canCreateCohorteVaeCollective: canCreateCohorteVaeCollective === "on",
+          isAAPAccount: isAAPAccount === "on",
+        },
+        {
+          fetchOptions: {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
         },
-      },
-    ),
-  );
+      ),
+    );
 
-  if (!result.data?.vaeCollective_createSousCompteVaeCollective) {
-    throw new Error("Sous compte non trouvé");
+    if (!result.data?.vaeCollective_createSousCompteVaeCollective) {
+      throw new Error("Sous compte non trouvé");
+    }
+
+    redirect(
+      `/commanditaires/${commanditaireId}/comptes-utilisateur/${result.data?.vaeCollective_createSousCompteVaeCollective.id}`,
+    );
+  } catch (error: unknown) {
+    if (
+      error instanceof Error &&
+      error.message.includes("ACCOUNT_ALREADY_EXISTS")
+    ) {
+      return {
+        errors: {
+          accountEmail: { message: "Cette adresse email est déjà utilisée" },
+        },
+      } as FormState;
+    }
+    throw error;
   }
-
-  redirect(
-    `/commanditaires/${commanditaireId}/comptes-utilisateur/${result.data?.vaeCollective_createSousCompteVaeCollective.id}`,
-  );
 };
