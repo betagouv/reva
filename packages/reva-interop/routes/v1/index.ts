@@ -259,7 +259,7 @@ const routesApiV1: FastifyPluginAsyncJsonSchemaToTs = async (fastify) => {
   fastify.register(juryRoutesApiV1);
 
   fastify.get("/docs", { schema: { hide: true } }, async (_request, reply) => {
-    reply.type("html");
+    reply.type("text/html");
     return `<!DOCTYPE html>
 <html>
   <head>
