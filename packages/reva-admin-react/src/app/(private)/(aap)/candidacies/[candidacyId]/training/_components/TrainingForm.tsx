@@ -542,6 +542,7 @@ export const TrainingForm = ({
               label="Financement pris en charge (en totalité ou en partie) par Transitions Pro"
               inputTitle="Financement pris en charge (en totalité ou en partie) par Transitions Pro"
               labelPosition="left"
+              showCheckedHint={false}
               checked={financementPrisEnChargeParTransitionsPro}
               onChange={(checked) =>
                 setValue("financementPrisEnChargeParTransitionsPro", checked)
