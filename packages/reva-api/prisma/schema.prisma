@@ -607,13 +607,10 @@ model Account {
   isApiUser                                   Boolean                                      @default(false) @map("is_api_user")
   sousComptesVaeCollectives                   SousCompteVaeCollective[]
   lastLoginAt                                 DateTime?                                    @map("last_login_at") @db.Timestamptz(6)
-  certificationAuthority                      CertificationAuthority?                      @relation(fields: [certificationAuthorityId], references: [id])
-  certificationAuthorityId                    String?                                      @db.Uuid
   certificationAuthorityOnAccount             CertificationAuthorityOnAccount?
 
   @@index([email])
   @@index([keycloakId])
-  @@index([certificationAuthorityId])
   @@map("account")
 }
 
@@ -1215,7 +1212,6 @@ model CertificationAuthority {
   updatedAt                                               DateTime?                                                 @map("updated_at") @db.Timestamptz(6)
   certificationAuthorityOnDepartment                      CertificationAuthorityOnDepartment[]
   certificationAuthorityOnCertification                   CertificationAuthorityOnCertification[]
-  Account                                                 Account[]
   Feasibility                                             Feasibility[]
   certificationAuthorityLocalAccount                      CertificationAuthorityLocalAccount[]
   DossierDeValidation                                     DossierDeValidation[]
