@@ -46,11 +46,15 @@ export const getIsCertificationAuthorityAccountOrLocalAccountStructureMember =
           keycloakId: userKeycloakId,
         },
         select: {
-          certificationAuthority: {
+          certificationAuthorityOnAccount: {
             select: {
-              id: true,
-              certificationAuthorityOnCertificationAuthorityStructure: {
-                select: { certificationAuthorityStructureId: true },
+              certificationAuthority: {
+                select: {
+                  id: true,
+                  certificationAuthorityOnCertificationAuthorityStructure: {
+                    select: { certificationAuthorityStructureId: true },
+                  },
+                },
               },
             },
           },
@@ -58,11 +62,13 @@ export const getIsCertificationAuthorityAccountOrLocalAccountStructureMember =
       });
 
       userAccountAuthorityStructureIds = toStructureIds(
-        userAccount?.certificationAuthority
+        userAccount?.certificationAuthorityOnAccount?.certificationAuthority
           ?.certificationAuthorityOnCertificationAuthorityStructure,
       );
 
-      userCertificationAuthorityId = userAccount?.certificationAuthority?.id;
+      userCertificationAuthorityId =
+        userAccount?.certificationAuthorityOnAccount?.certificationAuthority
+          ?.id;
     } else {
       // Compte local - Certification Authority Local Account
       userAccount = await prismaClient.account.findUnique({

@@ -14,7 +14,9 @@ export const getCohortesVaeCollectivesForConnectedCertificationAuthorityOrLocalA
       const certificationAuthority =
         await prismaClient.certificationAuthority.findFirst({
           where: {
-            Account: { some: { keycloakId: userKeycloakId } },
+            certificationAuthorityOnAccounts: {
+              some: { account: { keycloakId: userKeycloakId } },
+            },
           },
         });
 

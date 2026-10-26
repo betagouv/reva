@@ -50,15 +50,19 @@ export const certificationAuthorityAcceptCgu = async (context: {
         id: account.id,
       },
       select: {
-        certificationAuthority: {
+        certificationAuthorityOnAccount: {
           select: {
-            certificationAuthorityOnCertificationAuthorityStructure: {
+            certificationAuthority: {
               select: {
-                id: true,
-                certificationAuthorityStructure: {
+                certificationAuthorityOnCertificationAuthorityStructure: {
                   select: {
                     id: true,
-                    cguVersion: true,
+                    certificationAuthorityStructure: {
+                      select: {
+                        id: true,
+                        cguVersion: true,
+                      },
+                    },
                   },
                 },
               },
@@ -71,7 +75,8 @@ export const certificationAuthorityAcceptCgu = async (context: {
 
   const certificationAuthorityStructure =
     userRegistryManager?.certificationAuthorityStructure ||
-    certificationAuthorityAdmin?.certificationAuthority
+    certificationAuthorityAdmin?.certificationAuthorityOnAccount
+      ?.certificationAuthority
       ?.certificationAuthorityOnCertificationAuthorityStructure[0]
       ?.certificationAuthorityStructure;
   if (!certificationAuthorityStructure) {

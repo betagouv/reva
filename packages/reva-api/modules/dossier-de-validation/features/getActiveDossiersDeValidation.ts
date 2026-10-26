@@ -1,6 +1,7 @@
 import { DossierDeValidation, Prisma } from "@prisma/client";
 
 import { candidacySearchWord } from "@/modules/candidacy/utils/candidacy.helper";
+import { getCertificationAuthorityIdForAccount } from "@/modules/certification-authority/features/getCertificationAuthorityIdForAccount";
 import { getCertificationAuthorityLocalAccountByAccountId } from "@/modules/certification-authority/features/getCertificationAuthorityLocalAccountByAccountId";
 import { processPaginationInfo } from "@/modules/shared/list/pagination";
 import { getWhereClauseFromSearchFilter } from "@/modules/shared/search/search";
@@ -41,11 +42,15 @@ export const getActiveDossiersDeValidation = async ({
     const account = await prismaClient.account.findFirstOrThrow({
       where: { keycloakId },
     });
+
+    const accountCertificationAuthorityId =
+      await getCertificationAuthorityIdForAccount(account.id);
+
     if (
       hasRole("manage_certification_authority_local_account") &&
       certificationAuthorityLocalAccountId
     ) {
-      if (!account.certificationAuthorityId) {
+      if (!accountCertificationAuthorityId) {
         throw new Error(NOT_AUTHORIZED);
       }
 
@@ -53,14 +58,14 @@ export const getActiveDossiersDeValidation = async ({
         await prismaClient.certificationAuthorityLocalAccount.findUnique({
           where: {
             id: certificationAuthorityLocalAccountId,
-            certificationAuthorityId: account.certificationAuthorityId,
+            certificationAuthorityId: accountCertificationAuthorityId,
           },
         });
 
       const candidacyWhereClause = {
         ...queryWhereClause?.candidacy,
         ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-          account: null,
+          certificationAuthorityId: null,
           isCertificationAuthorityLocalAccount: true,
           certificationAuthorityLocalAccount,
         }).candidacy,
@@ -69,7 +74,7 @@ export const getActiveDossiersDeValidation = async ({
       queryWhereClause = {
         ...queryWhereClause,
         ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-          account: null,
+          certificationAuthorityId: null,
           isCertificationAuthorityLocalAccount: true,
           certificationAuthorityLocalAccount,
         }),
@@ -90,7 +95,7 @@ export const getActiveDossiersDeValidation = async ({
       const candidacyWhereClause = {
         ...queryWhereClause?.candidacy,
         ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-          account,
+          certificationAuthorityId: accountCertificationAuthorityId,
           isCertificationAuthorityLocalAccount,
           certificationAuthorityLocalAccount,
         }).candidacy,
@@ -99,7 +104,7 @@ export const getActiveDossiersDeValidation = async ({
       queryWhereClause = {
         ...queryWhereClause,
         ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-          account,
+          certificationAuthorityId: accountCertificationAuthorityId,
           isCertificationAuthorityLocalAccount,
           certificationAuthorityLocalAccount,
         }),
@@ -111,15 +116,16 @@ export const getActiveDossiersDeValidation = async ({
     (certificationAuthorityId || certificationAuthorityLocalAccountId)
   ) {
     if (certificationAuthorityId) {
-      const account = await prismaClient.account.findFirst({
-        where: { certificationAuthorityId },
-      });
+      const certificationAuthorityOnAccount =
+        await prismaClient.certificationAuthorityOnAccount.findFirst({
+          where: { certificationAuthorityId },
+        });
 
-      if (account) {
+      if (certificationAuthorityOnAccount) {
         const candidacyWhereClause = {
           ...queryWhereClause?.candidacy,
           ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-            account,
+            certificationAuthorityId,
             isCertificationAuthorityLocalAccount: false,
             certificationAuthorityLocalAccount: null,
           }).candidacy,
@@ -128,7 +134,7 @@ export const getActiveDossiersDeValidation = async ({
         queryWhereClause = {
           ...queryWhereClause,
           ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-            account,
+            certificationAuthorityId,
             isCertificationAuthorityLocalAccount: false,
             certificationAuthorityLocalAccount: null,
           }),
@@ -148,7 +154,7 @@ export const getActiveDossiersDeValidation = async ({
       const candidacyWhereClause = {
         ...queryWhereClause?.candidacy,
         ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-          account: null,
+          certificationAuthorityId: null,
           isCertificationAuthorityLocalAccount: true,
           certificationAuthorityLocalAccount,
         }).candidacy,
@@ -157,7 +163,7 @@ export const getActiveDossiersDeValidation = async ({
       queryWhereClause = {
         ...queryWhereClause,
         ...getDossierDeValidationListQueryWhereClauseForUserWithManageRole({
-          account: null,
+          certificationAuthorityId: null,
           isCertificationAuthorityLocalAccount: true,
           certificationAuthorityLocalAccount,
         }),

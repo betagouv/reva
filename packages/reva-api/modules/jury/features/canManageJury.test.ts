@@ -12,6 +12,7 @@ import { createCandidacyDropOutHelper } from "@/test/helpers/entities/create-can
 import { createCandidacyHelper } from "@/test/helpers/entities/create-candidacy-helper";
 import { createCertificationAuthorityHelper } from "@/test/helpers/entities/create-certification-authority-helper";
 import { createCertificationAuthorityLocalAccountHelper } from "@/test/helpers/entities/create-certification-authority-local-account-helper";
+import { createCertificationAuthorityOnAccountHelper } from "@/test/helpers/entities/create-certification-authority-on-account-helper";
 import { createFeasibilityUploadedPdfHelper } from "@/test/helpers/entities/create-feasibility-uploaded-pdf-helper";
 
 import { canManageJury } from "./canManageJury";
@@ -166,8 +167,11 @@ test("returns false when user lacks manage_feasibility role", async () => {
 test("returns true when CA admin account is linked to the candidacy CA", async () => {
   const { candidacy, certificationAuthority } = await createAdmissibleSetup();
   const account = await createAccountHelper({
-    certificationAuthorityId: certificationAuthority.id,
     keycloakId: faker.string.uuid(),
+  });
+  await createCertificationAuthorityOnAccountHelper({
+    certificationAuthorityId: certificationAuthority.id,
+    accountId: account.id,
   });
 
   const result = await canManageJury({
@@ -187,8 +191,11 @@ test("returns false when CA admin account is linked to a different CA", async ()
   const otherCertificationAuthority =
     await createCertificationAuthorityHelper();
   const account = await createAccountHelper({
-    certificationAuthorityId: otherCertificationAuthority.id,
     keycloakId: faker.string.uuid(),
+  });
+  await createCertificationAuthorityOnAccountHelper({
+    certificationAuthorityId: otherCertificationAuthority.id,
+    accountId: account.id,
   });
 
   const result = await canManageJury({

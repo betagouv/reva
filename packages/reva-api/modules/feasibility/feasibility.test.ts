@@ -383,7 +383,7 @@ test("should refresh certificationAuthorityId when a feasibility is marked INCOM
       create: { certificationId: candidacy.certificationId! },
     },
     certificationAuthorityOnDepartment: {
-      create: { departmentId: candidacy.candidate.departmentId },
+      create: { departmentId: candidacy.candidate.departmentId! },
     },
   });
 

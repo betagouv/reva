@@ -1,17 +1,13 @@
-import {
-  Prisma,
-  Account,
-  CertificationAuthorityLocalAccount,
-} from "@prisma/client";
+import { Prisma, CertificationAuthorityLocalAccount } from "@prisma/client";
 
 import { COMPTE_LOCAL_AUTORITE_CERTIFICATION_NON_TROUVEE } from "@/modules/shared/errors/messages";
 
 export const getJuryListQueryWhereClauseForUserWithManageRole = ({
-  account,
+  certificationAuthorityId,
   isCertificationAuthorityLocalAccount,
   certificationAuthorityLocalAccount,
 }: {
-  account: Account | null;
+  certificationAuthorityId: string | null | undefined;
   isCertificationAuthorityLocalAccount: boolean;
   certificationAuthorityLocalAccount: CertificationAuthorityLocalAccount | null;
 }): Prisma.JuryWhereInput => {
@@ -39,7 +35,7 @@ export const getJuryListQueryWhereClauseForUserWithManageRole = ({
   } else {
     queryWhereClause = {
       ...queryWhereClause,
-      certificationAuthorityId: account?.certificationAuthorityId || "_",
+      certificationAuthorityId: certificationAuthorityId || "_",
     };
   }
 

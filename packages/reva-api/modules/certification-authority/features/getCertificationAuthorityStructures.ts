@@ -23,9 +23,14 @@ export const getCertificationAuthorityStructures = async ({
               OR: [
                 { label: { contains: searchFilter, mode: "insensitive" } },
                 {
-                  Account: {
+                  certificationAuthorityOnAccounts: {
                     some: {
-                      email: { contains: searchFilter, mode: "insensitive" },
+                      account: {
+                        email: {
+                          contains: searchFilter,
+                          mode: "insensitive",
+                        },
+                      },
                     },
                   },
                 },

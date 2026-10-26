@@ -1,6 +1,7 @@
 import debug from "debug";
 import { IFieldResolver, MercuriusContext } from "mercurius";
 
+import { getCertificationAuthorityIdForAccount } from "@/modules/certification-authority/features/getCertificationAuthorityIdForAccount";
 import { NOT_AUTHORIZED_CANDIDACY_MANAGE } from "@/modules/shared/security/messages";
 import { prismaClient } from "@/prisma/client";
 
@@ -34,9 +35,12 @@ export const isFeasibilityManager =
         throw new Error(NOT_AUTHORIZED_CANDIDACY_MANAGE);
       }
 
+      const accountCertificationAuthorityId =
+        await getCertificationAuthorityIdForAccount(account.id);
+
       if (
         candidacyFeasibility.certificationAuthorityId ===
-        account.certificationAuthorityId
+        accountCertificationAuthorityId
       ) {
         log("authorized");
         return next(root, args, context, info);

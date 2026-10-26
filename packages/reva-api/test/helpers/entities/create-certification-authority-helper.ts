@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 
 import { prismaClient } from "@/prisma/client";
 
+import { createAccountHelper } from "./create-account-helper";
 import { createCertificationAuthorityStructureHelper } from "./create-certification-authority-structure-helper";
 
 export const createCertificationAuthorityHelper = async (
@@ -10,32 +11,31 @@ export const createCertificationAuthorityHelper = async (
 ) => {
   const certificationAuthorityStructure =
     await createCertificationAuthorityStructureHelper();
+  const account = await createAccountHelper();
 
-  return prismaClient.certificationAuthority.create({
-    data: {
-      contactEmail: faker.internet.email(),
-      contactFullName: faker.person.fullName(),
-      label: faker.company.name(),
-      certificationAuthorityOnCertificationAuthorityStructure: {
-        create: {
-          certificationAuthorityStructureId: certificationAuthorityStructure.id,
+  const certificationAuthority =
+    await prismaClient.certificationAuthority.create({
+      data: {
+        contactEmail: faker.internet.email(),
+        contactFullName: faker.person.fullName(),
+        label: faker.company.name(),
+        certificationAuthorityOnCertificationAuthorityStructure: {
+          create: {
+            certificationAuthorityStructureId:
+              certificationAuthorityStructure.id,
+          },
+        },
+        ...args,
+        certificationAuthorityOnAccounts: {
+          create: { accountId: account.id },
         },
       },
-      ...args,
-      Account: {
-        create: {
-          email: faker.internet.email(),
-          firstname: faker.person.firstName(),
-          lastname: faker.person.lastName(),
-          keycloakId: faker.string.uuid(),
+      include: {
+        certificationAuthorityOnCertificationAuthorityStructure: {
+          include: { certificationAuthorityStructure: true },
         },
       },
-    },
-    include: {
-      certificationAuthorityOnCertificationAuthorityStructure: {
-        include: { certificationAuthorityStructure: true },
-      },
-      Account: true,
-    },
-  });
+    });
+
+  return { ...certificationAuthority, Account: [account] };
 };

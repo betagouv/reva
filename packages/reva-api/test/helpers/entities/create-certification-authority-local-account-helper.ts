@@ -22,7 +22,7 @@ export const createCertificationAuthorityLocalAccountHelper = async (
       include: {
         certificationAuthority: {
           include: {
-            Account: true,
+            certificationAuthorityOnAccounts: { include: { account: true } },
             certificationAuthorityOnCertificationAuthorityStructure: {
               include: {
                 certificationAuthorityStructure: {
@@ -50,6 +50,10 @@ export const createCertificationAuthorityLocalAccountHelper = async (
 
   return {
     ...localAccount,
+    certificationAuthority: {
+      ...localAccount.certificationAuthority,
+      Account: certificationAuthority.Account,
+    },
     Account: [account],
     account,
   };

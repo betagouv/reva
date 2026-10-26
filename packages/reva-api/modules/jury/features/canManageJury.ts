@@ -65,11 +65,15 @@ export const canManageJury = async ({
 
   // certification authority admin account
   if (roles.includes("manage_certification_authority_local_account")) {
+    if (!certificationAuthorityId) {
+      return false;
+    }
+
     // is user account attached to a certification authority which manage the candidacy certification
     const authorized = !!(await prismaClient.account.findFirst({
       where: {
         keycloakId,
-        certificationAuthorityId,
+        certificationAuthorityOnAccount: { certificationAuthorityId },
       },
       select: { id: true },
     }));

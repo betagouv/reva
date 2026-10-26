@@ -1,6 +1,7 @@
 import debug from "debug";
 import { IFieldResolver, MercuriusContext } from "mercurius";
 
+import { getCertificationAuthorityIdForAccount } from "@/modules/certification-authority/features/getCertificationAuthorityIdForAccount";
 import { NOT_AUTHORIZED_LOCAL_ACCOUNT_ACCESS } from "@/modules/shared/security/messages";
 import { prismaClient } from "@/prisma/client";
 
@@ -38,7 +39,11 @@ export const isCertificationAuthorityLocalAccountManager =
       },
     });
 
-    if (!account?.certificationAuthorityId) {
+    const accountCertificationAuthorityId = account
+      ? await getCertificationAuthorityIdForAccount(account.id)
+      : undefined;
+
+    if (!accountCertificationAuthorityId) {
       log("not authorized");
 
       throw new Error(NOT_AUTHORIZED_LOCAL_ACCOUNT_ACCESS);
@@ -47,7 +52,7 @@ export const isCertificationAuthorityLocalAccountManager =
     const certificationAuthorityLocalAccount =
       await prismaClient.certificationAuthorityLocalAccount.findFirst({
         where: {
-          certificationAuthorityId: account.certificationAuthorityId,
+          certificationAuthorityId: accountCertificationAuthorityId,
           id: localAccountId,
         },
       });

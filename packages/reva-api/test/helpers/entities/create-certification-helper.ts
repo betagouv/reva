@@ -13,7 +13,7 @@ export const createCertificationHelper = async (
 
   const newCertificationId = uuidV4();
 
-  return prismaClient.certification.create({
+  const certification = await prismaClient.certification.create({
     data: {
       id: newCertificationId,
       firstVersionCertificationId: newCertificationId,
@@ -46,7 +46,7 @@ export const createCertificationHelper = async (
       certificationAuthorityStructure: {
         include: {
           certificationAuthorityOnCertificationAuthorityStructure: {
-            include: { certificationAuthority: { include: { Account: true } } },
+            include: { certificationAuthority: true },
           },
           certificationRegistryManager: {
             include: {
@@ -57,4 +57,22 @@ export const createCertificationHelper = async (
       },
     },
   });
+
+  return {
+    ...certification,
+    certificationAuthorityStructure:
+      certification.certificationAuthorityStructure && {
+        ...certification.certificationAuthorityStructure,
+        certificationAuthorityOnCertificationAuthorityStructure:
+          certification.certificationAuthorityStructure.certificationAuthorityOnCertificationAuthorityStructure.map(
+            (caocas) => ({
+              ...caocas,
+              certificationAuthority: {
+                ...caocas.certificationAuthority,
+                Account: certificationAuthority.Account,
+              },
+            }),
+          ),
+      },
+  };
 };

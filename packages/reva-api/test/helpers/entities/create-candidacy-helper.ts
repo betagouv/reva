@@ -60,7 +60,7 @@ export const createCandidacyHelper = async (args?: {
       ? candidacyArgs.organismId
       : organism.id;
 
-  const candidacy = await prismaClient.candidacy.create({
+  const rawCandidacy = await prismaClient.candidacy.create({
     data: {
       typology: CandidateTypology.BENEVOLE,
       financeModule,
@@ -91,7 +91,13 @@ export const createCandidacyHelper = async (args?: {
             include: {
               certificationAuthorityOnCertificationAuthorityStructure: {
                 include: {
-                  certificationAuthority: { include: { Account: true } },
+                  certificationAuthority: {
+                    include: {
+                      certificationAuthorityOnAccounts: {
+                        include: { account: true },
+                      },
+                    },
+                  },
                 },
               },
               certificationRegistryManager: { include: { account: true } },
@@ -113,6 +119,32 @@ export const createCandidacyHelper = async (args?: {
       candidacyStatuses: true,
     },
   });
+
+  const certificationAuthorityStructure =
+    rawCandidacy.certification?.certificationAuthorityStructure;
+
+  const candidacy = {
+    ...rawCandidacy,
+    certification: rawCandidacy.certification && {
+      ...rawCandidacy.certification,
+      certificationAuthorityStructure: certificationAuthorityStructure && {
+        ...certificationAuthorityStructure,
+        certificationAuthorityOnCertificationAuthorityStructure:
+          certificationAuthorityStructure.certificationAuthorityOnCertificationAuthorityStructure.map(
+            (caocas) => ({
+              ...caocas,
+              certificationAuthority: {
+                ...caocas.certificationAuthority,
+                Account:
+                  caocas.certificationAuthority.certificationAuthorityOnAccounts.map(
+                    (coa) => coa.account,
+                  ),
+              },
+            }),
+          ),
+      },
+    },
+  };
 
   const finalTypeAccompagnement =
     candidacy.typeAccompagnement ?? typeAccompagnement;

@@ -1,7 +1,8 @@
-import { Account, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import { getAccountByKeycloakId } from "@/modules/account/features/getAccountByKeycloakId";
 import { candidacySearchWord } from "@/modules/candidacy/utils/candidacy.helper";
+import { getCertificationAuthorityIdForAccount } from "@/modules/certification-authority/features/getCertificationAuthorityIdForAccount";
 import { getCertificationAuthorityLocalAccountByAccountId } from "@/modules/certification-authority/features/getCertificationAuthorityLocalAccountByAccountId";
 import { getWhereClauseFromSearchFilter } from "@/modules/shared/search/search";
 import { NOT_AUTHORIZED } from "@/modules/shared/security/messages";
@@ -43,13 +44,22 @@ export const getActiveJuryCountByCategory = async ({
         })
       : null;
 
-  let certificationAuthorityAccount: Account | null;
+  const accountCertificationAuthorityId = account
+    ? await getCertificationAuthorityIdForAccount(account.id)
+    : undefined;
+
+  let adminFilterCertificationAuthorityId: string | null = null;
 
   if (hasRole("admin")) {
     if (certificationAuthorityId) {
-      certificationAuthorityAccount = await prismaClient.account.findFirst({
-        where: { certificationAuthorityId },
-      });
+      const certificationAuthorityOnAccount =
+        await prismaClient.certificationAuthorityOnAccount.findFirst({
+          where: { certificationAuthorityId },
+        });
+
+      if (certificationAuthorityOnAccount) {
+        adminFilterCertificationAuthorityId = certificationAuthorityId;
+      }
     } else if (certificationAuthorityLocalAccountId) {
       certificationAuthorityLocalAccount =
         await prismaClient.certificationAuthorityLocalAccount.findUnique({
@@ -64,7 +74,7 @@ export const getActiveJuryCountByCategory = async ({
     hasRole("manage_certification_authority_local_account") &&
     certificationAuthorityLocalAccountId
   ) {
-    if (!account?.certificationAuthorityId) {
+    if (!accountCertificationAuthorityId) {
       throw new Error(NOT_AUTHORIZED);
     }
 
@@ -72,7 +82,7 @@ export const getActiveJuryCountByCategory = async ({
       await prismaClient.certificationAuthorityLocalAccount.findUnique({
         where: {
           id: certificationAuthorityLocalAccountId,
-          certificationAuthorityId: account.certificationAuthorityId,
+          certificationAuthorityId: accountCertificationAuthorityId,
         },
         include: {
           certificationAuthorityLocalAccountOnDepartment: true,
@@ -97,7 +107,7 @@ export const getActiveJuryCountByCategory = async ({
                   whereClause = {
                     ...whereClause,
                     ...getJuryListQueryWhereClauseForUserWithManageRole({
-                      account: null,
+                      certificationAuthorityId: null,
                       isCertificationAuthorityLocalAccount: true,
                       certificationAuthorityLocalAccount,
                     }),
@@ -106,7 +116,7 @@ export const getActiveJuryCountByCategory = async ({
                   whereClause = {
                     ...whereClause,
                     ...getJuryListQueryWhereClauseForUserWithManageRole({
-                      account,
+                      certificationAuthorityId: accountCertificationAuthorityId,
                       isCertificationAuthorityLocalAccount,
                       certificationAuthorityLocalAccount,
                     }),
@@ -114,14 +124,15 @@ export const getActiveJuryCountByCategory = async ({
                 }
               } else if (
                 hasRole("admin") &&
-                (certificationAuthorityAccount ||
+                (adminFilterCertificationAuthorityId ||
                   certificationAuthorityLocalAccount)
               ) {
-                if (certificationAuthorityAccount) {
+                if (adminFilterCertificationAuthorityId) {
                   whereClause = {
                     ...whereClause,
                     ...getJuryListQueryWhereClauseForUserWithManageRole({
-                      account: certificationAuthorityAccount,
+                      certificationAuthorityId:
+                        adminFilterCertificationAuthorityId,
                       isCertificationAuthorityLocalAccount: false,
                       certificationAuthorityLocalAccount: null,
                     }),
@@ -130,7 +141,7 @@ export const getActiveJuryCountByCategory = async ({
                   whereClause = {
                     ...whereClause,
                     ...getJuryListQueryWhereClauseForUserWithManageRole({
-                      account: null,
+                      certificationAuthorityId: null,
                       isCertificationAuthorityLocalAccount: true,
                       certificationAuthorityLocalAccount,
                     }),

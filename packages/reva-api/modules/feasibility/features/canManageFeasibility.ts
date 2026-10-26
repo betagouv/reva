@@ -28,11 +28,17 @@ export const canManageFeasibility = async ({
   } else if (hasRole("manage_feasibility")) {
     //certification authority admin account
     if (hasRole("manage_certification_authority_local_account")) {
+      if (!feasibility.certificationAuthorityId) {
+        return false;
+      }
+
       //is user account attached to a certification authority which manage the candidacy certification ?
       return !!(await prismaClient.account.findFirst({
         where: {
           keycloakId,
-          certificationAuthorityId: feasibility.certificationAuthorityId,
+          certificationAuthorityOnAccount: {
+            certificationAuthorityId: feasibility.certificationAuthorityId,
+          },
         },
         select: { id: true },
       }));

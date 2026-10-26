@@ -27,10 +27,9 @@ export const updateCertificationAuthorityById = async ({
     await prismaClient.certificationAuthority.findUnique({
       where: { id: certificationAuthorityId },
       include: {
-        Account: {
-          where: {
-            isApiUser: false,
-          },
+        certificationAuthorityOnAccounts: {
+          where: { account: { isApiUser: false } },
+          include: { account: true },
         },
       },
     });
@@ -44,7 +43,8 @@ export const updateCertificationAuthorityById = async ({
   //only update the account info if the user is an admin
   if (userRoles.includes("admin")) {
     await updateAccountById({
-      accountId: certificationAuthority.Account[0].id,
+      accountId:
+        certificationAuthority.certificationAuthorityOnAccounts[0].account.id,
       accountData: {
         firstname: certificationAuthorityData.accountFirstname,
         lastname: certificationAuthorityData.accountLastname,

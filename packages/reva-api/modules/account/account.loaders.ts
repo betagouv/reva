@@ -2,22 +2,20 @@ import { prismaClient } from "@/prisma/client";
 
 export const loaders = {
   Account: {
-    certificationAuthority: async (
-      queries: { obj: { certificationAuthorityId?: string } }[],
-    ) => {
-      const certificationAuthorityIds: string[] = queries
-        .map(({ obj }) => obj.certificationAuthorityId)
-        .filter(
-          (certificationAuthorityId) => !!certificationAuthorityId,
-        ) as string[];
+    certificationAuthority: async (queries: { obj: { id: string } }[]) => {
+      const accountIds = queries.map(({ obj }) => obj.id);
 
-      const certificationAuthorities =
-        await prismaClient.certificationAuthority.findMany({
-          where: { id: { in: certificationAuthorityIds } },
+      const certificationAuthorityOnAccounts =
+        await prismaClient.certificationAuthorityOnAccount.findMany({
+          where: { accountId: { in: accountIds } },
+          include: { certificationAuthority: true },
         });
 
-      return certificationAuthorityIds.map((cid) =>
-        certificationAuthorities.find((c) => c.id === cid),
+      return accountIds.map(
+        (accountId) =>
+          certificationAuthorityOnAccounts.find(
+            (c) => c.accountId === accountId,
+          )?.certificationAuthority,
       );
     },
   },

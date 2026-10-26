@@ -331,7 +331,9 @@ const resolveCertificationAuthorityInfo = async (
       },
       select: {
         id: true,
-        certificationAuthorityId: true,
+        certificationAuthorityOnAccount: {
+          select: { certificationAuthorityId: true },
+        },
         certificationAuthorityLocalAccountOnAccount: {
           select: {
             certificationAuthorityLocalAccount: {
@@ -353,9 +355,10 @@ const resolveCertificationAuthorityInfo = async (
     }
 
     // Certification Authority admin account
-    if (account.certificationAuthorityId) {
+    if (account.certificationAuthorityOnAccount?.certificationAuthorityId) {
       return {
-        certificationAuthorityId: account.certificationAuthorityId,
+        certificationAuthorityId:
+          account.certificationAuthorityOnAccount.certificationAuthorityId,
         certificationAuthorityLocalAccountId: undefined,
       };
     }

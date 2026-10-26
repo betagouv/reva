@@ -6,6 +6,5 @@ export interface Account {
   email: string;
   firstname: string | null;
   lastname: string | null;
-  certificationAuthorityId: string | null;
   disabledAt: Date | null;
 }

@@ -24,11 +24,15 @@ export const getIsCertificationAuthorityStructureMember =
         keycloakId: userKeycloakId,
       },
       select: {
-        certificationAuthority: {
+        certificationAuthorityOnAccount: {
           select: {
-            certificationAuthorityOnCertificationAuthorityStructure: {
+            certificationAuthority: {
               select: {
-                certificationAuthorityStructureId: true,
+                certificationAuthorityOnCertificationAuthorityStructure: {
+                  select: {
+                    certificationAuthorityStructureId: true,
+                  },
+                },
               },
             },
           },
@@ -52,7 +56,7 @@ export const getIsCertificationAuthorityStructureMember =
     }
 
     const certificationAuthorityStructureIds =
-      userAccount?.certificationAuthority?.certificationAuthorityOnCertificationAuthorityStructure?.map(
+      userAccount?.certificationAuthorityOnAccount?.certificationAuthority?.certificationAuthorityOnCertificationAuthorityStructure?.map(
         (caocas) => caocas.certificationAuthorityStructureId,
       ) || [];
 

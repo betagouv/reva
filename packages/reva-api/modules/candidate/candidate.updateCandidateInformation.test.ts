@@ -230,7 +230,7 @@ describe("candidate information update", () => {
           create: { certificationId: candidacy.certificationId! },
         },
         certificationAuthorityOnDepartment: {
-          create: { departmentId: candidacy.candidate.departmentId },
+          create: { departmentId: candidacy.candidate.departmentId! },
         },
       });
 

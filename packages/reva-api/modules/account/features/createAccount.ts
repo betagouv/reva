@@ -105,7 +105,13 @@ export const createAccount = async (params: {
       firstname: params.firstname,
       lastname: params.lastname,
       organismId: params.organismId,
-      certificationAuthorityId: params.certificationAuthorityId,
+      certificationAuthorityOnAccount: params.certificationAuthorityId
+        ? {
+            create: {
+              certificationAuthorityId: params.certificationAuthorityId,
+            },
+          }
+        : undefined,
       certificationAuthorityLocalAccountOnAccount:
         params.certificationAuthorityLocalAccountId
           ? {
