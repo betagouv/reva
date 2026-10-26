@@ -609,6 +609,7 @@ model Account {
   lastLoginAt                                 DateTime?                                    @map("last_login_at") @db.Timestamptz(6)
   certificationAuthority                      CertificationAuthority?                      @relation(fields: [certificationAuthorityId], references: [id])
   certificationAuthorityId                    String?                                      @db.Uuid
+  certificationAuthorityOnAccount             CertificationAuthorityOnAccount?
 
   @@index([email])
   @@index([keycloakId])
@@ -1222,8 +1223,23 @@ model CertificationAuthority {
   showLocalAccountsContactInfo                            Boolean                                                   @default(true) @map("show_local_accounts_contact_info")
   certificationAuthorityOnCertificationAuthorityStructure CertificationAuthorityOnCertificationAuthorityStructure[]
   candidacies                                             Candidacy[]
+  certificationAuthorityOnAccounts                        CertificationAuthorityOnAccount[]
 
   @@map("certification_authority")
+}
+
+model CertificationAuthorityOnAccount {
+  id                       String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  certificationAuthority   CertificationAuthority @relation(map: "ca_on_account_ca", fields: [certificationAuthorityId], references: [id], onDelete: Cascade)
+  certificationAuthorityId String                 @map("certification_authority_id") @db.Uuid
+  account                  Account                @relation(map: "ca_on_account_account", fields: [accountId], references: [id], onDelete: Cascade)
+  accountId                String                 @map("account_id") @db.Uuid
+  createdAt                DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime?              @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([accountId])
+  @@index([certificationAuthorityId])
+  @@map("certification_authority_on_account")
 }
 
 model CertificationAuthorityOnCertificationAuthorityStructure {
