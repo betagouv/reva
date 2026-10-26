@@ -100,7 +100,7 @@ describe("appointment - autorisation des resolvers", () => {
         candidacy.id,
         asRole(
           "manage_certification_authority_local_account",
-          certificationAuthority.Account[0].keycloakId,
+          certificationAuthority.account.keycloakId,
         ),
       );
       expect(resp.json().errors[0].message).toBe(NOT_AUTHORIZED);
@@ -118,7 +118,7 @@ describe("appointment - autorisation des resolvers", () => {
         returnFields: "{ appointments { rows { id } } }",
         authorization: asRole(
           "manage_certification_authority_local_account",
-          certificationAuthority.Account[0].keycloakId,
+          certificationAuthority.account.keycloakId,
         ),
       });
       expect(resp.json().errors[0].message).toBe(NOT_AUTHORIZED);

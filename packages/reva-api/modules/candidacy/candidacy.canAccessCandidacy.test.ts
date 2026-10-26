@@ -184,7 +184,7 @@ test("a certification authority manager can access candidacy feasibility in his 
     headers: {
       authorization: authorizationHeaderForUser({
         role: "manage_certification_authority_local_account",
-        keycloakId: certificationAuthority.Account[0].keycloakId,
+        keycloakId: certificationAuthority.account.keycloakId,
       }),
     },
   });
@@ -204,7 +204,7 @@ test("a certification authority manager can't access a candidacy with a feasibil
     headers: {
       authorization: authorizationHeaderForUser({
         role: "manage_certification_authority_local_account",
-        keycloakId: certificationAuthority.Account[0].keycloakId,
+        keycloakId: certificationAuthority.account.keycloakId,
       }),
     },
   });

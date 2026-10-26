@@ -69,7 +69,7 @@ export const createCertificationHelper = async (
               ...caocas,
               certificationAuthority: {
                 ...caocas.certificationAuthority,
-                Account: certificationAuthority.Account,
+                account: certificationAuthority.account,
               },
             }),
           ),

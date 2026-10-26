@@ -50,7 +50,7 @@ const creerCandidatureAvecDossier = async () => {
 
   await createCertificationAuthorityLocalAccountHelper({
     certificationAuthorityId: certificationAuthority.id,
-    accountId: certificationAuthority.Account[0].id,
+    accountId: certificationAuthority.account.id,
     certificationAuthorityLocalAccountOnCertification: {
       create: { certificationId: certification.id },
     },
@@ -71,7 +71,7 @@ const creerCandidatureAvecDossier = async () => {
     candidacy,
     feasibility,
     decisionFile,
-    certificateurKeycloakId: certificationAuthority.Account[0].keycloakId,
+    certificateurKeycloakId: certificationAuthority.account.keycloakId,
     aapKeycloakId:
       candidacy.organism?.organismOnAccounts[0].account.keycloakId ?? "",
     candidatKeycloakId: candidacy.candidate?.keycloakId ?? "",

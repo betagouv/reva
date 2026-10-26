@@ -209,7 +209,7 @@ test("should update a certification authority's contact info and leave the accou
 
   const resp = await graphqlUpdateCertificationAuthority({
     role: "manage_certification_authority_local_account",
-    account: certificationAuthority.Account[0],
+    account: certificationAuthority.account,
     certificationAuthorityId: certificationAuthority.id,
     data: {
       label: certificationAuthority.label,
@@ -227,9 +227,9 @@ test("should update a certification authority's contact info and leave the accou
     contactFullName: "new name",
     contactEmail: "new email",
     account: {
-      email: certificationAuthority.Account[0].email,
-      firstname: certificationAuthority.Account[0].firstname,
-      lastname: certificationAuthority.Account[0].lastname,
+      email: certificationAuthority.account.email,
+      firstname: certificationAuthority.account.firstname,
+      lastname: certificationAuthority.account.lastname,
     },
   });
 });
@@ -392,7 +392,7 @@ test("should return an exisiting certification local account list of 1 item for 
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
       keycloakId:
-        certificationAuthorityLocalAccount.certificationAuthority.Account[0]
+        certificationAuthorityLocalAccount.certificationAuthority.account
           .keycloakId,
     }),
     payload: {
@@ -560,7 +560,7 @@ describe("certification authority certification parcours", () => {
           certificationAuthorityId: certificationAuthority.id,
           role: "manage_certification_authority_local_account",
           account: {
-            keycloakId: certificationAuthority.Account[0].keycloakId,
+            keycloakId: certificationAuthority.account.keycloakId,
           },
         });
       expect(
@@ -585,7 +585,7 @@ describe("certification authority certification parcours", () => {
           certificationAuthorityId: certificationAuthority.id,
           role: "manage_certification_authority_local_account",
           account: {
-            keycloakId: certificationAuthority.Account[0].keycloakId,
+            keycloakId: certificationAuthority.account.keycloakId,
           },
         });
       expect(
@@ -617,7 +617,7 @@ describe("certification authority certification parcours", () => {
           certificationAuthorityId: certificationAuthority.id,
           role: "admin",
           account: {
-            keycloakId: certificationAuthority.Account[0].keycloakId,
+            keycloakId: certificationAuthority.account.keycloakId,
           },
         });
       expect(
@@ -653,7 +653,7 @@ describe("certification authority certification parcours", () => {
           certificationAuthorityId: certificationAuthority.id,
           role: "admin",
           account: {
-            keycloakId: certificationAuthority.Account[0].keycloakId,
+            keycloakId: certificationAuthority.account.keycloakId,
           },
         });
       expect(
@@ -674,7 +674,7 @@ describe("certification authority certification parcours", () => {
           certificationAuthorityId: certificationAuthority.id,
           role: "admin",
           account: {
-            keycloakId: certificationAuthority.Account[0].keycloakId,
+            keycloakId: certificationAuthority.account.keycloakId,
           },
         });
       expect(
@@ -722,7 +722,7 @@ describe("certification authority certification parcours", () => {
           certificationAuthorityId: certificationAuthority.id,
           role: "admin",
           account: {
-            keycloakId: certificationAuthority.Account[0].keycloakId,
+            keycloakId: certificationAuthority.account.keycloakId,
           },
           certificationAuthorityLocalAccountIdFilter:
             certificationAuthorityLocalAccount.id,
@@ -769,7 +769,7 @@ describe("certification authority certification parcours", () => {
         await graphqlUpdateParcoursForCertificationAndCertificationAuthority({
           role: "manage_certification_authority_local_account",
           account: {
-            keycloakId: certificationAuthority.Account[0].keycloakId,
+            keycloakId: certificationAuthority.account.keycloakId,
           },
           certificationId: certification.id,
           certificationAuthorityId: certificationAuthority.id,

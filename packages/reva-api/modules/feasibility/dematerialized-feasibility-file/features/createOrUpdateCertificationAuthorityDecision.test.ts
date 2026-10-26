@@ -44,7 +44,7 @@ type CandidacyHelper = Awaited<ReturnType<typeof createCandidacyHelper>>;
 const getCertificationAuthorityKeycloakId = (candidacy: CandidacyHelper) =>
   candidacy.certification?.certificationAuthorityStructure
     ?.certificationAuthorityOnCertificationAuthorityStructure?.[0]
-    ?.certificationAuthority?.Account?.[0]?.keycloakId;
+    ?.certificationAuthority?.account?.keycloakId;
 
 const getCertificationAuthorityId = (candidacy: CandidacyHelper) =>
   candidacy.certification?.certificationAuthorityStructure
@@ -54,7 +54,7 @@ const getCertificationAuthorityId = (candidacy: CandidacyHelper) =>
 const getCertificationAuthorityAccountId = (candidacy: CandidacyHelper) =>
   candidacy.certification?.certificationAuthorityStructure
     ?.certificationAuthorityOnCertificationAuthorityStructure?.[0]
-    ?.certificationAuthority?.Account?.[0]?.id;
+    ?.certificationAuthority?.account?.id;
 
 const getAapKeycloakId = (candidacy: CandidacyHelper) =>
   candidacy.organism?.organismOnAccounts?.[0]?.account?.keycloakId;

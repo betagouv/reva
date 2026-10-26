@@ -77,7 +77,7 @@ const createTransferContext = async ({
     certificationAuthorityId: certificateurAuthority.id,
   });
 
-  const certificateurAccount = certificateurAuthority.Account[0];
+  const certificateurAccount = certificateurAuthority.account;
 
   if (!certificateurAccount) {
     throw new Error("Le certificateur n'a pas de compte associé");

@@ -52,7 +52,7 @@ describe("cohortes vae collectives for certification authority or local account"
       });
 
       const resp = await getCohortesForCertificationAuthorityOrLocalAccount({
-        userKeycloakId: certificationAuthority.Account[0].keycloakId || "",
+        userKeycloakId: certificationAuthority.account.keycloakId || "",
         userRole: "manage_certification_authority_local_account",
       });
 
@@ -81,8 +81,7 @@ describe("cohortes vae collectives for certification authority or local account"
         await createCertificationAuthorityHelper();
 
       const resp = await getCohortesForCertificationAuthorityOrLocalAccount({
-        userKeycloakId:
-          secondCertificationAuthority.Account[0].keycloakId || "",
+        userKeycloakId: secondCertificationAuthority.account.keycloakId || "",
         userRole: "manage_certification_authority_local_account",
       });
 

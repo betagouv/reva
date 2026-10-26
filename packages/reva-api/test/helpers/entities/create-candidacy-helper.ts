@@ -135,10 +135,9 @@ export const createCandidacyHelper = async (args?: {
               ...caocas,
               certificationAuthority: {
                 ...caocas.certificationAuthority,
-                Account:
-                  caocas.certificationAuthority.certificationAuthorityOnAccounts.map(
-                    (coa) => coa.account,
-                  ),
+                account:
+                  caocas.certificationAuthority
+                    .certificationAuthorityOnAccounts[0]?.account,
               },
             }),
           ),

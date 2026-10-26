@@ -37,5 +37,5 @@ export const createCertificationAuthorityHelper = async (
       },
     });
 
-  return { ...certificationAuthority, Account: [account] };
+  return { ...certificationAuthority, account };
 };

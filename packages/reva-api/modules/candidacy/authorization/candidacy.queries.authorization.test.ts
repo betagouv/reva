@@ -335,7 +335,7 @@ describe("candidacy resolver read authorization", () => {
       const response = await getCandidaciesForCertificationAuthority(
         asRole(
           "manage_certification_authority_local_account",
-          certificationAuthority.Account[0].keycloakId,
+          certificationAuthority.account.keycloakId,
         ),
       );
 

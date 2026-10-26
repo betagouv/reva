@@ -69,7 +69,7 @@ test("should count all (1) available feasibility for certificator user even if o
     fastify: global.testApp,
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority?.Account[0].keycloakId,
+      keycloakId: certificationAuthority?.account.keycloakId,
     }),
     payload: {
       requestType: "query",
@@ -95,7 +95,7 @@ test("should count no available feasibility for certificator user since he doesn
     fastify: global.testApp,
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority.Account[0].keycloakId,
+      keycloakId: certificationAuthority.account.keycloakId,
     }),
     payload: {
       requestType: "query",
@@ -132,7 +132,7 @@ test("should return a feasibilty for certificator since he is allowed to handle 
     fastify: global.testApp,
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority?.Account[0].keycloakId,
+      keycloakId: certificationAuthority?.account.keycloakId,
     }),
     payload: {
       requestType: "query",
@@ -161,7 +161,7 @@ test("should return a feasibility error when accessing it since the certificator
     fastify: global.testApp,
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority.Account[0].keycloakId,
+      keycloakId: certificationAuthority.account.keycloakId,
     }),
     payload: {
       requestType: "query",
@@ -196,7 +196,7 @@ test("should return all (1) available feasibility for certificateur user", async
     fastify: global.testApp,
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority?.Account[0].keycloakId,
+      keycloakId: certificationAuthority?.account.keycloakId,
     }),
     payload: {
       requestType: "query",
@@ -285,7 +285,7 @@ test("should validate a feasibility since certificator is allowed to do so", asy
     decision: "ADMISSIBLE",
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority?.Account[0].keycloakId,
+      keycloakId: certificationAuthority?.account.keycloakId,
     }),
   });
 
@@ -310,7 +310,7 @@ test("should not validate a feasibility since  the certificator doesn't handle i
     decision: "ADMISSIBLE",
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority.Account[0].keycloakId,
+      keycloakId: certificationAuthority.account.keycloakId,
     }),
   });
   expect(resp.statusCode).toBe(500);
@@ -328,7 +328,7 @@ test("should not validate a feasibility since the certificator doesn't handle it
     decision: "ADMISSIBLE",
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority.Account[0].keycloakId,
+      keycloakId: certificationAuthority.account.keycloakId,
     }),
   });
   expect(resp.statusCode).toBe(500);
@@ -356,7 +356,7 @@ test("should reject a feasibility since certificator is allowed to do so", async
     decision: "REJECTED",
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority?.Account[0].keycloakId,
+      keycloakId: certificationAuthority?.account.keycloakId,
     }),
   });
 
@@ -422,7 +422,7 @@ test("should refresh certificationAuthorityId when a feasibility is marked INCOM
     decision: "INCOMPLETE",
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: oldCertificationAuthority.Account[0].keycloakId,
+      keycloakId: oldCertificationAuthority.account.keycloakId,
     }),
   });
 
@@ -447,7 +447,7 @@ test("should not reject a feasibility since the certificator doesn't handle it",
     fastify: global.testApp,
     authorization: authorizationHeaderForUser({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority.Account[0].keycloakId,
+      keycloakId: certificationAuthority.account.keycloakId,
     }),
     payload: {
       requestType: "query",

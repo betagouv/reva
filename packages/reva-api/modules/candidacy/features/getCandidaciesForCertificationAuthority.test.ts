@@ -44,7 +44,7 @@ const createContextForCertificationAuthority = (
 ): GraphqlContext =>
   buildContext({
     roles: ["manage_feasibility"],
-    sub: certificationAuthority.Account[0].keycloakId,
+    sub: certificationAuthority.account.keycloakId,
   });
 
 const setupCertificationAuthority = async () => {

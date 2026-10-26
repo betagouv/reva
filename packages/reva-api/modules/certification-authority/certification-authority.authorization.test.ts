@@ -22,7 +22,7 @@ const managerOf = (
 ) =>
   asRole(
     "manage_certification_authority_local_account",
-    localAccount.certificationAuthority.Account[0].keycloakId,
+    localAccount.certificationAuthority.account.keycloakId,
   );
 
 type LocalAccountMutation = {

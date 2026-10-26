@@ -48,7 +48,7 @@ const creerCandidatureAvecJury = async () => {
 
   await createCertificationAuthorityLocalAccountHelper({
     certificationAuthorityId: certificationAuthority.id,
-    accountId: certificationAuthority.Account[0].id,
+    accountId: certificationAuthority.account.id,
     certificationAuthorityLocalAccountOnCertification: {
       create: { certificationId: certification.id },
     },
@@ -77,7 +77,7 @@ const creerCandidatureAvecJury = async () => {
     candidacy,
     jury,
     convocationFile,
-    certificateurKeycloakId: certificationAuthority.Account[0].keycloakId,
+    certificateurKeycloakId: certificationAuthority.account.keycloakId,
     aapKeycloakId:
       candidacy.organism?.organismOnAccounts[0].account.keycloakId ?? "",
     candidatKeycloakId: candidacy.candidate?.keycloakId ?? "",

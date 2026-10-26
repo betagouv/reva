@@ -48,7 +48,7 @@ describe("isFeasibilityManager", () => {
 
       if (
         !certificationAuthority?.id ||
-        !certificationAuthority.Account[0].id ||
+        !certificationAuthority.account.id ||
         !candidacy.candidate?.departmentId
       ) {
         throw new Error("Required IDs are undefined");
@@ -56,7 +56,7 @@ describe("isFeasibilityManager", () => {
 
       await createCertificationAuthorityLocalAccountHelper({
         certificationAuthorityId: certificationAuthority.id,
-        accountId: certificationAuthority.Account[0].id,
+        accountId: certificationAuthority.account.id,
         certificationAuthorityLocalAccountOnCertification: {
           create: { certificationId: certification.id },
         },
@@ -72,7 +72,7 @@ describe("isFeasibilityManager", () => {
 
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: candidacy.id,
-        keycloakId: certificationAuthority?.Account[0].keycloakId,
+        keycloakId: certificationAuthority?.account.keycloakId,
       });
 
       expect(resp.statusCode).toEqual(200);
@@ -120,7 +120,7 @@ describe("isFeasibilityManager", () => {
 
       await createCertificationAuthorityLocalAccountHelper({
         certificationAuthorityId: certificationAuthority.id,
-        accountId: certificationAuthority.Account[0].id,
+        accountId: certificationAuthority.account.id,
         certificationAuthorityLocalAccountOnCertification: {
           create: { certificationId: certification.id },
         },
@@ -131,7 +131,7 @@ describe("isFeasibilityManager", () => {
 
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: candidacy.id,
-        keycloakId: certificationAuthority?.Account[0].keycloakId,
+        keycloakId: certificationAuthority?.account.keycloakId,
       });
 
       expect(resp.json()).toHaveProperty("errors");
@@ -167,7 +167,7 @@ describe("isFeasibilityManager", () => {
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: candidacy.id,
         keycloakId:
-          certificationAuthority?.Account[0].keycloakId ?? faker.string.uuid(),
+          certificationAuthority?.account.keycloakId ?? faker.string.uuid(),
       });
 
       expect(resp.json()).toHaveProperty("errors");
@@ -189,7 +189,7 @@ describe("isFeasibilityManager", () => {
 
       if (
         !certificationAuthority?.id ||
-        !certificationAuthority.Account[0].id ||
+        !certificationAuthority.account.id ||
         !candidacy.candidate?.departmentId
       ) {
         throw new Error("Required IDs are undefined");
@@ -197,7 +197,7 @@ describe("isFeasibilityManager", () => {
 
       await createCertificationAuthorityLocalAccountHelper({
         certificationAuthorityId: certificationAuthority.id,
-        accountId: certificationAuthority.Account[0].id,
+        accountId: certificationAuthority.account.id,
         certificationAuthorityLocalAccountOnCertification: {
           create: { certificationId: certification.id },
         },
@@ -213,7 +213,7 @@ describe("isFeasibilityManager", () => {
 
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: candidacy.id,
-        keycloakId: certificationAuthority?.Account[0].keycloakId,
+        keycloakId: certificationAuthority?.account.keycloakId,
       });
 
       expect(resp.statusCode).toEqual(200);
@@ -226,7 +226,7 @@ describe("isFeasibilityManager", () => {
 
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: feasibility.candidacyId,
-        keycloakId: certificationAuthority.Account[0].keycloakId,
+        keycloakId: certificationAuthority.account.keycloakId,
       });
 
       expect(resp.json()).toHaveProperty("errors");
@@ -251,7 +251,7 @@ describe("isFeasibilityManager", () => {
 
       await createCertificationAuthorityLocalAccountHelper({
         certificationAuthorityId: certificationAuthority.id,
-        accountId: certificationAuthority.Account[0].id,
+        accountId: certificationAuthority.account.id,
         certificationAuthorityLocalAccountOnCertification: {
           create: { certificationId: certification.id },
         },
@@ -267,7 +267,7 @@ describe("isFeasibilityManager", () => {
 
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: candidacy.id,
-        keycloakId: certificationAuthority.Account[0].keycloakId,
+        keycloakId: certificationAuthority.account.keycloakId,
       });
 
       expect(resp.json()).toHaveProperty("errors");
@@ -289,7 +289,7 @@ describe("isFeasibilityManager", () => {
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: candidacy.id,
         keycloakId:
-          certificationAuthority?.Account[0].keycloakId ?? faker.string.uuid(),
+          certificationAuthority?.account.keycloakId ?? faker.string.uuid(),
       });
 
       expect(resp.json()).toHaveProperty("errors");
@@ -304,7 +304,7 @@ describe("isFeasibilityManager", () => {
 
       await createCertificationAuthorityLocalAccountHelper({
         certificationAuthorityId: certificationAuthority.id,
-        accountId: certificationAuthority.Account[0].id,
+        accountId: certificationAuthority.account.id,
       });
 
       await createFeasibilityUploadedPdfHelper({
@@ -314,7 +314,7 @@ describe("isFeasibilityManager", () => {
 
       const resp = await getActiveFeasibilityByCandidacyId({
         candidacyId: candidacy.id,
-        keycloakId: certificationAuthority.Account[0].keycloakId,
+        keycloakId: certificationAuthority.account.keycloakId,
       });
 
       expect(resp.json()).toHaveProperty("errors");

@@ -204,7 +204,7 @@ describe("candidacy resolver read authorization", () => {
 
     const response = await getCandidacy({
       role: "manage_certification_authority_local_account",
-      keycloakId: certificationAuthority.Account[0].keycloakId,
+      keycloakId: certificationAuthority.account.keycloakId,
       candidacyId: feasibility.candidacyId,
     });
     expect(response.getCandidacyById).toMatchObject({
@@ -218,7 +218,7 @@ describe("candidacy resolver read authorization", () => {
     await expect(
       getCandidacy({
         role: "manage_certification_authority_local_account",
-        keycloakId: certificationAuthority.Account[0].keycloakId,
+        keycloakId: certificationAuthority.account.keycloakId,
         candidacyId: candidacy.id,
       }),
     ).rejects.toThrowError(NOT_AUTHORIZED_CANDIDACY_ACCESS);

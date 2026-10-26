@@ -52,7 +52,7 @@ export const createCertificationAuthorityLocalAccountHelper = async (
     ...localAccount,
     certificationAuthority: {
       ...localAccount.certificationAuthority,
-      Account: certificationAuthority.Account,
+      account: certificationAuthority.account,
     },
     Account: [account],
     account,
