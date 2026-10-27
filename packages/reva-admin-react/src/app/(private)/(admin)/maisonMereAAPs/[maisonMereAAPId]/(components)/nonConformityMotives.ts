@@ -105,6 +105,13 @@ export const nonConformityMotives: NonConformityMotive[] = [
     message:
       "Merci de redéposer une nouvelle demande d’inscription avec les documents requis. Vous n’avez pas besoin de remplir à nouveau le questionnaire.",
   },
+  {
+    key: "EMAIL_DEJA_UTILISE",
+    group: "Procédure et Inscription",
+    label: "E-mail déjà utilisé",
+    message:
+      "La nouvelle adresse électronique de connexion renseignée est déjà utilisée sur la plateforme.",
+  },
 ];
 
 // Motifs cochés, dans l'ordre du référentiel: c'est celui du courriel et de la
