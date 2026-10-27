@@ -10,7 +10,7 @@ import { REST_API_URL } from "@/config/config";
 import { graphql } from "@/graphql/generated";
 
 const getCandidacyByIdForDossierDeValidationPage = graphql(`
-  query getCandidacyByIdForDossierDeValidationPage($candidacyId: ID!) {
+  query getCandidacyByIdForDossierDeValidationPageV2($candidacyId: ID!) {
     getCandidacyById(id: $candidacyId) {
       id
       readyForJuryEstimatedAt
@@ -42,6 +42,13 @@ const getCandidacyByIdForDossierDeValidationPage = graphql(`
           id
           decisionSentAt
           decisionComment
+        }
+        amenagementSpecifique {
+          justificationFile {
+            name
+            previewUrl
+          }
+          justificationDescription
         }
       }
       jury {

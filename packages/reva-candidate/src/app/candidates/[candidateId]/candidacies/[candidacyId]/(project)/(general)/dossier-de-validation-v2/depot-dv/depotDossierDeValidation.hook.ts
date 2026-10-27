@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/preserve-manual-memoization */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toDate } from "date-fns";
 import { useParams } from "next/navigation";
@@ -10,7 +11,7 @@ import { REST_API_URL } from "@/config/config";
 import { graphql } from "@/graphql/generated";
 
 const getCandidacyByIdForDossierDeValidationPage = graphql(`
-  query getCandidacyByIdForDossierDeValidationPage($candidacyId: ID!) {
+  query getCandidacyByIdForDepotDossierDeValidationPage($candidacyId: ID!) {
     getCandidacyById(id: $candidacyId) {
       id
       readyForJuryEstimatedAt
@@ -42,6 +43,13 @@ const getCandidacyByIdForDossierDeValidationPage = graphql(`
           id
           decisionSentAt
           decisionComment
+        }
+        amenagementSpecifique {
+          justificationFile {
+            name
+            previewUrl
+          }
+          justificationDescription
         }
       }
       jury {
@@ -128,6 +136,10 @@ export const useDepotDossierDeValidationPage = () => {
       dossierDeValidationOtherFiles: {
         0?: File | undefined;
       }[];
+      amenagementSpecifiqueFile?: {
+        0?: File | undefined;
+      };
+      amenagementSpecifiqueDescription?: string;
     }) => {
       const formData = new FormData();
 
@@ -145,6 +157,19 @@ export const useDepotDossierDeValidationPage = () => {
           f?.[0] && formData.append("dossierDeValidationOtherFiles", f?.[0]),
       );
 
+      if (data.amenagementSpecifiqueFile?.[0]) {
+        formData.append(
+          "amenagementSpecifiqueFile",
+          data.amenagementSpecifiqueFile?.[0],
+        );
+      }
+
+      if (data.amenagementSpecifiqueDescription) {
+        formData.append(
+          "amenagementSpecifiqueDescription",
+          data.amenagementSpecifiqueDescription,
+        );
+      }
       const result = await fetch(
         `${REST_API_URL}/dossier-de-validation/upload-dossier-de-validation`,
         {

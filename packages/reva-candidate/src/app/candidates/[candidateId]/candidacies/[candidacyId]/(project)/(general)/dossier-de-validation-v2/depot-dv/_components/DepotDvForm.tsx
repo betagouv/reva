@@ -1,23 +1,21 @@
-import Accordion from "@codegouvfr/react-dsfr/Accordion";
-import Alert from "@codegouvfr/react-dsfr/Alert";
+"use client";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import Tile from "@codegouvfr/react-dsfr/Tile";
+import Input from "@codegouvfr/react-dsfr/Input";
+import Stepper from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, toDate } from "date-fns";
-import { useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import z from "zod";
 
-import { GrayCard } from "@/components/card/gray-card/GrayCard";
 import { FancyUpload } from "@/components/fancy-upload/FancyUpload";
-import { FormButtons } from "@/components/form/form-footer/FormButtons";
 import { errorToast } from "@/components/toast/toast";
+import { sanitizedText } from "@/utils/input-sanitization";
 
 import { JuryResult } from "@/graphql/generated/graphql";
 
 import { DepotDvResourcesSection } from "./DepotDvResourcesSection";
-import { PreviousDossierAccordion } from "./PreviousDossierAccordion";
 
 const maxFileSizeMb = 10;
 const maxFileSizeBytes = maxFileSizeMb * 1024 * 1024;
@@ -36,6 +34,12 @@ const fileValidationErrors = {
   tooLarge: `Le fichier que vous tentez d’envoyer est trop volumineux. Veuillez soumettre un fichier d’une taille inférieur à ${maxFileSizeMb}Mo.`,
   wrongType:
     "Le format de fichier n'est pas supporté. Essayez avec un .jpg, .png ou .pdf.",
+};
+
+const STEP_TITLES = {
+  "dossier-de-validation": "Dépot du dossier",
+  "special-needs": "Demande d’aménagement spécifique du jury",
+  confirmation: "Vérification, validation et envoi",
 };
 
 function createFileValidation(options: { isRequired: true }): z.ZodType<File>;
@@ -70,6 +74,7 @@ const dossierDeValidationSchema = z.object({
       message: "Veuillez cocher toutes les cases.",
     }),
   }),
+  amenagementSpecifiqueCheck: z.boolean().optional(),
   dossierDeValidationFile: z.object({
     0: createFileValidation({ isRequired: true }),
   }),
@@ -79,6 +84,31 @@ const dossierDeValidationSchema = z.object({
       0: createFileValidation({ isRequired: false }),
     })
     .array(),
+  amenagementSpecifiqueDescription: z.string().optional(),
+  amenagementSpecifiqueFile: z.object({
+    0: createFileValidation({ isRequired: false }),
+  }),
+});
+
+const dossierDeValidationSchemaFiles = z.object({
+  dossierDeValidationFile: z.object({
+    0: createFileValidation({ isRequired: true }),
+  }),
+  dossierDeValidationOtherFiles: z
+    .object({
+      0: createFileValidation({ isRequired: false }),
+    })
+    .array(),
+});
+
+const dossierDeValidationSchemaAmenagement = z.object({
+  amenagementSpecifiqueDescription: sanitizedText({
+    minLength: 10,
+    maxLength: 10000,
+  }),
+  amenagementSpecifiqueFile: z.object({
+    0: createFileValidation({ isRequired: true }),
+  }),
 });
 
 export type DossierDeValidationFormData = z.infer<
@@ -86,13 +116,11 @@ export type DossierDeValidationFormData = z.infer<
 >;
 
 export const DepotDvForm = ({
-  dossierDeValidation,
-  dossierDeValidationProblems,
-  jury,
-  hasFailedJuryResult,
+  needsAmenagement,
   onSubmit,
   certification,
 }: {
+  needsAmenagement: boolean;
   dossierDeValidation?: {
     id: string;
     decision?: string | null;
@@ -105,6 +133,13 @@ export const DepotDvForm = ({
       name: string;
       previewUrl?: string | null;
     }[];
+    amenagementSpecifique?: {
+      justificationFile?: {
+        name: string;
+        previewUrl?: string | null;
+      } | null;
+      justificationDescription?: string | null;
+    } | null;
   } | null;
   dossierDeValidationProblems: {
     decisionSentAt: Date;
@@ -123,17 +158,37 @@ export const DepotDvForm = ({
     label: string;
   } | null;
 }) => {
+  const router = useRouter();
   const {
     register,
     reset,
     control,
     handleSubmit,
-    formState: { errors, isSubmitting, isDirty },
+    getValues,
+    setError,
+    formState: { errors, isSubmitting },
   } = useForm<DossierDeValidationFormData>({
     resolver: zodResolver(dossierDeValidationSchema),
-    shouldUnregister: true,
-    defaultValues: { dossierDeValidationOtherFiles: [] },
+    shouldUnregister: false,
+    defaultValues: {
+      dossierDeValidationOtherFiles: [],
+      amenagementSpecifiqueFile: {
+        0: undefined,
+      },
+    },
   });
+
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const steps = useMemo(() => {
+    return (
+      [
+        "dossier-de-validation",
+        needsAmenagement ? "special-needs" : null,
+        "confirmation",
+      ] as const
+    ).filter((step) => step !== null);
+  }, [needsAmenagement]);
+  const currentStep = steps[currentStepIndex];
 
   const {
     fields: dossierDeValidationOtherFilesFields,
@@ -171,101 +226,42 @@ export const DepotDvForm = ({
 
   const handleFormSubmit = handleSubmit(onSubmit);
 
-  const [currentProblem, ...previousProblems] = dossierDeValidationProblems;
+  const dossierDeValidationSchemaCheckboxes = z.object({
+    dossierDeValidationCheck1: z.literal(true, {
+      errorMap: () => ({
+        message: "Veuillez cocher toutes les cases.",
+      }),
+    }),
+    dossierDeValidationCheck2: z.literal(true, {
+      errorMap: () => ({
+        message: "Veuillez cocher toutes les cases.",
+      }),
+    }),
+    ...(needsAmenagement
+      ? {
+          amenagementSpecifiqueCheck: z.literal(true, {
+            errorMap: () => ({
+              message: "Veuillez cocher toutes les cases.",
+            }),
+          }),
+        }
+      : {}),
+  });
+
   return (
     <div className="flex flex-col">
-      {hasFailedJuryResult && (
-        <>
-          <Alert
-            severity="info"
-            className="mb-6"
-            title={`Vous n’avez pas validé la totalité de votre VAE à la suite de votre passage devant le jury${jury?.dateOfSession ? ` le ${format(toDate(jury.dateOfSession), "dd/MM/yyyy")}` : ""}`}
-            description={
-              <div className="flex flex-col gap-4">
-                {jury?.informationOfResult && (
-                  <p>
-                    <strong>Motif énoncé par le certificateur :</strong>{" "}
-                    {jury.informationOfResult}
-                  </p>
-                )}
-                <p>
-                  Suite à ce résultat, vous pouvez repasser devant le jury. Vous
-                  devrez, en amont, retravailler sur le dossier de validation et
-                  le renvoyer afin de le faire parvenir au certificateur. Une
-                  fois reçu, le certificateur pourra vous transmettre une
-                  nouvelle date de passage devant le jury. Vous pouvez dès à
-                  présent fournir une date prévisionnelle de dépot de dossier.
-                </p>
-                <p>
-                  Ce passage n'est pas une obligation et reste à votre libre
-                  choix. N'hésitez pas à vous rapprocher de votre certificateur
-                  pour avoir plus de détails et connaître les délais.
-                </p>
-              </div>
-            }
-          />
-          {dossierDeValidation?.dossierDeValidationSentAt && (
-            <PreviousDossierAccordion
-              dossierDeValidation={dossierDeValidation}
-              juryDateOfResult={jury?.dateOfResult}
-            />
-          )}
-        </>
-      )}
-
-      {dossierDeValidation?.decision === "INCOMPLETE" && currentProblem && (
-        <>
-          <Alert
-            data-testid="dossier-de-validation-signale-alert"
-            className="mb-6"
-            severity="warning"
-            title={`Dossier de validation signalé par le certificateur le ${format(currentProblem.decisionSentAt, "dd/MM/yyyy")}`}
-            description={
-              <div className="flex flex-col gap-6">
-                <p>
-                  Ce dossier de validation a été signalé comme comportant des
-                  erreurs par le certificateur.
-                </p>
-                <p>
-                  <span className="font-semibold">Motif du signalement : </span>
-                  {currentProblem.decisionComment}
-                </p>
-                <p className="font-semibold">
-                  Nous vous invitons à retourner dès que possible un dossier
-                  corrigé.
-                </p>
-              </div>
-            }
-          />
-          {previousProblems.length > 0 && (
-            <div className="fr-accordions-group mb-6">
-              <Accordion label="Voir les anciens dossiers de validation">
-                <ul className="flex flex-col gap-8 pl-0">
-                  {previousProblems.map((p, i) => (
-                    <GrayCard key={i}>
-                      <dl>
-                        <dt className="font-bold text-xl">Dossier signalé :</dt>
-                        <dd>
-                          Dossier signalé le{" "}
-                          {format(p.decisionSentAt, "dd/MM/yyyy")}
-                        </dd>
-                        <br />
-                        <dt className="font-bold text-xl">
-                          Motif du signalement :
-                        </dt>
-                        <dd>{p.decisionComment}</dd>
-                      </dl>
-                    </GrayCard>
-                  ))}
-                </ul>
-              </Accordion>
-            </div>
-          )}
-        </>
-      )}
-
       <div className="flex gap-6">
         <main className="flex-1">
+          <Stepper
+            stepCount={steps.length}
+            currentStep={currentStepIndex + 1}
+            title={STEP_TITLES[currentStep as keyof typeof STEP_TITLES]}
+            nextTitle={
+              STEP_TITLES[
+                steps[currentStepIndex + 1] as keyof typeof STEP_TITLES
+              ]
+            }
+          />
           <form
             className="flex flex-col flex-1 mb-2"
             onSubmit={handleFormSubmit}
@@ -277,123 +273,240 @@ export const DepotDvForm = ({
             <div className="flex flex-row gap-6">
               <div className="flex-1 basis-9/12">
                 <div className="flex flex-col gap-6 mb-8">
-                  <FancyUpload
-                    className="dossier-de-validation-file-upload"
-                    title="Joindre le dossier de validation"
-                    description="Si vous souhaitez déposer une attestation de transmission / finalisation du DV : vous pouvez déposer cette pièce ici."
-                    hint={fileUploadHintText}
-                    nativeInputProps={{
-                      ...register("dossierDeValidationFile"),
-                      accept: acceptedFileExtensions,
-                    }}
-                    state={
-                      errors.dossierDeValidationFile?.[0] ? "error" : "default"
-                    }
-                    stateRelatedMessage={
-                      errors.dossierDeValidationFile?.[0]?.message
-                    }
-                  />
-                  {dossierDeValidationOtherFilesFields.map((d, i) => (
-                    <FancyUpload
-                      key={d.id}
-                      title="Joindre des pièces supplémentaires (optionnel)"
-                      hint={fileUploadHintText}
-                      nativeInputProps={{
-                        ...register(`dossierDeValidationOtherFiles.${i}`, {
-                          onChange: (e) => {
-                            if (!e.target.value) {
-                              removeDossierDeValidationOtherFiles(i);
-                            }
+                  {currentStep === "dossier-de-validation" && (
+                    <>
+                      <FancyUpload
+                        className="dossier-de-validation-file-upload"
+                        title="Joindre le dossier de validation"
+                        description="Si vous souhaitez déposer une attestation de transmission / finalisation du DV : vous pouvez déposer cette pièce ici."
+                        hint={fileUploadHintText}
+                        nativeInputProps={{
+                          ...register("dossierDeValidationFile"),
+                          accept: acceptedFileExtensions,
+                        }}
+                        state={
+                          errors.dossierDeValidationFile?.[0]
+                            ? "error"
+                            : "default"
+                        }
+                        stateRelatedMessage={
+                          errors.dossierDeValidationFile?.[0]?.message
+                        }
+                      />
+                      {dossierDeValidationOtherFilesFields.map((d, i) => (
+                        <FancyUpload
+                          key={d.id}
+                          title="Joindre des pièces supplémentaires (optionnel)"
+                          hint={fileUploadHintText}
+                          nativeInputProps={{
+                            ...register(`dossierDeValidationOtherFiles.${i}`, {
+                              onChange: (e) => {
+                                if (!e.target.value) {
+                                  removeDossierDeValidationOtherFiles(i);
+                                }
+                              },
+                            }),
+                            accept: acceptedFileExtensions,
+                          }}
+                          onClickDelete={() =>
+                            removeDossierDeValidationOtherFiles(i)
+                          }
+                          state={
+                            errors.dossierDeValidationOtherFiles?.[i]
+                              ? "error"
+                              : "default"
+                          }
+                          stateRelatedMessage={
+                            errors.dossierDeValidationOtherFiles?.[i]?.[0]
+                              ?.message
+                          }
+                        />
+                      ))}
+                      <div>
+                        <hr className="pb-3" />
+                        <Button
+                          priority="tertiary no outline"
+                          iconId="fr-icon-add-line"
+                          onClick={handleAddAdditionalFile}
+                          type="button"
+                          disabled={isMaxAdditionalFiles}
+                        >
+                          Ajouter une pièce jointe supplémentaire
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                  {currentStep === "special-needs" && (
+                    <div className="flex flex-col gap-2">
+                      <Input
+                        textArea
+                        label="Besoin d’un aménagement spécifique pour le passage devant le jury :"
+                        hintText="Décrivez les aménagements dont vous souhaitez bénéficier lors du passage devant le jury pour son bon déroulement. Ces informations seront transmises au certificateur avec le dossier de validation. Il examinera votre demande."
+                        nativeTextAreaProps={{
+                          rows: 10,
+                          ...register("amenagementSpecifiqueDescription"),
+                        }}
+                        state={
+                          errors.amenagementSpecifiqueDescription
+                            ? "error"
+                            : "default"
+                        }
+                        stateRelatedMessage={
+                          errors.amenagementSpecifiqueDescription?.message
+                        }
+                      />
+                      <FancyUpload
+                        title="Joindre le justificatif"
+                        description="Ce document ne sera pas conservé par France VAE"
+                        hint="Formats supportés : jpg, png, pdf avec un poids maximum de 15Mo"
+                        nativeInputProps={{
+                          ...register("amenagementSpecifiqueFile"),
+                          accept: acceptedFileExtensions,
+                        }}
+                        state={
+                          errors.amenagementSpecifiqueFile?.[0]
+                            ? "error"
+                            : "default"
+                        }
+                        stateRelatedMessage={
+                          errors.amenagementSpecifiqueFile?.[0]?.message
+                        }
+                      />
+                    </div>
+                  )}
+                  {currentStep === "confirmation" && (
+                    <Checkbox
+                      className="mr-0"
+                      legend="Avant de finaliser votre envoi"
+                      data-testid="dossier-de-validation-checkbox-group"
+                      options={[
+                        {
+                          label:
+                            "J'ai bien vérifié que le dossier de validation était complet et lisible.",
+                          nativeInputProps: {
+                            ...register("dossierDeValidationCheck1"),
                           },
-                        }),
-                        accept: acceptedFileExtensions,
-                      }}
-                      onClickDelete={() =>
-                        removeDossierDeValidationOtherFiles(i)
-                      }
+                        },
+                        {
+                          label:
+                            "J'ai bien vérifié que toutes les pièces supplémentaires étaient lisibles",
+                          nativeInputProps: {
+                            ...register("dossierDeValidationCheck2"),
+                          },
+                        },
+                        needsAmenagement
+                          ? {
+                              label:
+                                "J’ai bien vérifié que le justificatif d’aménagement était lisible et valable.",
+                              nativeInputProps: {
+                                ...register("amenagementSpecifiqueCheck"),
+                              },
+                            }
+                          : undefined,
+                      ].filter((option) => option !== undefined)}
+                      small
                       state={
-                        errors.dossierDeValidationOtherFiles?.[i]
+                        errors.dossierDeValidationCheck1 ||
+                        errors.dossierDeValidationCheck2 ||
+                        errors.amenagementSpecifiqueCheck
                           ? "error"
                           : "default"
                       }
                       stateRelatedMessage={
-                        errors.dossierDeValidationOtherFiles?.[i]?.[0]?.message
+                        errors.dossierDeValidationCheck1?.message ||
+                        errors.dossierDeValidationCheck2?.message ||
+                        errors.amenagementSpecifiqueCheck?.message
                       }
                     />
-                  ))}
-                  <div>
-                    <hr className="pb-3" />
-                    <Button
-                      priority="tertiary no outline"
-                      iconId="fr-icon-add-line"
-                      onClick={handleAddAdditionalFile}
-                      type="button"
-                      disabled={isMaxAdditionalFiles}
-                    >
-                      Ajouter une pièce jointe supplémentaire
-                    </Button>
-                  </div>
-                  <Tile
-                    title="Aménagement spécifique du jury (optionnel)"
-                    desc="Vous pouvez demander un aménagement spécifique pour le passage devant le jury et joindre les justificatifs nécessaires à votre demande. Le certificateur étudiera votre demande."
-                    detail="Compléter la demande"
-                    linkProps={{
-                      href: "#",
-                    }}
-                    imageUrl="/candidat/images/pictograms/accessibility.svg"
-                    orientation="horizontal"
-                    small
-                    classes={{
-                      img: "mr-0 h-10 w-10",
-                    }}
-                  />
+                  )}
                 </div>
-
-                <Checkbox
-                  className="mr-0"
-                  legend="Avant de finaliser votre envoi"
-                  data-testid="dossier-de-validation-checkbox-group"
-                  options={[
-                    {
-                      label:
-                        "J'ai bien vérifié que le dossier de validation était complet et lisible.",
-                      nativeInputProps: {
-                        ...register("dossierDeValidationCheck1"),
-                      },
-                    },
-                    {
-                      label:
-                        "J'ai bien vérifié que toutes les pièces supplémentaires étaient lisibles",
-                      nativeInputProps: {
-                        ...register("dossierDeValidationCheck2"),
-                      },
-                    },
-                  ]}
-                  small
-                  state={
-                    errors.dossierDeValidationCheck1 ||
-                    errors.dossierDeValidationCheck2
-                      ? "error"
-                      : "default"
-                  }
-                  stateRelatedMessage={
-                    errors.dossierDeValidationCheck1?.message ||
-                    errors.dossierDeValidationCheck2?.message
-                  }
-                />
               </div>
               <div className="basis-3/12">
                 <DepotDvResourcesSection certification={certification} />
               </div>
             </div>
-            <FormButtons
-              hideResetButton
-              formState={{
-                isSubmitting,
-                isDirty,
-              }}
-              backUrl="../"
-            />
+            {currentStep === "confirmation" && (
+              <div className="flex flex-row gap-4 justify-between mt-8">
+                <Button
+                  priority="secondary"
+                  type="button"
+                  onClick={() => {
+                    if (currentStepIndex > 0) {
+                      setCurrentStepIndex(currentStepIndex - 1);
+                    } else {
+                      router.push("../");
+                    }
+                  }}
+                >
+                  Précédent
+                </Button>
+                <Button
+                  priority="primary"
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    const result =
+                      dossierDeValidationSchemaCheckboxes.safeParse(
+                        getValues(),
+                      );
+                    if (!result.success) {
+                      result.error.errors.forEach((error) => {
+                        const path = error.path.join(".");
+                        setError(path as keyof DossierDeValidationFormData, {
+                          message: error.message,
+                        });
+                      });
+                      return;
+                    }
+                    handleFormSubmit();
+                  }}
+                >
+                  Enregistrer
+                </Button>
+              </div>
+            )}
+            {currentStep !== "confirmation" && (
+              <div className="flex flex-row gap-4 justify-between">
+                <Button
+                  priority="secondary"
+                  type="button"
+                  onClick={() => {
+                    if (currentStepIndex > 0) {
+                      setCurrentStepIndex(currentStepIndex - 1);
+                    } else {
+                      router.push("../");
+                    }
+                  }}
+                >
+                  Précédent
+                </Button>
+                <Button
+                  priority="primary"
+                  type="button"
+                  onClick={() => {
+                    let schemaToUse = null;
+                    if (currentStep === "dossier-de-validation") {
+                      schemaToUse = dossierDeValidationSchemaFiles;
+                    } else if (currentStep === "special-needs") {
+                      schemaToUse = dossierDeValidationSchemaAmenagement;
+                    }
+                    const result = schemaToUse?.safeParse(getValues());
+                    if (!result?.success) {
+                      result?.error?.errors.forEach((error) => {
+                        const path = error.path.join(".");
+                        setError(path as keyof DossierDeValidationFormData, {
+                          message: error.message,
+                        });
+                      });
+                      return;
+                    }
+                    setCurrentStepIndex(currentStepIndex + 1);
+                  }}
+                >
+                  Suivant
+                </Button>
+              </div>
+            )}
           </form>
         </main>
       </div>

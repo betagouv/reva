@@ -1,6 +1,7 @@
 "use client";
 import Breadcrumb from "@codegouvfr/react-dsfr/Breadcrumb";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Panel } from "@/components/layout/Panel";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
@@ -11,6 +12,7 @@ import {
   DepotDvForm,
   DossierDeValidationFormData,
 } from "./_components/DepotDvForm";
+import { DepotDvIntroScreen } from "./_components/DepotDvIntroScreen";
 import { useDepotDossierDeValidationPage } from "./depotDossierDeValidation.hook";
 
 const failedJuryResults: JuryResult[] = [
@@ -33,6 +35,10 @@ export default function DepotDvPage() {
     jury,
   } = useDepotDossierDeValidationPage();
 
+  const [needsAmenagement, setNeedsAmenagement] = useState<boolean | null>(
+    null,
+  );
+
   if (queryStatus === "pending") {
     return <div>Chargement...</div>;
   }
@@ -43,11 +49,18 @@ export default function DepotDvPage() {
   const handleDossierDeValidationFormSubmit = async ({
     dossierDeValidationFile,
     dossierDeValidationOtherFiles,
+    amenagementSpecifiqueFile,
+    amenagementSpecifiqueDescription,
   }: DossierDeValidationFormData) => {
+    console.log("sending dossierDeValidationFile", dossierDeValidationFile);
+    console.log("amenagementSpecifiqueFile", amenagementSpecifiqueFile);
+    // return;
     try {
       await sendDossierDeValidation({
         dossierDeValidationFile,
         dossierDeValidationOtherFiles,
+        amenagementSpecifiqueFile,
+        amenagementSpecifiqueDescription,
       });
       successToast("Votre dossier de validation a été envoyé");
       router.push("../");
@@ -83,14 +96,24 @@ export default function DepotDvPage() {
           joindre les pièces supplémentaires requises et, si nécessaire,
           demander un aménagement spécifique pour le passage devant le jury.
         </p>
-        <DepotDvForm
-          dossierDeValidation={dossierDeValidation}
-          dossierDeValidationProblems={dossierDeValidationProblems}
-          jury={jury}
-          hasFailedJuryResult={!!hasFailedJuryResult}
-          onSubmit={handleDossierDeValidationFormSubmit}
-          certification={certification}
-        />
+        {needsAmenagement === null ? (
+          <DepotDvIntroScreen
+            certification={certification}
+            onClickStart={(needsAmenagement) =>
+              setNeedsAmenagement(needsAmenagement)
+            }
+          />
+        ) : (
+          <DepotDvForm
+            dossierDeValidation={dossierDeValidation}
+            dossierDeValidationProblems={dossierDeValidationProblems}
+            jury={jury}
+            hasFailedJuryResult={!!hasFailedJuryResult}
+            onSubmit={handleDossierDeValidationFormSubmit}
+            certification={certification}
+            needsAmenagement={needsAmenagement}
+          />
+        )}
       </div>
     </Panel>
   );
