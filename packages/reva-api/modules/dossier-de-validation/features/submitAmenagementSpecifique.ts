@@ -4,21 +4,6 @@ import { allowFileTypeByDocumentType } from "@/modules/shared/file/allowFileType
 import { deleteFile, uploadFileToS3 } from "@/modules/shared/file/file.service";
 import { prismaClient } from "@/prisma/client";
 
-export const AMENAGEMENT_SPECIFIQUE_DESCRIPTION_OBLIGATOIRE =
-  "La description de la demande d'aménagement est obligatoire.";
-
-export const AMENAGEMENT_SPECIFIQUE_JUSTIFICATIF_OBLIGATOIRE =
-  "Un justificatif est obligatoire pour enregistrer la demande d'aménagement spécifique.";
-
-export const AMENAGEMENT_SPECIFIQUE_DOSSIER_DEJA_ENVOYE =
-  "Le dossier de validation a déjà été envoyé. La demande d'aménagement spécifique n'est plus modifiable.";
-
-export const AMENAGEMENT_SPECIFIQUE_FICHIER_TROP_VOLUMINEUX =
-  "Le fichier que vous tentez d'envoyer est trop volumineux. Veuillez soumettre un fichier d'une taille inférieure à 10 Mo.";
-
-export const AMENAGEMENT_SPECIFIQUE_FORMAT_NON_SUPPORTE =
-  "Le format de fichier n'est pas supporté. Essayez avec un .jpg, .png ou .pdf.";
-
 export const storeJustificationFile = async ({
   candidacyId,
   uploadedFile,
