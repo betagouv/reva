@@ -52,9 +52,6 @@ export default function DepotDvPage() {
     amenagementSpecifiqueFile,
     amenagementSpecifiqueDescription,
   }: DossierDeValidationFormData) => {
-    console.log("sending dossierDeValidationFile", dossierDeValidationFile);
-    console.log("amenagementSpecifiqueFile", amenagementSpecifiqueFile);
-    // return;
     try {
       await sendDossierDeValidation({
         dossierDeValidationFile,
