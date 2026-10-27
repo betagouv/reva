@@ -9,6 +9,7 @@ import { getCandidacy } from "../candidacy/features/getCandidacy";
 import { getActiveDossierDeValidationByCandidacyId } from "./features/getActiveDossierDeValidationByCandidacyId";
 import { getActiveDossierDeValidationCountByCategory } from "./features/getActiveDossierDeValidationCountByCategory";
 import { getActiveDossiersDeValidation } from "./features/getActiveDossiersDeValidation";
+import { getAmenagementSpecifiqueByDossierDeValidationId } from "./features/getAmenagementSpecifiqueByDossierDeValidationId";
 import { getDossierDeValidationById } from "./features/getDossierDeValidationById";
 import { getDossierDeValidationFilesNamesAndUrls } from "./features/getDossierDeValidationFilesNamesAndUrls";
 import { getDossierDeValidationHistory } from "./features/getDossierDeValidationHistory";
@@ -52,6 +53,34 @@ const unsafeResolvers = {
       }),
     candidacy: ({ candidacyId }: { candidacyId: string }) =>
       getCandidacy({ candidacyId }),
+    amenagementSpecifique: ({
+      id,
+      candidacyId,
+    }: {
+      id: string;
+      candidacyId: string;
+    }) =>
+      getAmenagementSpecifiqueByDossierDeValidationId({
+        dossierDeValidationId: id,
+        candidacyId,
+      }),
+  },
+  AmenagementSpecifique: {
+    justificationFile: async ({
+      candidacyId,
+      justificationFileId,
+    }: {
+      candidacyId: string;
+      justificationFileId?: string;
+    }) =>
+      justificationFileId
+        ? (
+            await getDossierDeValidationFilesNamesAndUrls({
+              candidacyId,
+              fileIds: [justificationFileId],
+            })
+          )?.[0]
+        : undefined,
   },
   Candidacy: {
     activeDossierDeValidation: ({ id }: { id: string }) =>
@@ -147,6 +176,13 @@ export const dossierDeValidationResolvers = withPolicies(unsafeResolvers, {
       isAdminCandidacyCompanionOrFeasibilityManagerOrCandidate,
     history: isAdminCandidacyCompanionOrFeasibilityManagerOrCandidate,
     candidacy: isAdminCandidacyCompanionOrFeasibilityManagerOrCandidate,
+    amenagementSpecifique:
+      isAdminCandidacyCompanionOrFeasibilityManagerOrCandidate,
+  },
+  AmenagementSpecifique: {
+    // Le parent renvoyé ci-dessus porte candidacyId, donc le même contrôle d'ownership
+    // que les autres pièces du dossier s'applique au justificatif.
+    justificationFile: isAdminCandidacyCompanionOrFeasibilityManagerOrCandidate,
   },
   Candidacy: {
     activeDossierDeValidation:

@@ -19,11 +19,14 @@ import { canManageDossierDeValidation } from "./features/canManageDossierDeValid
 import { getActiveDossierDeValidationByCandidacyId } from "./features/getActiveDossierDeValidationByCandidacyId";
 import { getDossierDeValidationOtherFiles } from "./features/getDossierDeValidationOtherFiles";
 import { sendDossierDeValidation } from "./features/sendDossierDeValidation";
+import { storeJustificationFile } from "./features/submitAmenagementSpecifique";
 
 interface UploadDossierDeValidationBody {
   candidacyId: { value: string };
   dossierDeValidationFile: UploadedFile;
   dossierDeValidationOtherFiles?: UploadedFile | UploadedFile[];
+  amenagementSpecifiqueFile?: UploadedFile;
+  amenagementSpecifiqueDescription?: { value: string };
 }
 
 type MimeType = "application/pdf" | "image/png" | "image/jpg" | "image/jpeg";
@@ -63,6 +66,20 @@ export const dossierDeValidationRoute: FastifyPluginAsync = async (server) => {
             })
           : [];
 
+        const amenagementFileIds = (
+          await prismaClient.amenagementSpecifique.findMany({
+            where: { dossierDeValidation: { candidacyId } },
+            select: { justificationFileId: true },
+          })
+        ).map((amenagement) => amenagement.justificationFileId);
+
+        const candidateOwnsCandidacy = await isCandidateOwnerOfCandidacyFeature(
+          {
+            candidacyId,
+            keycloakId: request.auth?.userInfo?.sub,
+          },
+        );
+
         const authorized =
           (await canUserManageCandidacy({
             candidacyId,
@@ -73,7 +90,8 @@ export const dossierDeValidationRoute: FastifyPluginAsync = async (server) => {
             keycloakId: request.auth?.userInfo?.sub,
             dossierDeValidationId: dossierDeValidation?.id || "",
             roles: request.auth.userInfo?.realm_access?.roles || [],
-          }));
+          })) ||
+          (candidateOwnsCandidacy && amenagementFileIds.includes(fileId));
 
         if (!authorized) {
           return reply.status(403).send({
@@ -85,6 +103,7 @@ export const dossierDeValidationRoute: FastifyPluginAsync = async (server) => {
           ![
             dossierDeValidation?.dossierDeValidationFileId,
             ...dossierDeValidationOtherFiles.map((f) => f.id),
+            ...amenagementFileIds,
           ].includes(fileId)
         ) {
           return reply.status(403).send({
@@ -143,6 +162,11 @@ export const dossierDeValidationRoute: FastifyPluginAsync = async (server) => {
                 items: { type: "object" },
               },
             ],
+          },
+          amenagementSpecifiqueFile: { type: "object" },
+          amenagementSpecifiqueDescription: {
+            type: "object",
+            properties: { value: { type: "string" } },
           },
         },
         required: ["candidacyId", "dossierDeValidationFile"],
@@ -211,11 +235,56 @@ export const dossierDeValidationRoute: FastifyPluginAsync = async (server) => {
         }
       }
 
+      const amenagementSpecifiqueFile = request.body.amenagementSpecifiqueFile;
+      const amenagementSpecifiqueDescription =
+        request.body.amenagementSpecifiqueDescription?.value;
+
+      if (
+        amenagementSpecifiqueDescription &&
+        amenagementSpecifiqueDescription.length < 10
+      ) {
+        return reply
+          .status(400)
+          .send(
+            `La description de l'aménagement spécifique doit contenir au moins 10 caractères.`,
+          );
+      }
+
+      let uploadedAmenagementFile: {
+        id: string;
+        path: string;
+        name: string;
+        mimeType: string;
+      } | null = null;
+      if (amenagementSpecifiqueFile) {
+        if (
+          !hasValidMimeType(amenagementSpecifiqueFile, [
+            "application/pdf",
+            "image/png",
+            "image/jpg",
+            "image/jpeg",
+          ])
+        ) {
+          return reply
+            .status(400)
+            .send(
+              `Le format de fichier n'est pas supporté. Essayez avec un .jpg, .png ou .pdf.`,
+            );
+        }
+
+        uploadedAmenagementFile = await storeJustificationFile({
+          candidacyId: request.body.candidacyId.value,
+          uploadedFile: amenagementSpecifiqueFile,
+        });
+      }
+
       try {
         await sendDossierDeValidation({
           candidacyId: request.body.candidacyId.value,
           dossierDeValidationFile,
           dossierDeValidationOtherFiles,
+          amenagementSpecifiqueFileId: uploadedAmenagementFile?.id,
+          justificationDescription: amenagementSpecifiqueDescription || "",
           userKeycloakId: request.auth?.userInfo?.sub,
           userEmail: request.auth?.userInfo?.email,
           userRoles: request.auth.userInfo?.realm_access?.roles || [],

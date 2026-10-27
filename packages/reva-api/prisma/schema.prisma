@@ -1467,10 +1467,26 @@ model DossierDeValidation {
   createdAt                        DateTime                              @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                        DateTime?                             @updatedAt @map("updated_at") @db.Timestamptz(6)
   candidacyWithLastActiveDfDvJurys CandidacyWithLastActiveDfDvJury[]
+  amenagementSpecifique            AmenagementSpecifique?
 
   @@index([candidacyId, isActive])
   @@index([certificationAuthorityId, isActive])
   @@map("dossier_de_validation")
+}
+
+model AmenagementSpecifique {
+  id                       String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  dossierDeValidationId    String              @map("dossier_de_validation_id") @db.Uuid
+  dossierDeValidation      DossierDeValidation @relation(fields: [dossierDeValidationId], references: [id], onDelete: Cascade)
+  justificationFile        File?               @relation(fields: [justificationFileId], references: [id], onDelete: SetNull)
+  justificationFileId      String              @map("justification_file_id") @db.Uuid
+  justificationDescription String              @map("justification_description") @db.Text
+  createdAt                DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime?           @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([dossierDeValidationId])
+  @@index([dossierDeValidationId])
+  @@map("amenagement_specifique")
 }
 
 model DossierDeValidationOtherFilesOnFile {
@@ -1553,6 +1569,7 @@ model File {
   linkedAsCertificationAdditionalInfoAdditionalDocuments                      CertificationAdditionalInfoAdditionalDocument[]
   dematerializedFeasibilityFile                                               DematerializedFeasibilityFile[]                 @relation("dff_file")
   linkedAsDecisionFile                                                        FeasibilityDecision[]                           @relation("decision_file")
+  amenagementSpecifiques                                                      AmenagementSpecifique[]
 
   @@map("file")
 }

@@ -23,6 +23,10 @@ export const allowFileTypeByDocumentType = {
     ...allowedFileTypesMap.image,
     ...allowedFileTypesMap.pdf,
   ],
+  amenagementSpecifiqueJustificationFile: [
+    ...allowedFileTypesMap.image,
+    ...allowedFileTypesMap.pdf,
+  ],
   juryConvocationFile: [...allowedFileTypesMap.pdf],
   juryDecisionFile: [...allowedFileTypesMap.pdf],
   juryDecisionOtherFiles: [

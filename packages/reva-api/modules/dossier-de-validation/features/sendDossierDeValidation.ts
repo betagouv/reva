@@ -23,6 +23,8 @@ export const sendDossierDeValidation = async ({
   candidacyId,
   dossierDeValidationFile,
   dossierDeValidationOtherFiles,
+  amenagementSpecifiqueFileId,
+  justificationDescription,
   userKeycloakId,
   userEmail,
   userRoles,
@@ -30,6 +32,8 @@ export const sendDossierDeValidation = async ({
   candidacyId: string;
   dossierDeValidationFile: UploadedFile;
   dossierDeValidationOtherFiles: UploadedFile[];
+  amenagementSpecifiqueFileId?: string;
+  justificationDescription?: string;
   userKeycloakId?: string;
   userEmail: string;
   userRoles: KeyCloakUserRole[];
@@ -202,6 +206,15 @@ export const sendDossierDeValidation = async ({
     },
   });
 
+  if (amenagementSpecifiqueFileId) {
+    await prismaClient.amenagementSpecifique.create({
+      data: {
+        dossierDeValidationId: dossierDeValidation.id,
+        justificationFileId: amenagementSpecifiqueFileId,
+        justificationDescription: justificationDescription || "",
+      },
+    });
+  }
   await updateCandidacyStatus({
     candidacyId,
     status: "DOSSIER_DE_VALIDATION_ENVOYE",

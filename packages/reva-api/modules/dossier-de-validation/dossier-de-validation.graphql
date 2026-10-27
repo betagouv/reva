@@ -11,6 +11,20 @@ type DossierDeValidation {
   createdAt: Timestamp!
   updatedAt: Timestamp
   history: [DossierDeValidation!]!
+  amenagementSpecifique: AmenagementSpecifique
+}
+
+type AmenagementSpecifique {
+  id: ID!
+  justificationDescription: String!
+  justificationFile: File
+  createdAt: Timestamp!
+  updatedAt: Timestamp
+}
+
+input AmenagementSpecifiqueInput {
+  justificationDescription: String!
+  justificationFile: Upload
 }
 
 enum DossierDeValidationDecision {
@@ -71,4 +85,8 @@ type Mutation {
     dossierDeValidationId: ID!
     decisionComment: String
   ): DossierDeValidation!
+  dossierDeValidation_submitAmenagementSpecifique(
+    dossierDeValidationId: ID!
+    input: AmenagementSpecifiqueInput!
+  ): AmenagementSpecifique!
 }
