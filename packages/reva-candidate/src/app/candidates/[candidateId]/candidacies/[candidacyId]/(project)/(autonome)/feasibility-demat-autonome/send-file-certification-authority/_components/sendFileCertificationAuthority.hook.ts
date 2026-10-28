@@ -75,6 +75,7 @@ const getActiveFeasibilitySendFileCertificationAuthorityByCandidacyId = graphql(
           }
           certificationAuthorityStructure {
             label
+            hasReducedRequirements
           }
         }
         goals {
@@ -173,6 +174,7 @@ const getActiveFeasibilitySendFileCertificationAuthorityByCandidacyId = graphql(
                 }
               }
             }
+            complementExperienceParcoursVise
             certificationCompetenceDetails {
               state
               certificationCompetence {

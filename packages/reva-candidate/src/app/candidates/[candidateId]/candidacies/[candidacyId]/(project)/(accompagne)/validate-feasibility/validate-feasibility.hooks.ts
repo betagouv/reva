@@ -87,6 +87,7 @@ const GET_CANDIDACY_BY_ID_WITH_CANDIDATE_FOR_VALIDATE_FEASIBILITY = graphql(`
         }
         certificationAuthorityStructure {
           label
+          hasReducedRequirements
         }
       }
       goals {
@@ -163,6 +164,7 @@ const GET_CANDIDACY_BY_ID_WITH_CANDIDATE_FOR_VALIDATE_FEASIBILITY = graphql(`
               }
             }
           }
+          complementExperienceParcoursVise
           certificationCompetenceDetails {
             state
             certificationCompetence {

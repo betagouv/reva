@@ -169,6 +169,7 @@ const getCandidacyByIdForFeasibilityDematAutonomePage = graphql(`
               }
             }
           }
+          complementExperienceParcoursVise
           certificationCompetenceDetails {
             state
             certificationCompetence {
@@ -194,7 +195,6 @@ const getCandidacyByIdForFeasibilityDematAutonomePage = graphql(`
             previewUrl
             mimeType
           }
-          complementExperienceParcoursVise
         }
       }
     }

@@ -104,7 +104,8 @@
           }
         ],
         "certificationAuthorityStructure": {
-          "label": "Certificateur Metiers Services"
+          "label": "Certificateur Metiers Services",
+          "hasReducedRequirements": true
         }
       },
       "goals": [
@@ -253,6 +254,7 @@
           "eligibilityRequirement": "FULL_ELIGIBILITY_REQUIREMENT",
           "eligibilityValidUntil": 1735646400000,
           "eligibilityCandidateSituation": "PREMIERE_DEMANDE_RECEVABILITE",
+          "complementExperienceParcoursVise": "Experience complementaire en gestion d'equipe logistique.",
           "swornStatementFile": {
             "name": "attestation-honneur.pdf",
             "previewUrl": "https://files.example.com/attestation-honneur.pdf",

@@ -7,12 +7,15 @@ import {
 } from "@/graphql/generated/graphql";
 
 import { CertificationCompetenceAccordion } from "./CertificationCompetenceAccordion";
+import { ComplementExperienceParcoursViseAccordion } from "./ComplementExperienceParcoursViseAccordion";
 
 export default function ExperiencesSection({
   experiences,
   blocsDeCompetences,
   certificationCompetenceDetails,
   isEligibilityRequirementPartial,
+  complementExperienceParcoursVise,
+  showComplementExperienceParcoursVise,
 }: {
   experiences: Experience[];
   blocsDeCompetences: {
@@ -30,6 +33,8 @@ export default function ExperiencesSection({
   }[];
   certificationCompetenceDetails: CertificationCompetenceDetails[];
   isEligibilityRequirementPartial: boolean;
+  complementExperienceParcoursVise?: string | null;
+  showComplementExperienceParcoursVise: boolean;
 }) {
   const durationLabel = {
     betweenOneAndThreeYears: "entre 1 et 3 ans",
@@ -63,7 +68,8 @@ export default function ExperiencesSection({
         </div>
       )}
 
-      {blocsDeCompetences.length > 0 && (
+      {(blocsDeCompetences.length > 0 ||
+        showComplementExperienceParcoursVise) && (
         <>
           <h3 className="mb-0">Blocs de compétences</h3>
 
@@ -78,6 +84,17 @@ export default function ExperiencesSection({
                 hideAccordionContent={isEligibilityRequirementPartial}
               />
             ))}
+            {showComplementExperienceParcoursVise && (
+              <li className="flex flex-row justify-between items-start py-0 gap-6">
+                <ComplementExperienceParcoursViseAccordion
+                  complementExperienceParcoursVise={
+                    complementExperienceParcoursVise
+                  }
+                  disabled
+                  isEditable
+                />
+              </li>
+            )}
           </div>
         </>
       )}

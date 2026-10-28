@@ -79,7 +79,7 @@ export function DffSummary({
     return null;
   }
 
-  const { feasibility } = candidacy;
+  const { feasibility, certification } = candidacy;
   const dematerializedFeasibilityFile =
     feasibility?.dematerializedFeasibilityFile;
 
@@ -103,6 +103,7 @@ export function DffSummary({
     candidateConfirmationAt,
     attachments,
     swornStatementFile,
+    complementExperienceParcoursVise,
   } = dematerializedFeasibilityFile;
 
   const {
@@ -120,6 +121,9 @@ export function DffSummary({
 
   const isEligibilityRequirementPartial =
     eligibilityRequirement === "PARTIAL_ELIGIBILITY_REQUIREMENT";
+
+  const certificationAuthorityStructureHasReducedRequirements =
+    !!certification?.certificationAuthorityStructure?.hasReducedRequirements;
 
   return (
     <div className="flex flex-col gap-12 mt-8" data-testid="dff-summary">
@@ -201,6 +205,10 @@ export function DffSummary({
             blocsDeCompetences={blocsDeCompetences}
             certificationCompetenceDetails={certificationCompetenceDetails}
             isEligibilityRequirementPartial={isEligibilityRequirementPartial}
+            complementExperienceParcoursVise={complementExperienceParcoursVise}
+            showComplementExperienceParcoursVise={
+              certificationAuthorityStructureHasReducedRequirements
+            }
           />
         </div>
 

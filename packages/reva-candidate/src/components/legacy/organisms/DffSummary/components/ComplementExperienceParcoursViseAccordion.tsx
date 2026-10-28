@@ -8,7 +8,7 @@ export const ComplementExperienceParcoursViseAccordion = ({
   disabled,
   isEditable,
 }: {
-  complementExperienceParcoursVise?: string;
+  complementExperienceParcoursVise?: string | null;
   disabled?: boolean;
   isEditable?: boolean;
 }) => (
@@ -18,6 +18,12 @@ export const ComplementExperienceParcoursViseAccordion = ({
   >
     {complementExperienceParcoursVise ? (
       <Accordion className="w-full" label={label}>
+        <p>
+          <span className="font-bold">
+            Informations complémentaires ne pouvant pas figurer dans les autres
+            blocs liés à la mention du diplôme :
+          </span>
+        </p>
         <p>
           <span>{complementExperienceParcoursVise}</span>
         </p>

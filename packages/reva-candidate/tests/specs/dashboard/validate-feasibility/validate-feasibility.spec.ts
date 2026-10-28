@@ -147,6 +147,28 @@ test.describe("Dematerialized feasibility résumé", () => {
     ).toBeVisible();
   });
 
+  test("displays complement experience parcours vise without edit action", async ({
+    page,
+  }) => {
+    const dffSummary = page.getByTestId("dff-summary");
+    const complement = dffSummary.getByTestId(
+      "complement-experience-parcours-vise-accordion",
+    );
+
+    await expect(complement).toBeVisible();
+    await complement
+      .getByText("Complément d’expérience lié au parcours visé (optionnel)")
+      .click();
+    await expect(
+      complement.getByText(
+        "Experience complementaire en gestion d'equipe logistique.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("complement-experience-parcours-vise-button"),
+    ).not.toBeVisible();
+  });
+
   test("displays prerequisites", async ({ page }) => {
     const dffSummary = page.getByTestId("dff-summary");
 

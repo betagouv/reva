@@ -1025,4 +1025,127 @@ test.describe("ComplementExperienceParcoursViseAccordion", () => {
       });
     });
   });
+
+  test.describe("when the feasibility summary is displayed", () => {
+    const admissibleFeasibilityWithoutBlocs = {
+      ...DEFAULT_FEASIBILITY_FILE,
+      decision: DFF_CERTIFICATION_AUTHORITY_DECISION_ADMISSIBLE,
+      dematerializedFeasibilityFile: {
+        ...DEFAULT_DEMATERIALIZED_FEASIBILITY_FILE,
+        blocsDeCompetences: [],
+      },
+    };
+
+    test.describe("when certificationAuthorityStructureHasReducedRequirements is false", () => {
+      const candidacy = createCandidacyHelpers({
+        feasibility: admissibleFeasibilityWithoutBlocs,
+        certificationAuthorityStructureHasReducedRequirements: false,
+      });
+
+      test.use({
+        mswHandlers: [createFeasibilityHandlers(candidacy), { scope: "test" }],
+      });
+
+      test("should not show the complement in the summary", async ({
+        page,
+      }) => {
+        await visitFeasibilityPage(page);
+
+        const dffSummary = page.getByTestId("dff-summary");
+        await expect(dffSummary).toBeVisible();
+        await expect(
+          dffSummary.getByRole("heading", { name: "Blocs de compétences" }),
+        ).not.toBeVisible();
+        await expect(
+          dffSummary.getByTestId(
+            "complement-experience-parcours-vise-accordion",
+          ),
+        ).not.toBeVisible();
+      });
+    });
+
+    test.describe("when certificationAuthorityStructureHasReducedRequirements is true", () => {
+      test.describe("when complementExperienceParcoursVise is null", () => {
+        const candidacy = createCandidacyHelpers({
+          feasibility: admissibleFeasibilityWithoutBlocs,
+          certificationAuthorityStructureHasReducedRequirements: true,
+        });
+
+        test.use({
+          mswHandlers: [
+            createFeasibilityHandlers(candidacy),
+            { scope: "test" },
+          ],
+        });
+
+        test("should show the label in the summary without a button", async ({
+          page,
+        }) => {
+          await visitFeasibilityPage(page);
+
+          const dffSummary = page.getByTestId("dff-summary");
+          const complement = dffSummary.getByTestId(
+            "complement-experience-parcours-vise-accordion",
+          );
+
+          await expect(
+            dffSummary.getByRole("heading", { name: "Blocs de compétences" }),
+          ).toBeVisible();
+          await expect(complement).toBeVisible();
+          await expect(complement).toContainText(
+            "Complément d’expérience lié au parcours visé (optionnel)",
+          );
+          await expect(
+            page.getByTestId("complement-experience-parcours-vise-button"),
+          ).not.toBeVisible();
+        });
+      });
+
+      test.describe("when complementExperienceParcoursVise has content", () => {
+        const feasibilityWithContent = {
+          ...admissibleFeasibilityWithoutBlocs,
+          dematerializedFeasibilityFile: {
+            ...admissibleFeasibilityWithoutBlocs.dematerializedFeasibilityFile,
+            complementExperienceParcoursVise:
+              "Contenu du complément d'expérience",
+          },
+        };
+
+        const candidacy = createCandidacyHelpers({
+          feasibility: feasibilityWithContent,
+          certificationAuthorityStructureHasReducedRequirements: true,
+        });
+
+        test.use({
+          mswHandlers: [
+            createFeasibilityHandlers(candidacy),
+            { scope: "test" },
+          ],
+        });
+
+        test("should show the complement content in the summary without a button", async ({
+          page,
+        }) => {
+          await visitFeasibilityPage(page);
+
+          const complement = page
+            .getByTestId("dff-summary")
+            .getByTestId("complement-experience-parcours-vise-accordion");
+
+          await expect(complement).toBeVisible();
+          await complement
+            .getByText(
+              "Complément d’expérience lié au parcours visé (optionnel)",
+            )
+            .click();
+          await expect(complement).toContainText(
+            "Contenu du complément d'expérience",
+          );
+          await expect(
+            page.getByTestId("complement-experience-parcours-vise-button"),
+          ).not.toBeVisible();
+        });
+      });
+    });
+  });
 });
