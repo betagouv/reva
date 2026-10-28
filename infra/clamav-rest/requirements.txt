@@ -1,6 +1,6 @@
 bidict==0.23.1
 blinker==1.9.0
-brotli==1.2.0
+brotli==1.2.1
 certifi==2026.10.19
 charset-normalizer==3.4.7
 clamd==1.0.2
