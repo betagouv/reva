@@ -59,7 +59,8 @@ const FeasibilityBadge = ({
     // Accompagné
     case !candidacyIsAutonome &&
       isFeasibilityDemat &&
-      feasibilityIsReadyToBeSentToCertificationAuthority:
+      feasibilityIsReadyToBeSentToCertificationAuthority &&
+      (!decision || decision === "DRAFT" || decision === "INCOMPLETE"):
       return (
         <Badge severity="info" data-testid="feasibility-badge-to-send">
           à envoyer au certificateur
