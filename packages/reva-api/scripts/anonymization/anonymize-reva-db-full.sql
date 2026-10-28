@@ -273,6 +273,12 @@ SET
 -- jury
 UPDATE jury
 SET
+  address_of_session = CASE
+    WHEN address_of_session IS NOT NULL THEN 'Adresse-' || LEFT(id::text, 8)
+  END,
+  information_of_session = CASE
+    WHEN information_of_session IS NOT NULL THEN 'Information anonymisée'
+  END,
   information_of_result = CASE
     WHEN information_of_result IS NOT NULL THEN 'Information anonymisée'
   END;
