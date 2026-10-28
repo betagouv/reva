@@ -182,6 +182,9 @@ SET
   END,
   prerequisites_comment = CASE
     WHEN prerequisites_comment IS NOT NULL THEN 'Commentaire anonymisé'
+  END,
+  complement_experience_parcours_vise = CASE
+    WHEN complement_experience_parcours_vise IS NOT NULL THEN 'Complément anonymisé'
   END;
 
 -- dff_certification_competence_bloc
