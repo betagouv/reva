@@ -33,6 +33,7 @@ SET
 -- appointment
 UPDATE appointment
 SET
+  title = 'Titre-' || LEFT(id::text, 8),
   description = CASE
     WHEN description IS NOT NULL THEN 'Description anonymisée'
   END,
