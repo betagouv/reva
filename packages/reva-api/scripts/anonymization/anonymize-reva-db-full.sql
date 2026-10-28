@@ -120,6 +120,16 @@ SET
     WHEN archiving_reason_additional_information IS NOT NULL THEN 'Information anonymisée'
   END;
 
+-- accompagnement (duplicates free-text fields from candidacy)
+UPDATE accompagnement
+SET
+  other_training = CASE
+    WHEN other_training IS NOT NULL THEN 'Formation anonymisée'
+  END,
+  certificate_skills = CASE
+    WHEN certificate_skills IS NOT NULL THEN 'Compétences anonymisées'
+  END;
+
 -- certification_authority (contact info may identify individuals)
 UPDATE certification_authority
 SET
