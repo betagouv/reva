@@ -8,6 +8,7 @@ import {
 } from "@/graphql/generated/graphql";
 
 import { CertificationCompetenceAccordion } from "./CertificationCompetenceAccordion";
+import { ComplementExperienceParcoursViseAccordion } from "./ComplementExperienceParcoursViseAccordion";
 
 export default function ExperiencesSection({
   experiences,
@@ -15,12 +16,18 @@ export default function ExperiencesSection({
   certificationCompetenceDetails,
   isEligibilityRequirementPartial,
   accordionsDefaultExpanded = false,
+  complementExperienceParcoursVise,
+  showComplementExperienceParcoursVise,
+  candidacyId,
 }: {
   experiences: Experience[];
   blocsDeCompetences: DffCertificationCompetenceBloc[];
   certificationCompetenceDetails: CertificationCompetenceDetails[];
   isEligibilityRequirementPartial: boolean;
   accordionsDefaultExpanded?: boolean;
+  complementExperienceParcoursVise?: string | null;
+  showComplementExperienceParcoursVise: boolean;
+  candidacyId: string;
 }) {
   const durationLabel = {
     betweenOneAndThreeYears: "entre 1 et 3 ans",
@@ -54,7 +61,8 @@ export default function ExperiencesSection({
         </div>
       )}
 
-      {blocsDeCompetences.length > 0 && (
+      {(blocsDeCompetences.length > 0 ||
+        showComplementExperienceParcoursVise) && (
         <>
           <h3 className="mb-0">Blocs de compétences</h3>
 
@@ -69,6 +77,19 @@ export default function ExperiencesSection({
                 hideAccordionContent={isEligibilityRequirementPartial}
               />
             ))}
+            {showComplementExperienceParcoursVise && (
+              <li className="flex flex-row justify-between items-start py-0 gap-6">
+                <ComplementExperienceParcoursViseAccordion
+                  defaultExpanded={accordionsDefaultExpanded}
+                  complementExperienceParcoursVise={
+                    complementExperienceParcoursVise
+                  }
+                  disabled
+                  isEditable
+                  candidacyId={candidacyId}
+                />
+              </li>
+            )}
           </div>
         </>
       )}

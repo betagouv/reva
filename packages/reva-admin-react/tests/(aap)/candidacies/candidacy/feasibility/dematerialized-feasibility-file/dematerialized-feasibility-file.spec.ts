@@ -1730,4 +1730,143 @@ test.describe("ComplementExperienceParcoursViseAccordion", () => {
       });
     });
   });
+
+  test.describe("when the feasibility summary is displayed", () => {
+    const admissibleFeasibilityWithoutBlocs = {
+      ...DEFAULT_FEASIBILITY_FILE,
+      decision: DFF_CERTIFICATION_AUTHORITY_DECISION_ADMISSIBLE,
+      dematerializedFeasibilityFile: {
+        ...DEFAULT_DEMATERIALIZED_FEASIBILITY_FILE,
+        blocsDeCompetences: [],
+      },
+    };
+
+    test.describe("when certificationAuthorityStructureHasReducedRequirements is false", () => {
+      test.use({
+        mswHandlers: [
+          [
+            ...aapCommonHandlers,
+            ...createFeasibilityHandlers({
+              feasibility: admissibleFeasibilityWithoutBlocs,
+              certificationAuthorityStructureHasReducedRequirements: false,
+            }),
+          ],
+          { scope: "test" },
+        ],
+      });
+
+      test("should not show the complement in the summary", async ({
+        page,
+      }) => {
+        await login({ role: "aap", page });
+        await page.goto(`/admin2/candidacies/${CANDIDACY_ID}/feasibility-aap`);
+        await waitForFeasibilityQueries(page);
+
+        const dffSummary = page.getByTestId("dff-summary");
+        await expect(dffSummary).toBeVisible();
+        await expect(
+          dffSummary.getByRole("heading", { name: "Blocs de compétences" }),
+        ).not.toBeVisible();
+        await expect(
+          dffSummary.getByTestId(
+            "complement-experience-parcours-vise-accordion",
+          ),
+        ).not.toBeVisible();
+      });
+    });
+
+    test.describe("when certificationAuthorityStructureHasReducedRequirements is true", () => {
+      test.describe("when complementExperienceParcoursVise is null", () => {
+        test.use({
+          mswHandlers: [
+            [
+              ...aapCommonHandlers,
+              ...createFeasibilityHandlers({
+                feasibility: admissibleFeasibilityWithoutBlocs,
+                certificationAuthorityStructureHasReducedRequirements: true,
+              }),
+            ],
+            { scope: "test" },
+          ],
+        });
+
+        test("should show the label in the summary without a button", async ({
+          page,
+        }) => {
+          await login({ role: "aap", page });
+          await page.goto(
+            `/admin2/candidacies/${CANDIDACY_ID}/feasibility-aap`,
+          );
+          await waitForFeasibilityQueries(page);
+
+          const dffSummary = page.getByTestId("dff-summary");
+          const complement = dffSummary.getByTestId(
+            "complement-experience-parcours-vise-accordion",
+          );
+
+          await expect(
+            dffSummary.getByRole("heading", { name: "Blocs de compétences" }),
+          ).toBeVisible();
+          await expect(complement).toBeVisible();
+          await expect(complement).toContainText(
+            "Complément d’expérience lié au parcours visé (optionnel)",
+          );
+          await expect(
+            page.getByTestId("complement-experience-parcours-vise-button"),
+          ).not.toBeVisible();
+        });
+      });
+
+      test.describe("when complementExperienceParcoursVise has content", () => {
+        const feasibilityWithContent = {
+          ...admissibleFeasibilityWithoutBlocs,
+          dematerializedFeasibilityFile: {
+            ...admissibleFeasibilityWithoutBlocs.dematerializedFeasibilityFile,
+            complementExperienceParcoursVise:
+              "Contenu du complément d'expérience",
+          },
+        };
+
+        test.use({
+          mswHandlers: [
+            [
+              ...aapCommonHandlers,
+              ...createFeasibilityHandlers({
+                feasibility: feasibilityWithContent,
+                certificationAuthorityStructureHasReducedRequirements: true,
+              }),
+            ],
+            { scope: "test" },
+          ],
+        });
+
+        test("should show the complement content in the summary without a button", async ({
+          page,
+        }) => {
+          await login({ role: "aap", page });
+          await page.goto(
+            `/admin2/candidacies/${CANDIDACY_ID}/feasibility-aap`,
+          );
+          await waitForFeasibilityQueries(page);
+
+          const complement = page
+            .getByTestId("dff-summary")
+            .getByTestId("complement-experience-parcours-vise-accordion");
+
+          await expect(complement).toBeVisible();
+          await complement
+            .getByText(
+              "Complément d’expérience lié au parcours visé (optionnel)",
+            )
+            .click();
+          await expect(complement).toContainText(
+            "Contenu du complément d'expérience",
+          );
+          await expect(
+            page.getByTestId("complement-experience-parcours-vise-button"),
+          ).not.toBeVisible();
+        });
+      });
+    });
+  });
 });

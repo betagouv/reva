@@ -59,6 +59,7 @@ const feasibilityGetActiveFeasibilityByCandidacyId = graphql(`
             }
           }
         }
+        complementExperienceParcoursVise
         certificationCompetenceDetails {
           state
           certificationCompetence {
@@ -139,6 +140,7 @@ const feasibilityGetActiveFeasibilityByCandidacyId = graphql(`
           }
           certificationAuthorityStructure {
             label
+            hasReducedRequirements
           }
         }
         goals {

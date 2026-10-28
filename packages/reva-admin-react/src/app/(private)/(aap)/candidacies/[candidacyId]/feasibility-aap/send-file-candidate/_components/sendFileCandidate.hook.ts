@@ -61,6 +61,7 @@ const feasibilityWithDematerializedFeasibilityFileSendFileCandidateByCandidacyId
               }
             }
           }
+          complementExperienceParcoursVise
           certificationCompetenceDetails {
             state
             certificationCompetence {
@@ -131,6 +132,7 @@ const feasibilityWithDematerializedFeasibilityFileSendFileCandidateByCandidacyId
             }
             certificationAuthorityStructure {
               label
+              hasReducedRequirements
             }
           }
           goals {

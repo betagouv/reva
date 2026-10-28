@@ -4,12 +4,14 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 const label = "Complément d’expérience lié au parcours visé (optionnel)";
 
 export const ComplementExperienceParcoursViseAccordion = ({
+  defaultExpanded,
   complementExperienceParcoursVise,
   disabled,
   isEditable,
   candidacyId,
 }: {
-  complementExperienceParcoursVise?: string;
+  defaultExpanded?: boolean;
+  complementExperienceParcoursVise?: string | null;
   disabled?: boolean;
   isEditable?: boolean;
   candidacyId: string;
@@ -19,7 +21,17 @@ export const ComplementExperienceParcoursViseAccordion = ({
     data-testid="complement-experience-parcours-vise-accordion"
   >
     {complementExperienceParcoursVise ? (
-      <Accordion label={label} className="flex-1">
+      <Accordion
+        label={label}
+        className="flex-1"
+        defaultExpanded={defaultExpanded}
+      >
+        <p>
+          <span className="font-bold">
+            Informations complémentaires ne pouvant pas figurer dans les autres
+            blocs liés à la mention du diplôme :
+          </span>
+        </p>
         <p>
           <span>{complementExperienceParcoursVise}</span>
         </p>

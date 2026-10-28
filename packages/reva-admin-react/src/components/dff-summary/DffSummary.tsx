@@ -101,6 +101,7 @@ export function DffSummary({
     eligibilityValidUntil,
     eligibilityCandidateSituation,
     candidateDecisionComment,
+    complementExperienceParcoursVise,
   } = dematerializedFeasibilityFile;
   const {
     experiences,
@@ -113,6 +114,10 @@ export function DffSummary({
   } = candidacy as Candidacy;
   const isEligibilityRequirementPartial =
     eligibilityRequirement === "PARTIAL_ELIGIBILITY_REQUIREMENT";
+
+  const certificationAuthorityStructureHasReducedRequirements =
+    !!candidacy.certification?.certificationAuthorityStructure
+      ?.hasReducedRequirements;
 
   const { candidate } = candidacy;
 
@@ -211,6 +216,11 @@ export function DffSummary({
             certificationCompetenceDetails={certificationCompetenceDetails}
             isEligibilityRequirementPartial={isEligibilityRequirementPartial}
             accordionsDefaultExpanded={accordionsDefaultExpanded}
+            complementExperienceParcoursVise={complementExperienceParcoursVise}
+            showComplementExperienceParcoursVise={
+              certificationAuthorityStructureHasReducedRequirements
+            }
+            candidacyId={candidacy.id}
           />
         </div>
 

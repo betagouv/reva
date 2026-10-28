@@ -134,6 +134,8 @@ const dematerializedFeasibilityFile = {
   eligibilityRequirement: "FULL_ELIGIBILITY_REQUIREMENT",
   eligibilityValidUntil: 1735646400000,
   eligibilityCandidateSituation: "PREMIERE_DEMANDE_RECEVABILITE",
+  complementExperienceParcoursVise:
+    "Expérience complémentaire en gestion d'équipe logistique.",
   dffFile: {
     url: "https://files.example.com/dff-resume.pdf",
     name: "dossier-feasibilite.pdf",
@@ -205,6 +207,7 @@ const candidacy = {
     },
     certificationAuthorityStructure: {
       label: "Ministère du Travail",
+      hasReducedRequirements: true,
     },
   },
   goals: [
@@ -690,6 +693,28 @@ scenarios.forEach(({ label, role, url, handlers, waitForQueries }) => {
           "Compétences à confirmer sur la digitalisation des flux.",
         ),
       ).toBeVisible();
+    });
+
+    test("displays complement experience parcours vise without edit action", async ({
+      page,
+    }) => {
+      const dffSummary = page.getByTestId("dff-summary");
+      const complement = dffSummary.getByTestId(
+        "complement-experience-parcours-vise-accordion",
+      );
+
+      await expect(complement).toBeVisible();
+      await complement
+        .getByText("Complément d’expérience lié au parcours visé (optionnel)")
+        .click();
+      await expect(
+        complement.getByText(
+          "Expérience complémentaire en gestion d'équipe logistique.",
+        ),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId("complement-experience-parcours-vise-button"),
+      ).not.toBeVisible();
     });
 
     test("groups prerequisites by status", async ({ page }) => {
