@@ -15,6 +15,10 @@ BEGIN;
 -- aap_log (à purger)
 TRUNCATE aap_log;
 
+-- file_upload_spooler (à purger, transient staging table that can hold raw
+-- invoice/attendance-sheet file bytes and filenames pending FTPS upload)
+TRUNCATE file_upload_spooler;
+
 -- account
 UPDATE account
 SET
