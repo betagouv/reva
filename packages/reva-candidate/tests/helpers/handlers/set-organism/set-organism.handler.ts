@@ -43,6 +43,15 @@ export const setOrganismHandlers = ({
       },
     }),
   ),
+  fvae.query(
+    "getDepartments",
+    graphQLResolver({
+      getDepartments: [
+        { id: "dept-44", label: "Loire-Atlantique", code: "44" },
+        { id: "dept-75", label: "Paris", code: "75" },
+      ],
+    }),
+  ),
   fvae.mutation(
     "candidacy_selectOrganism",
     graphQLResolver({
@@ -57,5 +66,6 @@ export async function setOrganismPageWait(page: Page) {
   await Promise.all([
     waitGraphQL(page, "getCandidacyByIdForSetOrganism"),
     waitGraphQL(page, "getRandomOrganismsForCandidacy"),
+    waitGraphQL(page, "getDepartments"),
   ]);
 }

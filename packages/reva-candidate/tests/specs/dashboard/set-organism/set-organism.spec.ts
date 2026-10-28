@@ -14,7 +14,7 @@ import {
 import { waitGraphQL } from "@tests/helpers/network/requests";
 
 import type { MswFixture } from "next/experimental/testmode/playwright/msw";
-import type { Page } from "playwright";
+import type { Page, Response } from "playwright";
 
 const candidate = createCandidateEntity({
   id: "candidate1",
@@ -76,6 +76,61 @@ const remoteOrganism = createOrganismEntity({
   adresseVille: "Nantes",
   modaliteAccompagnement: "A_DISTANCE",
 });
+
+function organismZipInput(page: Page) {
+  return page.getByRole("textbox", {
+    name: "Où souhaitez-vous réaliser votre accompagnement ?",
+  });
+}
+
+const nantesAddressSearchResult = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-1.553621, 47.218371],
+      },
+      properties: {
+        label: "Nantes",
+        score: 0.97,
+        type: "municipality",
+        id: "44109",
+        name: "Nantes",
+        postcode: "44000",
+        citycode: "44109",
+        city: "Nantes",
+        context: "44, Loire-Atlantique, Pays de la Loire",
+        street: "Nantes",
+      },
+    },
+  ],
+  query: "44000",
+  limit: 10,
+};
+
+async function mockNantesAddressSearch(page: Page) {
+  await page.route(/api-adresse\.data\.gouv\.fr\/search\//, async (route) => {
+    await route.fulfill({ json: nantesAddressSearchResult });
+  });
+}
+
+async function selectNantes(page: Page) {
+  const input = organismZipInput(page);
+  await input.fill("44000");
+  await page
+    .getByTestId("autocomplete-options")
+    .getByText("Nantes (44000)", { exact: true })
+    .click();
+  await expect(input).toHaveValue("Nantes (44)");
+  await input.press("Escape");
+  await expect(page.getByTestId("autocomplete-options")).toHaveCount(0);
+}
+
+function searchFilterZip(response: Response) {
+  return response.request().postDataJSON().variables?.searchFilter?.zip;
+}
 
 async function openSetOrganismPage({
   page,
@@ -174,7 +229,7 @@ test.describe("Candidacy with certification selected", () => {
       organisms: [onsiteOrganism, remoteOrganism],
     });
 
-    const zipInput = page.getByTestId("input-wrapper-zip").getByRole("textbox");
+    const zipInput = organismZipInput(page);
     const pmrInput = page.getByTestId("checkbox-wrapper-pmr-input");
 
     await expect(zipInput).toBeDisabled();
@@ -194,6 +249,7 @@ test.describe("Candidacy with certification selected", () => {
     await expect(zipInput).toBeEnabled();
     await expect(pmrInput).toBeEnabled();
 
+    await mockNantesAddressSearch(page);
     await zipInput.fill("44000");
     const remoteQueryPromise = waitGraphQL(
       page,
@@ -206,22 +262,105 @@ test.describe("Candidacy with certification selected", () => {
     await expect(pmrInput).toBeDisabled();
   });
 
-  test("zip is reset when onsite is deselected", async ({ page, msw }) => {
+  test("selecting a place filters organisms by its zip code", async ({
+    page,
+    msw,
+  }) => {
+    await mockNantesAddressSearch(page);
     await openSetOrganismPage({
       page,
       msw,
       organisms: [onsiteOrganism, remoteOrganism],
     });
 
-    const zipInput = page.getByTestId("input-wrapper-zip").getByRole("textbox");
+    const onsiteQueryPromise = waitGraphQL(
+      page,
+      "getRandomOrganismsForCandidacy",
+    );
     await page.getByTestId("button-select-onsite").click();
-    await zipInput.fill("44000");
+    await onsiteQueryPromise;
 
+    const zipQueryPromise = waitGraphQL(page, "getRandomOrganismsForCandidacy");
+    await selectNantes(page);
+    const zipQuery = await zipQueryPromise;
+
+    expect(searchFilterZip(zipQuery)).toBe("44000");
+  });
+
+  test("zip filter is cleared when the selected place is removed", async ({
+    page,
+    msw,
+  }) => {
+    await mockNantesAddressSearch(page);
+    await openSetOrganismPage({
+      page,
+      msw,
+      organisms: [onsiteOrganism, remoteOrganism],
+    });
+
+    const onsiteQueryPromise = waitGraphQL(
+      page,
+      "getRandomOrganismsForCandidacy",
+    );
+    await page.getByTestId("button-select-onsite").click();
+    await onsiteQueryPromise;
+
+    const zipQueryPromise = waitGraphQL(page, "getRandomOrganismsForCandidacy");
+    await selectNantes(page);
+    await zipQueryPromise;
+
+    const zipInput = organismZipInput(page);
+    await zipInput.fill("");
+    const clearQueryPromise = waitGraphQL(
+      page,
+      "getRandomOrganismsForCandidacy",
+    );
+    await zipInput.press("Enter");
+    const clearQuery = await clearQueryPromise;
+
+    expect(searchFilterZip(clearQuery)).toBe("");
+    await expect(zipInput).toHaveValue("");
+  });
+
+  test("zip filter is cleared when onsite is deselected", async ({
+    page,
+    msw,
+  }) => {
+    await mockNantesAddressSearch(page);
+    await openSetOrganismPage({
+      page,
+      msw,
+      organisms: [onsiteOrganism, remoteOrganism],
+    });
+
+    const onsiteQueryPromise = waitGraphQL(
+      page,
+      "getRandomOrganismsForCandidacy",
+    );
+    await page.getByTestId("button-select-onsite").click();
+    await onsiteQueryPromise;
+
+    const zipQueryPromise = waitGraphQL(page, "getRandomOrganismsForCandidacy");
+    await selectNantes(page);
+    await zipQueryPromise;
+
+    const remoteQueryPromise = waitGraphQL(
+      page,
+      "getRandomOrganismsForCandidacy",
+    );
     await page.getByTestId("button-select-remote").click();
-    await expect(zipInput).toHaveValue("");
+    const remoteQuery = await remoteQueryPromise;
 
+    expect(searchFilterZip(remoteQuery)).toBe("");
+
+    const backToOnsiteQueryPromise = waitGraphQL(
+      page,
+      "getRandomOrganismsForCandidacy",
+    );
     await page.getByTestId("button-select-onsite").click();
-    await expect(zipInput).toHaveValue("");
+    const backToOnsiteQuery = await backToOnsiteQueryPromise;
+
+    expect(searchFilterZip(backToOnsiteQuery)).toBe("");
   });
 
   test("selecting the first organism triggers candidacy_selectOrganism", async ({
@@ -281,29 +420,48 @@ test.describe("Candidacy with no organism results", () => {
       page,
       msw,
     }) => {
+      await mockNantesAddressSearch(page);
       await openSetOrganismPage({ page, msw, organisms: [] });
 
+      const onsiteQueryPromise = waitGraphQL(
+        page,
+        "getRandomOrganismsForCandidacy",
+      );
       await page.getByTestId("button-select-onsite").click();
+      await onsiteQueryPromise;
       await expect(page.getByTestId("button-select-onsite")).toHaveAttribute(
         "aria-pressed",
         "true",
       );
-      await page
-        .getByTestId("input-wrapper-zip")
-        .getByRole("textbox")
-        .fill("44000");
+
+      const zipQueryPromise = waitGraphQL(
+        page,
+        "getRandomOrganismsForCandidacy",
+      );
+      await selectNantes(page);
+      await zipQueryPromise;
+      const pmrQueryPromise = waitGraphQL(
+        page,
+        "getRandomOrganismsForCandidacy",
+      );
       await page.getByTestId("checkbox-wrapper-pmr-input").check({
         force: true,
       });
+      await pmrQueryPromise;
 
+      const resetQueryPromise = waitGraphQL(
+        page,
+        "getRandomOrganismsForCandidacy",
+      );
       await page.getByTestId(filterButton).click();
+      const resetQuery = await resetQueryPromise;
+
       await expect(page.getByTestId("button-select-onsite")).toHaveAttribute(
         "aria-pressed",
         "false",
       );
-      await expect(
-        page.getByTestId("input-wrapper-zip").getByRole("textbox"),
-      ).toHaveValue("");
+      expect(searchFilterZip(resetQuery)).toBe("");
+      await expect(organismZipInput(page)).toBeDisabled();
       await expect(
         page.getByTestId("checkbox-wrapper-pmr-input"),
       ).not.toBeChecked();

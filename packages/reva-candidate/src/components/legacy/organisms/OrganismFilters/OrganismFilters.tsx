@@ -65,7 +65,7 @@ export const OrganismFilters = ({
         <Accordion
           label="Modalités d’accompagnement"
           defaultExpanded
-          className=""
+          className="[&_.fr-collapse]:overflow-visible"
         >
           <div className="-mb-6">
             <Button

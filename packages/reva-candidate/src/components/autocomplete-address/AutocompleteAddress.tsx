@@ -23,6 +23,7 @@ export const AutocompleteAddress = ({
   defaultSearchText,
   displayMode = "street",
   disabled = false,
+  onClearSelection,
 }: {
   label?: string;
   displayMode?: "street" | "birthPlace";
@@ -38,10 +39,15 @@ export const AutocompleteAddress = ({
   stateRelatedMessage?: string;
   defaultSearchText?: string;
   disabled?: boolean;
+  onClearSelection?: () => void;
 }) => {
   const [searchText, setSearchText] = useState(defaultSearchText ?? "");
 
-  const { data: defaultOptions = [], status } = useAutocompleteAddress({
+  const {
+    data: defaultOptions = [],
+    status,
+    isLoading,
+  } = useAutocompleteAddress({
     search: searchText,
   });
   const options = useMemo(() => {
@@ -152,6 +158,12 @@ export const AutocompleteAddress = ({
       return;
     }
 
+    if (!searchText) {
+      setSelectedOption(null);
+      onClearSelection?.();
+      return;
+    }
+
     handleOptionSelection(selectedOption);
     setDisplayOptions(false);
   };
@@ -189,11 +201,34 @@ export const AutocompleteAddress = ({
         data-testid="autocomplete-input"
         iconId="fr-icon-map-pin-2-fill"
       />
-      {status === "success" && displayOptions && options.length > 0 && (
+      {isLoading && (
         <div
           data-testid="autocomplete-options"
           className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
         >
+          <div
+            key="empty-label"
+            className="whitespace-normal cursor-default select-none py"
+          >
+            <Loader />
+          </div>
+        </div>
+      )}
+
+      {status === "success" && displayOptions && (
+        <div
+          data-testid="autocomplete-options"
+          className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
+        >
+          {!options.length && (
+            <div
+              key="empty-label"
+              className="whitespace-normal cursor-default select-none py"
+            >
+              Aucun résultat trouvé. Veuillez renseigner un code postal valide.
+            </div>
+          )}
+
           {options.map((option) => {
             const isSelected = selectedOption?.id === option.id;
             let label = option.label;
@@ -225,10 +260,23 @@ export const AutocompleteAddress = ({
             key="empty-label"
             className="whitespace-normal cursor-default select-none py"
           >
-            Une erreur est survenue lors de la recherche
+            Une erreur est survenue. Veuillez renseigner un code postal valide.
           </div>
         </div>
       )}
     </div>
   );
+};
+
+const Loader = () => {
+  const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length < 3 ? prev + "." : ""));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <>Recherche en cours {dots}</>;
 };
