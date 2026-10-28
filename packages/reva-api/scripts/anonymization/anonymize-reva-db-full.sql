@@ -365,12 +365,20 @@ TRUNCATE subscription_request;
 -- account_email_otp (à purger)
 TRUNCATE account_email_otp;
 
--- certification_additional_info (not in the current anonymization field list,
--- but the expert contact phone is PII)
+-- certification_additional_info (expert contact details identify an individual)
 UPDATE certification_additional_info
 SET
+  certification_expert_contact_details = CASE
+    WHEN certification_expert_contact_details IS NOT NULL THEN 'Contact-' || LEFT(id::text, 8)
+  END,
   certification_expert_contact_phone = CASE
     WHEN certification_expert_contact_phone IS NOT NULL THEN '0101010101'
+  END,
+  certification_expert_contact_email = CASE
+    WHEN certification_expert_contact_email IS NOT NULL THEN 'expert-' || id || '@anon.invalid'
+  END,
+  comments_for_aap = CASE
+    WHEN comments_for_aap IS NOT NULL THEN 'Commentaire anonymisé'
   END;
 
 COMMIT;
