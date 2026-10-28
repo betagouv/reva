@@ -48,7 +48,12 @@ export const generateFeasibilityFileByCandidacyId = async (
   const candidacy = await prismaClient.candidacy.findUnique({
     where: { id: candidacyId },
     include: {
-      certification: { include: { competenceBlocs: true } },
+      certification: {
+        include: {
+          competenceBlocs: true,
+          certificationAuthorityStructure: true,
+        },
+      },
       candidate: {
         include: {
           highestDegree: true,
@@ -303,6 +308,10 @@ export const generateFeasibilityFileByCandidacyId = async (
           startedAtLabel: `Démarrée le ${formatDateWithoutTimestamp(experience.startedAt)}`,
         })),
         dffCompetenceBlocsWithCompetencesAndStates,
+        complementExperienceParcoursVise: certification
+          .certificationAuthorityStructure?.hasReducedRequirements
+          ? dematerializedFeasibilityFile.complementExperienceParcoursVise
+          : null,
       },
       doc,
     });
@@ -747,6 +756,7 @@ const addProfilCandidatSection = ({
     goals,
     experiences,
     dffCompetenceBlocsWithCompetencesAndStates,
+    complementExperienceParcoursVise,
   },
 }: {
   candidate: {
@@ -782,6 +792,7 @@ const addProfilCandidatSection = ({
         state: DFFCertificationCompetenceDetailsState | "TO_COMPLETE";
       }[];
     }[];
+    complementExperienceParcoursVise?: string | null;
   };
   doc: PDFKit.PDFDocument;
 }) => {
@@ -947,6 +958,30 @@ const addProfilCandidatSection = ({
             });
             doc.moveDown(1);
           });
+          if (complementExperienceParcoursVise) {
+            addTitledBlock({
+              doc,
+              title: "Complément d’expérience lié au parcours visé (optionnel)",
+              content: (doc) => {
+                doc
+                  .font("assets/fonts/Marianne/Marianne-Bold.otf")
+                  .fontSize(8)
+                  .text(
+                    "Informations complémentaires ne pouvant pas figurer dans les autres blocs liés à la mention du diplôme :",
+                    { width: pxToPt(1100) },
+                  );
+                doc.moveDown(0.5);
+                doc
+                  .font("assets/fonts/Marianne/Marianne-Regular.otf")
+                  .fontSize(8)
+                  .text(complementExperienceParcoursVise, {
+                    width: pxToPt(1100),
+                  });
+              },
+              widthInPt: pxToPt(1160),
+            });
+            doc.moveDown(1);
+          }
         },
       });
     },

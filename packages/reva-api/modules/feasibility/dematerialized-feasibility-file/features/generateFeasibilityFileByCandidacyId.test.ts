@@ -362,11 +362,20 @@ const setupCompleteDematerializedFeasibilityFile = async () => {
     "Utilisation des règles de base de calcul et du raisonnement mathématique",
   );
 
-  return { candidacyId: candidacy.id, certification };
+  return {
+    candidacyId: candidacy.id,
+    certification,
+    dematerializedFeasibilityFileId,
+    certificationAuthorityStructureId: certificationAuthorityStructure.id,
+  };
 };
 
 describe("demat feasibility pdf generation", () => {
   let expectSectionText: (sectionName: string, expected: string) => void;
+  let expectSectionTextWithComplement: (
+    sectionName: string,
+    expected: string,
+  ) => void;
   let candidacyId: string;
   let rncpId: string;
   beforeAll(async () => {
@@ -385,6 +394,31 @@ describe("demat feasibility pdf generation", () => {
       sectionDefinitions: SECTION_DEFINITIONS,
     });
     expectSectionText = pdfHelper.expectSectionText;
+
+    await prismaClient.certificationAuthorityStructure.update({
+      where: { id: setup.certificationAuthorityStructureId },
+      data: { hasReducedRequirements: true },
+    });
+    await prismaClient.dematerializedFeasibilityFile.update({
+      where: { id: setup.dematerializedFeasibilityFileId },
+      data: {
+        complementExperienceParcoursVise:
+          "Expérience complémentaire en gestion d'équipe.",
+      },
+    });
+
+    const pdfBufferWithComplement =
+      await generateFeasibilityFileByCandidacyId(candidacyId);
+
+    if (!pdfBufferWithComplement) {
+      throw new Error("No PDF buffer generated");
+    }
+
+    const pdfHelperWithComplement = await buildPdfTestHelper({
+      pdfBuffer: pdfBufferWithComplement,
+      sectionDefinitions: SECTION_DEFINITIONS,
+    });
+    expectSectionTextWithComplement = pdfHelperWithComplement.expectSectionText;
   });
   describe("contexte de la demande section", () => {
     it("contains the 'nature de la demande' subsection", () => {
@@ -529,6 +563,26 @@ describe("demat feasibility pdf generation", () => {
         Expérience significative en situation réelle
       `,
       );
+    });
+
+    describe("when the certification authority has reduced requirements", () => {
+      it("contains the complement experience parcours vise", () => {
+        expectSectionTextWithComplement(
+          "informationsReferentiel",
+          `
+        Informations sur les expériences du candidat en lien avec le référentiel d’activités et
+        de compétences
+        BLOC-CODE - Bloc de compétences Gestion
+        OUI
+        Analyser des besoins clients
+        Commentaire sur le bloc
+        Expérience significative en situation réelle
+        Complément d’expérience lié au parcours visé (optionnel)
+        Informations complémentaires ne pouvant pas figurer dans les autres blocs liés à la mention du diplôme :
+        Expérience complémentaire en gestion d'équipe.
+      `,
+        );
+      });
     });
   });
   describe("Accompagnement proposé au candidat section", () => {
