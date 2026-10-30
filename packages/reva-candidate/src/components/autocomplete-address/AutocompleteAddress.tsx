@@ -198,6 +198,7 @@ export const AutocompleteAddress = ({
         state={state}
         stateRelatedMessage={stateRelatedMessage}
         label={label ?? "Adresse"}
+        hintText="Indiquez un code postal"
         data-testid="autocomplete-input"
         iconId="fr-icon-map-pin-2-fill"
       />

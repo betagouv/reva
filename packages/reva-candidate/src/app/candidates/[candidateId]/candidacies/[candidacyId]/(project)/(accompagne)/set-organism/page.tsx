@@ -6,7 +6,6 @@ import { redirect, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { EmptyState } from "@/components/empty-state/EmptyState";
-import { Panel } from "@/components/layout/Panel";
 import { SearchBar } from "@/components/legacy/molecules/SearchBar/SearchBar";
 import { OrganismCard } from "@/components/legacy/organisms/OrganismCard/OrganismCard";
 import { OrganismFilters } from "@/components/legacy/organisms/OrganismFilters/OrganismFilters";
@@ -134,7 +133,7 @@ export default function SetOrganism() {
     redirect("../");
   }
   return (
-    <Panel>
+    <div className="w-full px-6">
       <div data-testid="organisms">
         <Breadcrumb
           currentPageLabel="Choix de l'accompagnateur"
@@ -152,14 +151,12 @@ export default function SetOrganism() {
           Choix de l'accompagnateur
         </h1>
         <p className="text-xl my-6">
-          Choisissez votre accompagnateur parmi toute la liste. Vous pouvez
-          choisir de réaliser votre accompagnement à distance ou sur site. Si
-          vous souhaitez utiliser votre Compte Personnel de Formation (CPF) pour
-          financer votre parcours, choisissez un accompagnateur référencé sur
-          Mon Compte Formation (MCF).
+          Vous pouvez choisir de réaliser votre accompagnement à distance ou sur
+          site. Si vous pouvez bénéficiez de Mon compte Formation, pensez à
+          choisir un accompagnateur référencé sur MCF.
         </p>
 
-        <div className="mt-6 lg:mb-14 lg:px-10 pb-10 lg:py-8 lg:shadow-lifted border-b lg:border-b-4 lg:border-[#FFA180]">
+        <div className="bg-white mt-6 lg:mb-8 lg:px-10 pb-10 lg:py-8 lg:shadow-lifted border-b lg:border-b-4 lg:border-[#FFA180]">
           <h3>Recherchez par nom</h3>
           <SearchBar
             label="Recherchez votre organisme d’accompagnement en saisissant son nom"
@@ -170,7 +167,7 @@ export default function SetOrganism() {
           />
         </div>
         <div className="lg:flex gap-x-6">
-          <div className="lg:w-1/3">
+          <div className="max-w-[282px]">
             <OrganismFilters
               onSearch={(filters) => {
                 setOrganismSearchOnsite(filters.organismSearchOnsite);
@@ -191,7 +188,7 @@ export default function SetOrganism() {
               }}
             />
           </div>
-          <div className="lg:w-2/3">
+          <div className="flex-1">
             {isLoading ? (
               <Loader />
             ) : (
@@ -256,7 +253,7 @@ export default function SetOrganism() {
           </div>
         </div>
       </div>
-    </Panel>
+    </div>
   );
 }
 

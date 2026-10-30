@@ -4,6 +4,7 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { useState } from "react";
 
 import { OrganismDistanceFilter } from "./OrganismDistanceFilter";
 
@@ -45,6 +46,8 @@ export const OrganismFilters = ({
     organismSearchIsAvailable,
   } = filters;
 
+  const [isExpanded, setIsExpanded] = useState(true);
+
   return (
     <div className="mt-8 lg:mt-0 w-full flex flex-col">
       <h2>Filtres :</h2>
@@ -60,14 +63,43 @@ export const OrganismFilters = ({
         }
         className="mb-2"
       />
-      <hr className="py-1 mt-2 mb-1" />
-      <div className="mb-4">
+      <hr className="py-1 my-2" />
+      <div className="mb-6">
         <Accordion
-          label="Modalités d’accompagnement"
-          defaultExpanded
-          className="[&_.fr-collapse]:overflow-visible"
+          label={
+            <span>
+              Modalités
+              <br />
+              d’accompagnement
+            </span>
+          }
+          defaultExpanded={isExpanded}
+          className={
+            isExpanded ? "[&_.fr-collapse--expanded]:overflow-visible" : ""
+          }
+          // expanded={isExpanded}
+          onExpandedChange={(expanded) => {
+            if (expanded) {
+              setTimeout(() => {
+                setIsExpanded(true);
+              }, 300);
+            } else {
+              setIsExpanded(false);
+            }
+          }}
         >
-          <div className="-mb-6">
+          <div>
+            <Button
+              data-testid="button-open-modal-distance"
+              priority="tertiary no outline"
+              title="Quelle option à distance choisir ?"
+              iconId="fr-icon-information-fill"
+              onClick={() => modalDistanceInfo.open()}
+            >
+              <span className="text-dsfrBlue-500 text-sm font-bold">
+                Quelle option choisir ?
+              </span>
+            </Button>
             <Button
               data-testid="button-select-onsite"
               aria-pressed={organismSearchOnsite}
@@ -81,7 +113,7 @@ export const OrganismFilters = ({
                   organismSearchZip: "",
                 });
               }}
-              className="p-2"
+              className="px-2"
             >
               <Tag
                 iconId="fr-icon-building-fill"
@@ -103,7 +135,7 @@ export const OrganismFilters = ({
                   organismSearchZip: "",
                 });
               }}
-              className="p-2"
+              className="px-2"
             >
               <Tag
                 iconId="fr-icon-customer-service-fill"
@@ -112,17 +144,7 @@ export const OrganismFilters = ({
                 À distance
               </Tag>
             </Button>
-            <Button
-              data-testid="button-open-modal-distance"
-              priority="tertiary no outline"
-              title="Quelle option à distance choisir ?"
-              iconId="fr-icon-information-fill"
-              onClick={() => modalDistanceInfo.open()}
-            >
-              <span className="text-dsfrBlue-500 text-sm font-bold">
-                Quelle option choisir ?
-              </span>
-            </Button>
+
             <modalDistanceInfo.Component
               title="Comment bien choisir entre “sur site” et “à distance” ?"
               size="large"
@@ -157,14 +179,14 @@ export const OrganismFilters = ({
           </div>
         </Accordion>
         <Accordion label="Référencement MCF" defaultExpanded>
-          <div className="-mb-6">
+          <div>
             <Button
               data-testid="button-open-modal-mcf"
               priority="tertiary no outline"
               title="Quelle option à distance choisir ?"
               iconId="fr-icon-information-fill"
               onClick={() => modalMcfInfo.open()}
-              className="mb-4"
+              className="mb-2"
             >
               <span className="text-dsfrBlue-500 text-sm font-bold">
                 Qu’est ce que MCF ?
@@ -208,6 +230,15 @@ export const OrganismFilters = ({
         <Button
           data-testid="sidebar-button-reset-filters"
           priority="tertiary no outline"
+          disabled={
+            !filters.organismSearchText &&
+            !filters.organismSearchRemote &&
+            !filters.organismSearchOnsite &&
+            !filters.organismSearchPmr &&
+            !filters.organismSearchZip &&
+            !filters.organismSearchMcf &&
+            !filters.organismSearchIsAvailable
+          }
           onClick={() => {
             onSearch({
               organismSearchRemote: false,

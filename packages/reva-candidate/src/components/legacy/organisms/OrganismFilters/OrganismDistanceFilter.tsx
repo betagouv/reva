@@ -25,7 +25,7 @@ export const OrganismDistanceFilter = ({
   };
 
   return (
-    <div className="flex flex-col gap-6 mt-6">
+    <div className="flex flex-col mt-4">
       <fieldset>
         <AutocompleteAddress
           label="Où souhaitez-vous réaliser votre accompagnement ?"
@@ -38,12 +38,9 @@ export const OrganismDistanceFilter = ({
           }}
           className="w-full mb-0"
           displayMode="birthPlace"
-          nativeInputProps={{
-            placeholder: "Indiquez un code postal",
-          }}
         />
         <Checkbox
-          className="mt-8"
+          className="mt-4"
           options={[
             {
               label:
