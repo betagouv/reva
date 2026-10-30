@@ -43,8 +43,8 @@
     }
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^6.2.1",
-    "@graphql-codegen/client-preset": "^5.2.4",
+    "@graphql-codegen/cli": "^7.4.6",
+    "@graphql-codegen/client-preset": "^6.2.3",
     "@parcel/watcher": "^2.5.1",
     "@playwright/test": "^1.55.1",
     "@types/lodash": "^4.17.17",
