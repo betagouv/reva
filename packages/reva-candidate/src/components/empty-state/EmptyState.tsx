@@ -28,7 +28,7 @@ export const EmptyState = ({
         <div className="z-10">{pictogram}</div>
       </div>
       <h3 className="text-center text-balance">{title}</h3>
-      <div className="max-w-lg [&_p]:text-lg text-center text-balance leading-relaxed">
+      <div className="max-w-[600px] [&_p]:text-lg text-center text-balance leading-relaxed flex flex-col items-center">
         {children}
       </div>
     </div>

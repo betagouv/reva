@@ -300,13 +300,24 @@ const NoOrganisms = ({
         pictogram={PICTOGRAMS.searchLG}
       >
         <p>
-          Nous ne trouvons pas d’accompagnateurs portant ce nom dans la liste
-          des organismes référencés chez France VAE.
+          Si l’erreur persiste, après vérification du nom renseigné et
+          réinitialisation des filtres sélectionnés, plusieurs possibilités :
         </p>
-        <p>
-          Vous pouvez vérifier le nom saisi ou essayer les filtres pour affiner
-          les résultats.
+        <p className="max-w-[500px]">
+          <ul>
+            <li>
+              L’accompagnateur recherché ne prend pas en charge la <br />
+              certification sélectionnée
+            </li>
+            <li>L’accompagnateur n’est pas référencé sur France VAE</li>
+          </ul>
         </p>
+        <label className="fr-label fr-hint-text">
+          Contactez l’accompagnateur souhaité pour comprendre avec lui pourquoi
+          il n’apparaît
+          <br />
+          pas dans la liste.
+        </label>
       </EmptyState>
     );
   }
