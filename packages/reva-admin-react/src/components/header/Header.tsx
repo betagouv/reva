@@ -246,6 +246,15 @@ const getNavigationTabs = ({
           }),
         ]
       : []),
+    ...(shouldShowAapMetabaseDashboard && isGestionnaireMaisonMereAAP
+      ? [
+          createTab({
+            text: LABELS.STATISTIQUES,
+            href: PATHS.STATISTIQUES_AAP,
+            isActive: currentPathname.startsWith(PATHS.STATISTIQUES_AAP),
+          }),
+        ]
+      : []),
     createTab({
       text: LABELS.PARAMETRES,
       href: PATHS.AGENCIES_SETTINGS,
@@ -256,15 +265,6 @@ const getNavigationTabs = ({
       href: PATHS.AAP_HELP,
       isActive: currentPathname.startsWith(PATHS.AAP_HELP),
     }),
-    ...(shouldShowAapMetabaseDashboard && isGestionnaireMaisonMereAAP
-      ? [
-          createTab({
-            text: LABELS.STATISTIQUES,
-            href: PATHS.STATISTIQUES_AAP,
-            isActive: currentPathname.startsWith(PATHS.STATISTIQUES_AAP),
-          }),
-        ]
-      : []),
   ];
 
   const registryManagerTabs = [
