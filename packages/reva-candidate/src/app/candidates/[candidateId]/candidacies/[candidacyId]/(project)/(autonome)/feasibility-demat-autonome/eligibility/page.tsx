@@ -39,7 +39,7 @@ const schema = z
         "DETENTEUR_RECEVABILITE_AVEC_REV_SANS_CHGT_REFERENTIEL",
       ],
       {
-        invalid_type_error: "Veuillez sélectionner une situation",
+        error: "Veuillez sélectionner une situation",
       },
     ),
     eligibilityValidUntil: sanitizedOptionalText(),

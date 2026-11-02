@@ -13,8 +13,8 @@ export const civilInformationSchema = ({
   z
     .object({
       gender: z
-        .nativeEnum(GenderEnum, {
-          invalid_type_error: "Une de ces options doit être sélectionnée.",
+        .enum(GenderEnum, {
+          error: "Une de ces options doit être sélectionnée.",
         })
         .default(GenderEnum.undisclosed),
       lastname: sanitizedText(),
@@ -85,8 +85,6 @@ export const civilInformationSchema = ({
           path: ["birthCity"],
         });
       }
-
-      return data;
     });
 
 export type FormCivilInformationData = z.infer<

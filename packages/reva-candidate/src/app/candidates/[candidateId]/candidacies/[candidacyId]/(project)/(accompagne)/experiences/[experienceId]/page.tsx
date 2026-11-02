@@ -38,8 +38,8 @@ const durationOptions: { label: string; value: ExperienceDuration }[] = [
 const schema = z.object({
   title: sanitizedText(),
   startedAt: sanitizedText(),
-  duration: z.nativeEnum(ExperienceDuration, {
-    errorMap: () => ({ message: "Ce champ est obligatoire" }),
+  duration: z.enum(ExperienceDuration, {
+    error: "Ce champ est obligatoire",
   }),
   description: sanitizedTextAllowSpecialCharacters(),
 });
