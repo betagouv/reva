@@ -273,11 +273,6 @@ const getNavigationTabs = ({
       href: PATHS.RESPONSABLE_CERTIFICATIONS,
       isActive: currentPathname.startsWith(PATHS.RESPONSABLE_CERTIFICATIONS),
     }),
-    createTab({
-      text: LABELS.HELP,
-      href: PATHS.CERTIFICATEUR_HELP,
-      isActive: currentPathname.startsWith(PATHS.CERTIFICATEUR_HELP),
-    }),
     ...(metabaseDashboardIframeUrlForRegistryManager
       ? [
           createTab({
@@ -287,6 +282,11 @@ const getNavigationTabs = ({
           }),
         ]
       : []),
+    createTab({
+      text: LABELS.HELP,
+      href: PATHS.CERTIFICATEUR_HELP,
+      isActive: currentPathname.startsWith(PATHS.CERTIFICATEUR_HELP),
+    }),
   ];
 
   const certificationAuthorityAdminTabs = [
@@ -295,6 +295,15 @@ const getNavigationTabs = ({
       href: certificateurCandidaciesPath,
       isActive: isCertificationAuthorityCandidaciesPath(currentPathname),
     }),
+    ...(metabaseDashboardIframeUrl
+      ? [
+          createTab({
+            text: LABELS.STATISTIQUES,
+            href: PATHS.STATISTIQUES,
+            isActive: currentPathname.startsWith(PATHS.STATISTIQUES),
+          }),
+        ]
+      : []),
     createTab({
       text: LABELS.PARAMETRES,
       href: PATHS.CERTIFICATION_AUTHORITIES_SETTINGS(
@@ -307,15 +316,6 @@ const getNavigationTabs = ({
       href: PATHS.CERTIFICATEUR_HELP,
       isActive: currentPathname.startsWith(PATHS.CERTIFICATEUR_HELP),
     }),
-    ...(metabaseDashboardIframeUrl
-      ? [
-          createTab({
-            text: LABELS.STATISTIQUES,
-            href: PATHS.STATISTIQUES,
-            isActive: currentPathname.startsWith(PATHS.STATISTIQUES),
-          }),
-        ]
-      : []),
   ];
 
   const certificationAuthorityLocalAccountTabs = [
@@ -324,6 +324,15 @@ const getNavigationTabs = ({
       href: certificateurCandidaciesPath,
       isActive: isCertificationAuthorityCandidaciesPath(currentPathname),
     }),
+    ...(metabaseDashboardIframeUrlForLocalAccount
+      ? [
+          createTab({
+            text: LABELS.STATISTIQUES,
+            href: PATHS.STATISTIQUES,
+            isActive: currentPathname.startsWith(PATHS.STATISTIQUES),
+          }),
+        ]
+      : []),
     createTab({
       text: LABELS.PARAMETRES,
       href: PATHS.CERTIFICATION_AUTHORITIES_SETTINGS_LOCAL(
@@ -336,15 +345,6 @@ const getNavigationTabs = ({
       href: PATHS.CERTIFICATEUR_HELP,
       isActive: currentPathname.startsWith(PATHS.CERTIFICATEUR_HELP),
     }),
-    ...(metabaseDashboardIframeUrlForLocalAccount
-      ? [
-          createTab({
-            text: LABELS.STATISTIQUES,
-            href: PATHS.STATISTIQUES,
-            isActive: currentPathname.startsWith(PATHS.STATISTIQUES),
-          }),
-        ]
-      : []),
   ];
 
   switch (true) {
