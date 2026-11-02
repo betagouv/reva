@@ -349,12 +349,14 @@ export const CandidacyCard = ({
             </span>
           )}
           {certificationLabel && <span>{certificationLabel}</span>}
-          {dateToDisplay && (
-            <span className="text-xs text-dsfr-light-text-mention-grey">
-              {dateToDisplay}
-            </span>
-          )}
         </span>
+      }
+      endDetail={
+        dateToDisplay && (
+          <span className="text-xs text-dsfr-light-text-mention-grey">
+            {dateToDisplay}
+          </span>
+        )
       }
     />
   );
