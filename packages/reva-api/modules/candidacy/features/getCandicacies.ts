@@ -1,13 +1,13 @@
 import { Candidacy, Prisma } from "@prisma/client";
 
-import {
-  CandidacySortByFilter,
-  CandidacyStatusFilter,
-} from "@/modules/graphql/generated/graphql";
 import { processPaginationInfo } from "@/modules/shared/list/pagination";
 import { getWhereClauseFromSearchFilter } from "@/modules/shared/search/search";
 import { prismaClient } from "@/prisma/client";
 
+import {
+  CandidacySortByFilter,
+  CandidacyStatusFilter,
+} from "../candidacy.types";
 import {
   candidacySearchWord,
   getWhereClauseFromStatusFilter,

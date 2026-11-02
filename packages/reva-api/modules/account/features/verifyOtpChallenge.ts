@@ -1,4 +1,3 @@
-import { AccountTokens } from "@/modules/graphql/generated/graphql";
 import { generateIAMTokenWithPasswordShared } from "@/modules/shared/auth/keycloak-token.utils";
 import { decodeOtpChallengeToken } from "@/modules/shared/auth/otp-challenge.utils";
 import {
@@ -8,6 +7,12 @@ import {
 
 import { getAccountByKeycloakId } from "./getAccountByKeycloakId";
 import { verifyEmailOtp } from "./verifyEmailOtp";
+
+type AccountTokens = {
+  accessToken: string;
+  refreshToken: string;
+  idToken: string;
+};
 
 export const verifyOtpChallenge = async ({
   challengeToken,

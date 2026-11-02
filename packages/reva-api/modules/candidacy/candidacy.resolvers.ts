@@ -33,7 +33,6 @@ import {
   logCandidacyAuditEvent,
 } from "../candidacy-log/features/logCandidacyAuditEvent";
 import { getCandidateById } from "../candidate/features/getCandidateById";
-import { CandidacySortByFilter } from "../graphql/generated/graphql";
 import { getOrganismById } from "../organism/features/getOrganism";
 import { getReorientationReasonById } from "../referential/features/getReorientationReasonById";
 
@@ -46,6 +45,7 @@ import {
   GetCandidaciesForAAPInput,
   GetCandidaciesForCertificationAuthorityInput,
   SearchOrganismFilter,
+  CandidacySortByFilter,
 } from "./candidacy.types";
 import { sendCandidacyArchivedEmailToCertificateur } from "./emails/sendCandidacyArchivedEmailToCertificateur";
 import { sendCandidacyDropOutEmailToCandidate } from "./emails/sendCandidacyDropOutEmailToCandidate";

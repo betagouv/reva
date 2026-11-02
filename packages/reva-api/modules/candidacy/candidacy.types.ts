@@ -1,10 +1,7 @@
 import { CandidacyStatusStep } from "@prisma/client";
 
 import { TypeAccompagnement } from "../candidate/candidate.types";
-import {
-  CandidacySortByFilter,
-  JuryResultFilter,
-} from "../graphql/generated/graphql";
+import { JuryResultFilter } from "../jury/jury.types";
 
 export interface Candidacy {
   id: string;
@@ -84,6 +81,22 @@ export const candidacyStatusFilters = [
 ] as const;
 
 export type CandidacyStatusFilter = (typeof candidacyStatusFilters)[number];
+
+// eslint-disable-next-line import/no-unused-modules
+export const candidacySortByFilters = [
+  "DATE_CREATION_ASC",
+  "DATE_CREATION_DESC",
+  "DATE_ENVOI_ASC",
+  "DATE_ENVOI_DESC",
+  "DOSSIER_DE_FAISABILITE_ENVOYE_ASC",
+  "DOSSIER_DE_FAISABILITE_ENVOYE_DESC",
+  "DOSSIER_DE_VALIDATION_ENVOYE_ASC",
+  "DOSSIER_DE_VALIDATION_ENVOYE_DESC",
+  "JURY_PROGRAMME_ASC",
+  "JURY_PROGRAMME_DESC",
+] as const;
+
+export type CandidacySortByFilter = (typeof candidacySortByFilters)[number];
 
 export interface SearchOrganismFilter {
   distanceStatus?: string;
