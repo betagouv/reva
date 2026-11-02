@@ -40,7 +40,7 @@ const legalStatuses = [
 const zodSchema = z.object({
   companySiret: sanitizedSiret(),
   companyLegalStatus: z.enum(legalStatuses, {
-    required_error: "obligatoire",
+    error: "obligatoire",
   }),
   companyName: sanitizedTextAllowSpecialCharacters(),
   companyWebsite: z.union([z.literal(""), sanitizedUrl()]),
