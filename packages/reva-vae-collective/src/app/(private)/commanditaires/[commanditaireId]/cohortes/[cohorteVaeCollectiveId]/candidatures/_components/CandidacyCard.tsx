@@ -341,16 +341,8 @@ export const CandidacyCard = ({
           )}
         </div>
       }
-      desc={
-        <span className="flex flex-col gap-2">
-          {organismLine && (
-            <span className="text-xs text-dsfr-light-text-mention-grey">
-              {organismLine}
-            </span>
-          )}
-          {certificationLabel && <span>{certificationLabel}</span>}
-        </span>
-      }
+      detail={organismLine}
+      desc={certificationLabel}
       endDetail={
         dateToDisplay && (
           <span className="text-xs text-dsfr-light-text-mention-grey">
