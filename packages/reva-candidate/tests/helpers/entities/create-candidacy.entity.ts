@@ -1,11 +1,11 @@
 import {
   Candidacy,
   CandidacyStatusStep,
-  Certification,
   Organism,
 } from "@/graphql/generated/graphql";
 
 import type { CandidateEntity } from "./create-candidate.entity";
+import type { CertificationEntity } from "./create-certification.entity";
 import type { DossierDeValidationEntity } from "./create-dossier-de-validation.entity";
 import type { FeasibilityEntity } from "./create-feasibility.entity";
 import type { JuryEntity } from "./create-jury.entity";
@@ -20,6 +20,7 @@ export type CandidacyEntity = Partial<
     | "candidate"
     | "jury"
     | "feasibility"
+    | "certification"
     | "activeDossierDeValidation"
     | "historyJury"
   >
@@ -27,6 +28,7 @@ export type CandidacyEntity = Partial<
   candidate?: CandidateEntity | null;
   jury?: JuryEntity | null;
   feasibility?: FeasibilityEntity | null;
+  certification?: CertificationEntity | null;
   activeDossierDeValidation?: DossierDeValidationEntity | null;
   id: Candidacy["id"];
   appointments: Candidacy["appointments"];
@@ -39,7 +41,7 @@ export type CreateCandidacyEntityOptions = {
   firstAppointmentOccuredAt?: Candidacy["firstAppointmentOccuredAt"];
   typeAccompagnement?: Candidacy["typeAccompagnement"];
   organism?: Organism | null;
-  certification?: Certification | null;
+  certification?: CertificationEntity | null;
   feasibility?: FeasibilityEntity | null;
   candidate?: CandidateEntity | null;
   activeDossierDeValidation?: DossierDeValidationEntity | null;
@@ -67,6 +69,7 @@ export type CreateCandidacyEntityOptions = {
   certificationAuthorityLocalAccounts?:
     | Candidacy["certificationAuthorityLocalAccounts"]
     | null;
+  feasibilityFileDematAutonomeResourceHidden?: Candidacy["feasibilityFileDematAutonomeResourceHidden"];
 };
 
 export function createCandidacyStatuses(statuses: CandidacyStatusStep[]) {

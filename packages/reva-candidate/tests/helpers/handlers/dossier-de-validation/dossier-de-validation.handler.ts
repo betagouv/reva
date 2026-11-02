@@ -67,3 +67,55 @@ export const dossierDeValidationHandlers = ({
     dossierDeValidationWait,
   };
 };
+
+export async function navigateToDossierValidationV2(
+  page: Page,
+  candidateId: string,
+  candidacyId: string,
+) {
+  await page.goto(
+    `candidates/${candidateId}/candidacies/${candidacyId}/dossier-de-validation-v2/`,
+  );
+}
+
+const dossierDeValidationV2Wait = async (page: Page) => {
+  await Promise.all([
+    waitGraphQL(page, "activeFeaturesForConnectedUser"),
+    waitGraphQL(page, "getCandidacyByIdForDossierDeValidationPageV2"),
+  ]);
+};
+
+export const dossierDeValidationV2Handlers = ({
+  candidacy,
+  activeFeaturesForConnectedUser = [],
+}: DashboardHandlersOptions) => {
+  const fvae = graphql.link("https://reva-api/api/graphql");
+
+  const candidacyInput = {
+    getCandidacyById: candidacy,
+  };
+
+  return {
+    handlers: [
+      ...createCandidaciesGuardsHandlers({
+        candidate: candidacy.candidate,
+        candidacies: [candidacy],
+        activeFeaturesForConnectedUser,
+      }),
+      ...createCandidacyGuardsAndDashboardHandlers(candidacy),
+      fvae.query(
+        "getCandidacyByIdForDossierDeValidationPageV2",
+        graphQLResolver(candidacyInput),
+      ),
+      fvae.query(
+        "getCandidacyByIdForDatePrevisionnellePage",
+        graphQLResolver(candidacyInput),
+      ),
+      fvae.query(
+        "getCandidacyByIdForDepotDossierDeValidationPage",
+        graphQLResolver(candidacyInput),
+      ),
+    ],
+    dossierDeValidationV2Wait,
+  };
+};

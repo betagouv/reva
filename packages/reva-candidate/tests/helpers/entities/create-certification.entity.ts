@@ -4,7 +4,7 @@ import {
   CertificationCompetenceBloc,
 } from "@/graphql/generated/graphql";
 
-type CertificationEntity = Partial<
+export type CertificationEntity = Partial<
   Omit<Certification, "competenceBlocs" | "competences">
 > & {
   competenceBlocs?: Partial<
