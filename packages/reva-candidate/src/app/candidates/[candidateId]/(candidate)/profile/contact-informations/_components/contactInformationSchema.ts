@@ -36,6 +36,8 @@ export const contactInformationSchema = () =>
           path: ["phone"],
         });
       }
+
+      return data;
     });
 
 export type FormContactInformationData = z.infer<

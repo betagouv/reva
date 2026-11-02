@@ -31,7 +31,7 @@ const schema = z.object({
   firstForeignLanguage: sanitizedOptionalText(),
   secondForeignlanguage: sanitizedOptionalText(),
   completion: z.enum(["PARTIAL", "COMPLETE"], {
-    error: "Merci de remplir ce champ",
+    invalid_type_error: "Merci de remplir ce champ",
   }),
   competenceBlocs: z
     .object({

@@ -60,10 +60,14 @@ function createFileValidation(
 
 const dossierDeValidationSchema = z.object({
   dossierDeValidationCheck1: z.literal(true, {
-    error: "Veuillez cocher toutes les cases.",
+    errorMap: () => ({
+      message: "Veuillez cocher toutes les cases.",
+    }),
   }),
   dossierDeValidationCheck2: z.literal(true, {
-    error: "Veuillez cocher toutes les cases.",
+    errorMap: () => ({
+      message: "Veuillez cocher toutes les cases.",
+    }),
   }),
   dossierDeValidationFile: z.object({
     0: createFileValidation({ isRequired: true }),
@@ -157,7 +161,7 @@ export const DossierDeValidationTab = ({
     if (!isMaxAdditionalFiles) {
       insertDossierDeValidationOtherFiles(
         dossierDeValidationOtherFilesFields.length,
-        [{ 0: undefined }],
+        [{}],
       );
     } else {
       errorToast(

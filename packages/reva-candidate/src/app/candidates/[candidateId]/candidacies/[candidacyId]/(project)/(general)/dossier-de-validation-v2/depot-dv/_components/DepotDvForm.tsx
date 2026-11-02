@@ -65,10 +65,14 @@ function createFileValidation(
 
 const dossierDeValidationSchema = z.object({
   dossierDeValidationCheck1: z.literal(true, {
-    error: "Veuillez cocher toutes les cases.",
+    errorMap: () => ({
+      message: "Veuillez cocher toutes les cases.",
+    }),
   }),
   dossierDeValidationCheck2: z.literal(true, {
-    error: "Veuillez cocher toutes les cases.",
+    errorMap: () => ({
+      message: "Veuillez cocher toutes les cases.",
+    }),
   }),
   amenagementSpecifiqueCheck: z.boolean().optional(),
   dossierDeValidationFile: z.object({
@@ -207,7 +211,7 @@ export const DepotDvForm = ({
     if (!isMaxAdditionalFiles) {
       insertDossierDeValidationOtherFiles(
         dossierDeValidationOtherFilesFields.length,
-        [{ 0: undefined }],
+        [{}],
       );
     } else {
       errorToast(
@@ -224,15 +228,21 @@ export const DepotDvForm = ({
 
   const dossierDeValidationSchemaCheckboxes = z.object({
     dossierDeValidationCheck1: z.literal(true, {
-      error: "Veuillez cocher toutes les cases.",
+      errorMap: () => ({
+        message: "Veuillez cocher toutes les cases.",
+      }),
     }),
     dossierDeValidationCheck2: z.literal(true, {
-      error: "Veuillez cocher toutes les cases.",
+      errorMap: () => ({
+        message: "Veuillez cocher toutes les cases.",
+      }),
     }),
     ...(needsAmenagement
       ? {
           amenagementSpecifiqueCheck: z.literal(true, {
-            error: "Veuillez cocher toutes les cases.",
+            errorMap: () => ({
+              message: "Veuillez cocher toutes les cases.",
+            }),
           }),
         }
       : {}),
@@ -440,7 +450,7 @@ export const DepotDvForm = ({
                         getValues(),
                       );
                     if (!result.success) {
-                      result.error.issues.forEach((error) => {
+                      result.error.errors.forEach((error) => {
                         const path = error.path.join(".");
                         setError(path as keyof DossierDeValidationFormData, {
                           message: error.message,
@@ -482,7 +492,7 @@ export const DepotDvForm = ({
                     }
                     const result = schemaToUse?.safeParse(getValues());
                     if (!result?.success) {
-                      result?.error?.issues.forEach((error) => {
+                      result?.error?.errors.forEach((error) => {
                         const path = error.path.join(".");
                         setError(path as keyof DossierDeValidationFormData, {
                           message: error.message,

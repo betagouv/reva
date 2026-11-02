@@ -36,7 +36,7 @@ const schema = z.object({
       competenceId: z.string(),
       label: z.string(),
       state: z.enum(["YES", "NO", "PARTIALLY"], {
-        error: "Merci de choisir une option",
+        invalid_type_error: "Merci de choisir une option",
       }),
     })
     .array(),

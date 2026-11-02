@@ -15,8 +15,8 @@ export const candidateInformationSchema = () =>
   z
     .object({
       gender: z
-        .enum(GenderEnum, {
-          error: "Une de ces options doit être sélectionnée.",
+        .nativeEnum(GenderEnum, {
+          invalid_type_error: "Une de ces options doit être sélectionnée.",
         })
         .default(GenderEnum.undisclosed),
       lastname: sanitizedText(),
@@ -90,6 +90,8 @@ export const candidateInformationSchema = () =>
           path: ["birthDepartment"],
         });
       }
+
+      return data;
     });
 
 export type FormCandidateInformationData = z.infer<
