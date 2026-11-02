@@ -10,11 +10,6 @@ import { MainLayout } from "@/app/_components/layout/main-layout/MainLayout";
 import { PICTOGRAMS } from "@/components/pictograms";
 
 import { graphql } from "@/graphql/generated";
-import {
-  ArticleActualite,
-  ArticleDAide,
-  ArticleFaq,
-} from "@/graphql/generated/graphql";
 import { strapi } from "@/graphql/strapi";
 
 import type { Metadata } from "next";
@@ -539,6 +534,33 @@ const QuestionsFrequentesSection = ({
     </div>
   </section>
 );
+
+export type ArticleDAide = {
+  documentId: string;
+  titre: string;
+  slug: string;
+  description: string | null;
+  vignette: {
+    alternativeText: string | null;
+    formats: {
+      small: {
+        url: string;
+      };
+    };
+  };
+};
+
+export type ArticleFaq = {
+  documentId: string;
+  question: string;
+  reponse: string | null;
+};
+
+export type ArticleActualite = {
+  documentId: string;
+  titre: string;
+  contenu: string | null;
+};
 
 const homePageItemsQuery = graphql(`
   query getHomePageItems {

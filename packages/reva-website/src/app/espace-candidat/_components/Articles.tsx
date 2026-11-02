@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArticleCard } from "@/components/article-card/ArticleCard";
 
 import { graphql } from "@/graphql/generated";
-import { ArticleDAide } from "@/graphql/generated/graphql";
 import { strapi } from "@/graphql/strapi";
 
 const articlesQuery = graphql(`
@@ -48,10 +47,7 @@ const Articles = async () => {
       </h2>
       <div className="flex flex-col lg:flex-row gap-8 my-8">
         {articles.articleDAides.map((article) => (
-          <ArticleCard
-            article={article as ArticleDAide}
-            key={article?.documentId}
-          />
+          <ArticleCard article={article} key={article?.documentId} />
         ))}
       </div>
       <div className="text-center text-xl">

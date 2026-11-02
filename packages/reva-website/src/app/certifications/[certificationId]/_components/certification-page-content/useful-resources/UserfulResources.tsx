@@ -1,8 +1,14 @@
 import { Card } from "@codegouvfr/react-dsfr/Card";
 
 import { graphql } from "@/graphql/generated";
-import { ArticleDAide } from "@/graphql/generated/graphql";
 import { strapi } from "@/graphql/strapi";
+
+type ArticleDAide = {
+  documentId: string;
+  titre: string;
+  slug: string;
+  description: string | null;
+};
 
 const articlesQuery = graphql(`
   query getArticlesForCertificationPageUsefulResources {

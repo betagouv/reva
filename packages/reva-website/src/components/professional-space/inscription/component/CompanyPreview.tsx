@@ -1,7 +1,7 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 
-import { EtablissementDiffusible } from "@/graphql/generated/graphql";
+import { LegalStatus } from "@/graphql/generated/graphql";
 
 const CompanySummaryItem = ({
   title,
@@ -20,6 +20,19 @@ const CompanySummaryItem = ({
   ) : (
     <></>
   );
+};
+
+type EtablissementDiffusible = {
+  siret: string;
+  siegeSocial: boolean;
+  raisonSociale: string;
+  formeJuridique: {
+    code: string;
+    libelle: string;
+    legalStatus: LegalStatus;
+  };
+  qualiopiStatus: boolean | null;
+  dateFermeture: Date | null;
 };
 
 interface Props {

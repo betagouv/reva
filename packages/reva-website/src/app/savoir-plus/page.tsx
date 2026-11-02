@@ -5,7 +5,6 @@ import { draftMode } from "next/headers";
 import { MainLayout } from "@/app/_components/layout/main-layout/MainLayout";
 
 import { graphql } from "@/graphql/generated";
-import { ArticleDAide } from "@/graphql/generated/graphql";
 import { strapi } from "@/graphql/strapi";
 
 import { HelpSection } from "./_components/HelpSection";
@@ -51,7 +50,7 @@ const SavoirPlusPage = async () => {
                   defaultExpanded={!index}
                   key={sa?.documentId}
                 >
-                  <HelpSection articles={articles as ArticleDAide[]} />
+                  <HelpSection articles={articles} />
                 </Accordion>
               );
             })}
@@ -60,6 +59,21 @@ const SavoirPlusPage = async () => {
       </MainLayout>
     </>
   );
+};
+
+export type ArticleDAide = {
+  documentId: string;
+  titre: string;
+  slug: string;
+  description: string | null;
+  vignette: {
+    alternativeText: string | null;
+    formats: {
+      small: {
+        url: string;
+      };
+    };
+  };
 };
 
 const sectionsQuery = graphql(`

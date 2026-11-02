@@ -1,8 +1,21 @@
 import Card from "@codegouvfr/react-dsfr/Card";
 
-import { ArticleDAide } from "@/graphql/generated/graphql";
+type ArticleDAide = {
+  documentId: string;
+  titre: string;
+  slug: string;
+  description: string | null;
+  vignette: {
+    alternativeText: string | null;
+    formats: {
+      small: {
+        url: string;
+      };
+    };
+  };
+};
 
-export const ArticleCard = ({ article }: { article: ArticleDAide }) => {
+export const ArticleCard = ({ article }: { article: ArticleDAide | null }) => {
   if (!article) return null;
   const { vignette, titre, description, slug } = article;
   return (

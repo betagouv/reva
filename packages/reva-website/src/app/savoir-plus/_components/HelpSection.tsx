@@ -5,23 +5,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 
-type ArticlesFromStrapi = {
+type ArticleDAide = {
   documentId: string;
-  slug: string;
   titre: string;
-  publishedAt?: number | null;
-  description?: string | null;
+  slug: string;
+  description: string | null;
   vignette: {
-    __typename?: "UploadFile";
-    url: string;
-    alternativeText?: string | null;
-    formats?: {
-      small?: {
+    alternativeText: string | null;
+    formats: {
+      small: {
         url: string;
       };
-    } | null;
+    };
   };
-}[];
+};
 
 const ArrowRight = () => (
   <span className="fr-icon-arrow-right-line" aria-hidden="true" />
@@ -62,7 +59,7 @@ const HelpArticle = ({
   </Link>
 );
 
-export const HelpSection = ({ articles }: { articles: ArticlesFromStrapi }) => {
+export const HelpSection = ({ articles }: { articles: ArticleDAide[] }) => {
   const [
     numberOfArticlesToDisplayInitially,
     setNumberOfArticlesToDisplayInitially,
