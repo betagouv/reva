@@ -314,9 +314,7 @@ export const CandidacyCard = ({
       title={getCandidateName({ candidacy, isMiddleNamesEnabled })}
       titleAs="h2"
       size="small"
-      classes={{
-        root: "shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]",
-      }}
+      shadow
       start={
         <div className="flex flex-wrap gap-2">
           {candidacy.typeAccompagnement === "AUTONOME" && (
