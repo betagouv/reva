@@ -31,13 +31,11 @@ export const contactInformationSchema = () =>
         data.phone = phoneNumberFormatted;
       } else {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Le numéro de téléphone est invalide",
           path: ["phone"],
         });
       }
-
-      return data;
     });
 
 export type FormContactInformationData = z.infer<

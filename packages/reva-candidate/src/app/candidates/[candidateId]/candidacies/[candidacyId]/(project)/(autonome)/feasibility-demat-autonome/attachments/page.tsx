@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumb } from "@codegouvfr/react-dsfr/Breadcrumb";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -63,14 +63,14 @@ const schema = z
         addIssue({
           path: ["idCard"],
           message: "Merci de remplir ce champ",
-          code: z.ZodIssueCode.custom,
+          code: "custom",
         });
       }
       if (idCard[0].size > MAX_UPLOAD_SIZE) {
         addIssue({
           path: ["idCard", 0],
           message: `Le fichier choisi est trop volumineux. Choisissez un fichier inférieur à ${MAX_FILE_SIZE}`,
-          code: z.ZodIssueCode.custom,
+          code: "custom",
         });
       }
       if (
@@ -81,7 +81,7 @@ const schema = z
         addIssue({
           path: ["equivalenceOrExemptionProof", 0],
           message: `Le fichier choisi est trop volumineux. Choisissez un fichier inférieur à ${MAX_FILE_SIZE}`,
-          code: z.ZodIssueCode.custom,
+          code: "custom",
         });
       }
       if (
@@ -92,7 +92,7 @@ const schema = z
         addIssue({
           path: ["trainingCertificate", 0],
           message: `Le fichier choisi est trop volumineux. Choisissez un fichier inférieur à ${MAX_FILE_SIZE}`,
-          code: z.ZodIssueCode.custom,
+          code: "custom",
         });
       }
       additionalFiles.forEach((file, index) => {
@@ -100,7 +100,7 @@ const schema = z
           addIssue({
             path: [`additionalFiles.${index}`, 0],
             message: `Le fichier choisi est trop volumineux. Choisissez un fichier inférieur à ${MAX_FILE_SIZE}`,
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
       });
@@ -125,7 +125,7 @@ export default function AttachmentsPage() {
     control,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues: {
       idCard: undefined,
       equivalenceOrExemptionProof: undefined,

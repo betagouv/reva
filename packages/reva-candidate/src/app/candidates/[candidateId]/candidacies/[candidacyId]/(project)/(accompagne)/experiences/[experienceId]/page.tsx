@@ -5,7 +5,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, parseISO, toDate } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -38,8 +38,8 @@ const durationOptions: { label: string; value: ExperienceDuration }[] = [
 const schema = z.object({
   title: sanitizedText(),
   startedAt: sanitizedText(),
-  duration: z.nativeEnum(ExperienceDuration, {
-    errorMap: () => ({ message: "Ce champ est obligatoire" }),
+  duration: z.enum(ExperienceDuration, {
+    error: "Ce champ est obligatoire",
   }),
   description: sanitizedTextAllowSpecialCharacters(),
 });
@@ -84,7 +84,7 @@ export default function UpdateExperience() {
     reset,
     formState: { isSubmitting, errors },
   } = useForm<ExperienceForm>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 

@@ -1,7 +1,7 @@
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -71,7 +71,7 @@ const CandidateInformationForm = ({
     clearErrors,
     handleSubmit,
   } = useForm<FormCandidateInformationData>({
-    resolver: zodResolver(candidateInformationSchema()),
+    resolver: standardSchemaResolver(candidateInformationSchema()),
     defaultValues: {
       firstname: candidate?.firstname,
       lastname: candidate?.lastname,
@@ -191,6 +191,8 @@ const CandidateInformationForm = ({
       graphqlErrorToast(e);
     }
   };
+
+  console.log("errors", errors);
 
   const handleOnAddressSelection = ({
     street,

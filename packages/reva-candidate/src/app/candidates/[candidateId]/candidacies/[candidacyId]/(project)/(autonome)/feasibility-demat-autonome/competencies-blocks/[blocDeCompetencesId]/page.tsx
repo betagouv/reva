@@ -5,7 +5,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -36,7 +36,7 @@ const schema = z.object({
       competenceId: z.string(),
       label: z.string(),
       state: z.enum(["YES", "NO", "PARTIALLY"], {
-        invalid_type_error: "Merci de choisir une option",
+        error: "Merci de choisir une option",
       }),
     })
     .array(),
@@ -173,7 +173,7 @@ const CompetenciesBlockPage = () => {
     watch,
     formState: { isSubmitting, isDirty, errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 

@@ -13,8 +13,8 @@ export const civilInformationSchema = ({
   z
     .object({
       gender: z
-        .nativeEnum(GenderEnum, {
-          invalid_type_error: "Une de ces options doit être sélectionnée.",
+        .enum(GenderEnum, {
+          error: "Une de ces options doit être sélectionnée.",
         })
         .default(GenderEnum.undisclosed),
       lastname: sanitizedText(),
@@ -39,7 +39,7 @@ export const civilInformationSchema = ({
         const date = toDate(data.birthdate);
         if (date.toString() === "Invalid Date") {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "La date de naissance est invalide",
             path: ["birthdate"],
           });
@@ -55,7 +55,7 @@ export const civilInformationSchema = ({
 
         if (!candidateBirthdayIsOlderThan16YearsAgo) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "Le candidat doit avoir plus de 16 ans",
             path: ["birthdate"],
           });
@@ -68,7 +68,7 @@ export const civilInformationSchema = ({
         !data.birthDepartment?.length
       ) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Merci de remplir ce champ",
           path: ["birthDepartment"],
         });
@@ -80,13 +80,11 @@ export const civilInformationSchema = ({
         (!data.birthCity?.length || !data.birthDepartment?.length)
       ) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Merci de remplir ce champ",
           path: ["birthCity"],
         });
       }
-
-      return data;
     });
 
 export type FormCivilInformationData = z.infer<

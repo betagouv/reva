@@ -3,7 +3,7 @@
 import { Card } from "@codegouvfr/react-dsfr/Card";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, toDate, addMonths } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -64,7 +64,7 @@ export default function CandidacyDropOutDecisionPage() {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
 
   const {

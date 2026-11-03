@@ -1,6 +1,6 @@
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -65,7 +65,7 @@ export const ContactInformationForm = ({
     formState: { errors, isDirty, isSubmitting },
     handleSubmit,
   } = useForm<FormContactInformationData>({
-    resolver: zodResolver(contactInformationSchema()),
+    resolver: standardSchemaResolver(contactInformationSchema()),
     defaultValues: {
       street: candidate?.street ?? "",
       city: candidate?.city ?? "",

@@ -1,6 +1,6 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -58,7 +58,7 @@ export const TypologyAndCollectiveAgreementForm = ({
     formState: { isDirty, isSubmitting },
     handleSubmit,
   } = useForm<TypologyFormData>({
-    resolver: zodResolver(typologyFormSchema),
+    resolver: standardSchemaResolver(typologyFormSchema),
     defaultValues: {
       ccnId: candidate?.conventionCollective?.id ?? "",
       typology:

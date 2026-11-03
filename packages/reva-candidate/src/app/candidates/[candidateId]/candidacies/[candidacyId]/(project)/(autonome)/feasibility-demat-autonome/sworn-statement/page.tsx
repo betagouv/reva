@@ -1,7 +1,7 @@
 "use client";
 
 import { Breadcrumb } from "@codegouvfr/react-dsfr/Breadcrumb";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -33,7 +33,7 @@ const schema = z
       addIssue({
         path: ["swornStatement"],
         message: "Merci de remplir ce champ",
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
   });
@@ -69,7 +69,7 @@ export default function SwornStatementPage() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 

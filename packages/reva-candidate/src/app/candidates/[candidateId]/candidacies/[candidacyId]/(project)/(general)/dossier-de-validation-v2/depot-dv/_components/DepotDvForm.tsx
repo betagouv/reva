@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Stepper from "@codegouvfr/react-dsfr/Stepper";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -65,14 +65,10 @@ function createFileValidation(
 
 const dossierDeValidationSchema = z.object({
   dossierDeValidationCheck1: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher toutes les cases.",
-    }),
+    error: "Veuillez cocher toutes les cases.",
   }),
   dossierDeValidationCheck2: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher toutes les cases.",
-    }),
+    error: "Veuillez cocher toutes les cases.",
   }),
   amenagementSpecifiqueCheck: z.boolean().optional(),
   dossierDeValidationFile: z.object({
@@ -168,7 +164,7 @@ export const DepotDvForm = ({
     setError,
     formState: { errors, isSubmitting },
   } = useForm<DossierDeValidationFormData>({
-    resolver: zodResolver(dossierDeValidationSchema),
+    resolver: standardSchemaResolver(dossierDeValidationSchema),
     shouldUnregister: false,
     defaultValues: {
       dossierDeValidationOtherFiles: [],
@@ -211,7 +207,7 @@ export const DepotDvForm = ({
     if (!isMaxAdditionalFiles) {
       insertDossierDeValidationOtherFiles(
         dossierDeValidationOtherFilesFields.length,
-        [{}],
+        [{ 0: undefined }],
       );
     } else {
       errorToast(
@@ -228,21 +224,15 @@ export const DepotDvForm = ({
 
   const dossierDeValidationSchemaCheckboxes = z.object({
     dossierDeValidationCheck1: z.literal(true, {
-      errorMap: () => ({
-        message: "Veuillez cocher toutes les cases.",
-      }),
+      error: "Veuillez cocher toutes les cases.",
     }),
     dossierDeValidationCheck2: z.literal(true, {
-      errorMap: () => ({
-        message: "Veuillez cocher toutes les cases.",
-      }),
+      error: "Veuillez cocher toutes les cases.",
     }),
     ...(needsAmenagement
       ? {
           amenagementSpecifiqueCheck: z.literal(true, {
-            errorMap: () => ({
-              message: "Veuillez cocher toutes les cases.",
-            }),
+            error: "Veuillez cocher toutes les cases.",
           }),
         }
       : {}),
@@ -450,7 +440,7 @@ export const DepotDvForm = ({
                         getValues(),
                       );
                     if (!result.success) {
-                      result.error.errors.forEach((error) => {
+                      result.error.issues.forEach((error) => {
                         const path = error.path.join(".");
                         setError(path as keyof DossierDeValidationFormData, {
                           message: error.message,
@@ -492,7 +482,7 @@ export const DepotDvForm = ({
                     }
                     const result = schemaToUse?.safeParse(getValues());
                     if (!result?.success) {
-                      result?.error?.errors.forEach((error) => {
+                      result?.error?.issues.forEach((error) => {
                         const path = error.path.join(".");
                         setError(path as keyof DossierDeValidationFormData, {
                           message: error.message,

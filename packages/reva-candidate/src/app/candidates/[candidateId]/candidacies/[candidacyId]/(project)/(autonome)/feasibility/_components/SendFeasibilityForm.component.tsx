@@ -1,7 +1,7 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, isBefore } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
@@ -96,7 +96,7 @@ export const SendFeasibilityForm = (): React.ReactNode => {
     setValue,
     formState: { errors, isSubmitting, isDirty, dirtyFields },
   } = useForm<FeasibilityFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues: {
       certificationAuthorityId: certificationAuthoritySelectedId,
       feasibilityFile: {},

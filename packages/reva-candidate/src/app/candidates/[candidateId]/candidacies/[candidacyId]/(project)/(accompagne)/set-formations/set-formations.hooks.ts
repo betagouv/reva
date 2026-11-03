@@ -1,4 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -118,7 +118,7 @@ export const useSetFormations = () => {
           !data?.highestDegreeLabel
         ) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "Ce champ est obligatoire",
             path: ["highestDegreeLabel"],
           });
@@ -129,7 +129,7 @@ export const useSetFormations = () => {
   type FormData = z.infer<typeof schema>;
 
   const methods = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
   const {
     register,

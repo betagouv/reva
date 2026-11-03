@@ -2,7 +2,7 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, toDate } from "date-fns";
 import { useCallback } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -60,14 +60,10 @@ function createFileValidation(
 
 const dossierDeValidationSchema = z.object({
   dossierDeValidationCheck1: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher toutes les cases.",
-    }),
+    error: "Veuillez cocher toutes les cases.",
   }),
   dossierDeValidationCheck2: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher toutes les cases.",
-    }),
+    error: "Veuillez cocher toutes les cases.",
   }),
   dossierDeValidationFile: z.object({
     0: createFileValidation({ isRequired: true }),
@@ -135,7 +131,7 @@ export const DossierDeValidationTab = ({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<DossierDeValidationFormData>({
-    resolver: zodResolver(dossierDeValidationSchema),
+    resolver: standardSchemaResolver(dossierDeValidationSchema),
     shouldUnregister: true,
     defaultValues: { dossierDeValidationOtherFiles: [] },
   });
@@ -161,7 +157,7 @@ export const DossierDeValidationTab = ({
     if (!isMaxAdditionalFiles) {
       insertDossierDeValidationOtherFiles(
         dossierDeValidationOtherFilesFields.length,
-        [{}],
+        [{ 0: undefined }],
       );
     } else {
       errorToast(

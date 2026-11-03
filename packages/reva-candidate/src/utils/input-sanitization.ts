@@ -37,6 +37,7 @@ export const sanitizedText = ({
     )
     .refine(
       (value: string) => {
+        console.log("value", value);
         if (!value) return true;
         return !REGEX_SPECIAL_CHARACTERS.test(value);
       },

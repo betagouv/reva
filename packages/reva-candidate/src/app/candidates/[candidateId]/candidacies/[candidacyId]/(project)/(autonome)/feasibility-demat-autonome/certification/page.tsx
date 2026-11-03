@@ -6,7 +6,7 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -31,7 +31,7 @@ const schema = z.object({
   firstForeignLanguage: sanitizedOptionalText(),
   secondForeignlanguage: sanitizedOptionalText(),
   completion: z.enum(["PARTIAL", "COMPLETE"], {
-    invalid_type_error: "Merci de remplir ce champ",
+    error: "Merci de remplir ce champ",
   }),
   competenceBlocs: z
     .object({
@@ -92,7 +92,7 @@ const CertificationPage = () => {
     formState: { isDirty, isSubmitting, errors },
     watch,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 

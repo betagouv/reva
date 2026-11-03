@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Card from "@codegouvfr/react-dsfr/Card";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Tag from "@codegouvfr/react-dsfr/Tag";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format } from "date-fns";
 import { redirect } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -59,7 +59,7 @@ export default function EndAccompagnementPage() {
     register,
     formState: { isSubmitting, errors },
   } = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
 
   const {

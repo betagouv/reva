@@ -1,7 +1,7 @@
 "use client";
 import Breadcrumb from "@codegouvfr/react-dsfr/Breadcrumb";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -42,7 +42,7 @@ export default function FeasibilityDematAutonomeResourcesPage() {
     reset,
     formState: { isSubmitting, errors },
   } = useForm<FeasibilityDematAutonomeResourcesForm>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 
