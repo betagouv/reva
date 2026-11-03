@@ -2,6 +2,7 @@
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 
 import { BackButton } from "@/components/back-button/BackButton";
@@ -13,23 +14,53 @@ import { useDossierDeValidationPageLogic } from "./dossierDeValidationPageLogic"
 
 const DossierDeValidationPage = () => {
   const candidaciesUrl = "/candidacies/annuaire";
+
+  const { readyForJuryEstimatedAt, dossierDeValidation } =
+    useDossierDeValidationPageLogic();
+
+  let pageStatus: "SHOW_FULL_WARNING" | "SHOW_DV" = "SHOW_FULL_WARNING";
+
+  if (readyForJuryEstimatedAt) {
+    if (dossierDeValidation) {
+      pageStatus = "SHOW_DV";
+    }
+  } else {
+    pageStatus = "SHOW_FULL_WARNING";
+  }
+
   return (
     <div className="flex flex-col w-full">
       <BackButton href={candidaciesUrl}>Tous les dossiers</BackButton>
-      <h1>Dossier de validation</h1>
-      <Tabs
-        tabs={[
-          {
-            label: "Date prévisionnelle",
-            content: <ReadyForJuryEstimatedDateTab />,
-          },
-          {
-            label: "Dossier",
-            isDefault: true,
-            content: <DossierDeValidationTab />,
-          },
-        ]}
-      />
+      <h1 className="mb-8">Dossier de validation</h1>
+
+      {pageStatus === "SHOW_FULL_WARNING" && (
+        <CallOut
+          title="Dossier de validation en attente"
+          colorVariant="blue-ecume"
+        >
+          Dès lors que la recevabilité est prononcée favorablement, une date
+          prévisionnelle de dépôt du dossier de validation peut être renseignée.
+          Cette date peut vous aider à anticiper l’organisation du passage
+          devant le jury. Elle reste toutefois facultative et n’a pas de
+          caractère engageant.
+        </CallOut>
+      )}
+
+      {pageStatus === "SHOW_DV" && (
+        <Tabs
+          tabs={[
+            {
+              label: "Date prévisionnelle",
+              content: <ReadyForJuryEstimatedDateTab />,
+            },
+            {
+              label: "Dossier",
+              isDefault: true,
+              content: <DossierDeValidationTab />,
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };

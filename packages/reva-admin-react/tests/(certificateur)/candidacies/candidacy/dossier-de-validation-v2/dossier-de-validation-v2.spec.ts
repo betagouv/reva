@@ -22,6 +22,7 @@ const PAGE_PATH = `/admin2/candidacies/${CANDIDACY_ID}/dossier-de-validation-v2`
 const CORRECTION_PAGE_HREF = `/admin2/candidacies/${CANDIDACY_ID}/dossier-de-validation-v2/problem/`;
 const SENT_AT = 1716984000000; // 2024-05-29
 const DECISION_SENT_AT = 1717588800000; // 2024-06-05
+const READY_FOR_JURY_ESTIMATED_AT = "2024-08-15";
 
 type DossierDeValidationFixture = {
   id: string;
@@ -101,7 +102,7 @@ test.describe("Dossier de validation v2 page", () => {
     candidateLastname: "Durand",
   });
 
-  test("shows the waiting alert and no correction link when there is no active dossier", async ({
+  test("shows the 'en attente' call-out and no tabs when readyForJuryEstimatedAt is not set", async ({
     page,
     msw,
   }) => {
@@ -116,8 +117,9 @@ test.describe("Dossier de validation v2 page", () => {
       page.getByRole("heading", { name: "Dossier de validation", level: 1 }),
     ).toBeVisible();
     await expect(
-      page.getByText("En attente du dossier de validation"),
+      page.getByText("Dossier de validation en attente"),
     ).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Dossier" })).toHaveCount(0);
     await expect(
       page.getByRole("link", { name: "Demander une correction" }),
     ).toHaveCount(0);
@@ -130,6 +132,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-1",
           decision: "PENDING",
@@ -164,6 +167,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-1",
           decision: "PENDING",
@@ -189,6 +193,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-2",
           decision: "INCOMPLETE",
@@ -222,6 +227,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-2",
           decision: "INCOMPLETE",
@@ -246,6 +252,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-3",
           decision: "COMPLETE",
@@ -271,6 +278,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-1",
           decision: "PENDING",
@@ -300,6 +308,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-1",
           decision: "PENDING",
@@ -325,6 +334,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-1",
           decision: "PENDING",
@@ -365,6 +375,7 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
         activeDossierDeValidation: {
           id: "ddv-1",
           decision: "PENDING",
@@ -383,23 +394,10 @@ test.describe("Dossier de validation v2 page", () => {
     ).toHaveCount(0);
   });
 
-  test("'Date prévisionnelle' tab shows the waiting alert when no date is set", async ({
-    page,
-    msw,
-  }) => {
-    msw.use(
-      ...certificateurCommonHandlers,
-      createDossierDeValidationHandler({ readyForJuryEstimatedAt: null }),
-    );
-
-    await openDossierDeValidationPage(page);
-
-    await page.getByRole("tab", { name: "Date prévisionnelle" }).click();
-
-    await expect(
-      page.getByText("Attente de la date prévisionnelle"),
-    ).toBeVisible();
-  });
+  // There is no test for the "Attente de la date prévisionnelle" alert
+  // inside this tab: the tabs only render once readyForJuryEstimatedAt is
+  // set (see pageStatus "SHOW_DV" in page.tsx), so that alert's branch is
+  // currently unreachable through the page.
 
   test("'Date prévisionnelle' tab shows the formatted date when it is set", async ({
     page,
@@ -408,7 +406,13 @@ test.describe("Dossier de validation v2 page", () => {
     msw.use(
       ...certificateurCommonHandlers,
       createDossierDeValidationHandler({
-        readyForJuryEstimatedAt: "2024-08-15",
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
+        activeDossierDeValidation: {
+          id: "ddv-1",
+          decision: "PENDING",
+          dossierDeValidationSentAt: SENT_AT,
+          dossierDeValidationFile: file("dossier.pdf"),
+        },
       }),
     );
 
