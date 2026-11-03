@@ -167,11 +167,11 @@ export default function SwornStatementPage() {
                 <FancyUpload
                   className="col-span-2"
                   title="Joindre l'attestation sur l'honneur complétée et signée"
-                  hint="Formats supportés : jpg, png, pdf avec un poids maximum de 2Mo"
+                  hint="Format supporté : PDF uniquement avec un poids maximum de 2Mo"
                   defaultFile={swornStatementDefaultFile}
                   nativeInputProps={{
                     ...register("swornStatement"),
-                    accept: ".pdf, .jpg, .jpeg, .png",
+                    accept: ".pdf",
                   }}
                   state={errors.swornStatement ? "error" : "default"}
                   stateRelatedMessage={errors.swornStatement?.[0]?.message}

@@ -199,7 +199,7 @@ export default function ValidateFeasibility() {
               onChange: (e) => {
                 setSwornStatementFile(e.target.files?.[0]);
               },
-              accept: ".pdf, .jpg, .jpeg, .png",
+              accept: ".pdf",
               disabled: !!candidateHasConfirmedFeasibility,
             }}
           />
