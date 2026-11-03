@@ -20,6 +20,8 @@ import {
   isSentToCandidateOutdatedAfterIncomplete,
 } from "@/utils/feasibilityIncompleteOutdated.util";
 
+import { Candidacy } from "@/graphql/generated/types";
+
 import { useValidateFeasibility } from "./validate-feasibility.hooks";
 
 export default function ValidateFeasibility() {
@@ -140,7 +142,7 @@ export default function ValidateFeasibility() {
       </div>
 
       <DffSummary
-        candidacy={candidacy}
+        candidacy={candidacy as Candidacy}
         candidateDecisionComment={candidateDecisionComment}
         setCandidateDecisionComment={setCandidateDecisionComment}
       />

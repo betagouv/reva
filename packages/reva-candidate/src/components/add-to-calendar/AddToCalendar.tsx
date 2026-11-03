@@ -14,7 +14,20 @@ import {
   createOutlookCalendarLinkForJury,
 } from "@/utils/calendarLinks";
 
-import { Appointment } from "@/graphql/generated/graphql";
+import {
+  AppointmentDuration,
+  AppointmentType,
+} from "@/graphql/generated/graphql";
+
+type AppointmentForCalendar = {
+  id: string;
+  title: string;
+  date: string;
+  type: AppointmentType;
+  description: string | null;
+  duration: AppointmentDuration | null;
+  location: string | null;
+};
 
 type JuryForCalendar = {
   id: string;
@@ -29,8 +42,6 @@ type JuryForCalendar = {
     } | null;
   };
 };
-
-type AppointmentForCalendar = Omit<Appointment, "temporalStatus">;
 
 interface AddToCalendarProps {
   event: AppointmentForCalendar | JuryForCalendar;

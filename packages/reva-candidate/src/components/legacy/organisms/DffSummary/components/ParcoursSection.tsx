@@ -1,4 +1,4 @@
-import { BasicSkill, Training } from "@/graphql/generated/graphql";
+import { BasicSkill, Training } from "@/graphql/generated/types";
 
 export default function ParcoursSection({
   basicSkills,

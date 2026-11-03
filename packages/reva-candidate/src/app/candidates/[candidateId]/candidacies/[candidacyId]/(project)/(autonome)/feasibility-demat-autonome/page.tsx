@@ -24,7 +24,7 @@ import {
   DffCertificationCompetenceBloc,
   Prerequisite,
   Candidacy,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { AttachmentsSection } from "./_components/AttachmentsSection";
 import { CertificationSection } from "./_components/CertificationSection";

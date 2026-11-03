@@ -12,10 +12,7 @@ import {
   getTypologyLabel,
 } from "@/utils/candidateTypology.util";
 
-import {
-  Candidate,
-  CandidateUpdateTypologyAndCcnInput,
-} from "@/graphql/generated/graphql";
+import { CandidateUpdateTypologyAndCcnInput } from "@/graphql/generated/graphql";
 
 import { CcnSearchList } from "./CcnSearchList";
 import {
@@ -68,20 +65,20 @@ export const TypologyAndCollectiveAgreementForm = ({
   });
 
   const resetFormData = useCallback(
-    (candidate: Candidate) => {
+    (candidate: CandidateUseProfile) => {
       reset({
-        ccnId: candidate.conventionCollective?.id ?? "",
+        ccnId: candidate?.conventionCollective?.id ?? "",
         typology:
           (candidate?.typology as TypologyFormData["typology"]) ??
           "NON_SPECIFIE",
-        additionalInformation: candidate.typologyAdditional ?? "",
+        additionalInformation: candidate?.typologyAdditional ?? "",
       });
     },
     [reset],
   );
 
   useEffect(() => {
-    resetFormData(candidate as Candidate);
+    resetFormData(candidate);
   }, [candidate, resetFormData]);
 
   const onSubmit = async (data: TypologyFormData) => {
@@ -121,7 +118,7 @@ export const TypologyAndCollectiveAgreementForm = ({
         onSubmit={handleSubmit(onSubmit)}
         onReset={(e) => {
           e.preventDefault();
-          resetFormData(candidate as Candidate);
+          resetFormData(candidate);
         }}
         className="flex flex-col gap-6"
         data-testid="contact-information-form"

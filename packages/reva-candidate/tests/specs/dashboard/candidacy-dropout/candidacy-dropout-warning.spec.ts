@@ -7,7 +7,7 @@ import { createCandidateEntity } from "@tests/helpers/entities/create-candidate.
 import { loginAndWaitForCandidaciesInitialLoad } from "@tests/helpers/handlers/candidacies/candidacies-guards.handler";
 import { candidacyDropOutHandlers } from "@tests/helpers/handlers/candidacy-dropout.handler";
 
-import type { CandidacyDropOut } from "@/graphql/generated/graphql";
+import type { CandidacyDropOut } from "@/graphql/generated/types";
 
 import type { Page } from "@playwright/test";
 import type { MswFixture } from "next/experimental/testmode/playwright/msw";

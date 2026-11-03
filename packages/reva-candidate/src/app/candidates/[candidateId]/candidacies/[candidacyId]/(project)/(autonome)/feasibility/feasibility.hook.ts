@@ -117,9 +117,3 @@ export const useFeasibilityPage = () => {
     updateFeasibilityFileTemplateFirstReadAt,
   };
 };
-
-type UseFeasibilityPageReturnType = ReturnType<typeof useFeasibilityPage>;
-
-export type UseFeasibilityPageFeasibility = NonNullable<
-  UseFeasibilityPageReturnType["candidacy"]
->["feasibility"];

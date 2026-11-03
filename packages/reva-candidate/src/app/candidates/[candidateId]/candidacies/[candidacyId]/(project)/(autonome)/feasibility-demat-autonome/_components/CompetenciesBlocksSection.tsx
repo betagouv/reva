@@ -12,7 +12,7 @@ import {
   CertificationCompetenceDetails,
   CompetenceBlocsPartCompletion,
   DffCertificationCompetenceBloc,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 const CompetencesSectionBadge = ({
   completion,

@@ -4,7 +4,13 @@ import request from "graphql-request";
 import { STRAPI_GRAPHQL_API_URL, WEBSITE_BASE_URL } from "@/config/config";
 
 import { graphql } from "@/graphql/generated";
-import { ArticleDAide } from "@/graphql/generated/graphql";
+
+type ArticleDAide = {
+  documentId: string;
+  titre: string;
+  slug: string;
+  description: string;
+};
 
 const articlesQuery = graphql(`
   query getArticlesForCertificationPageUsefulResources {

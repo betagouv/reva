@@ -288,11 +288,3 @@ export const useValidateFeasibility = () => {
     candidate,
   };
 };
-
-type ValidateFeasibilityHookReturnType = ReturnType<
-  typeof useValidateFeasibility
->;
-
-export type UseValidateFeasibilityCandidacy = NonNullable<
-  ValidateFeasibilityHookReturnType["candidacy"]
->;

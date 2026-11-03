@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useGraphQlClient } from "@/components/graphql/graphql-client/GraphqlClient";
 
 import { graphql } from "@/graphql/generated";
-import { CandidacyConventionCollective } from "@/graphql/generated/graphql";
 
 const RECORDS_PER_PAGE = 10;
 const getCcnsQuery = graphql(`
@@ -34,11 +33,13 @@ const getCcnsQuery = graphql(`
   }
 `);
 
+type ConventionCollective = { id: string; idcc: string; label: string };
+
 export const CcnSearchList = ({
   conventionCollective,
   onCcnButtonClick: _onCcnButtonClick,
 }: {
-  conventionCollective?: CandidacyConventionCollective | null;
+  conventionCollective?: ConventionCollective | null;
   onCcnButtonClick?(id: string): void;
 }) => {
   const { graphqlClient } = useGraphQlClient();
@@ -52,10 +53,9 @@ export const CcnSearchList = ({
 
   const [inputValue, setInputValue] = useState(searchFilter);
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedCcn, setSelectedCcn] =
-    useState<CandidacyConventionCollective | null>(
-      conventionCollective ?? null,
-    );
+  const [selectedCcn, setSelectedCcn] = useState<ConventionCollective | null>(
+    conventionCollective ?? null,
+  );
 
   const refTimeout = useRef<NodeJS.Timeout | null>(null);
 

@@ -13,10 +13,7 @@ import { FormButtons } from "@/components/form/form-footer/FormButtons";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { GenderEnum } from "@/constants/genders.constant";
 
-import {
-  Candidate,
-  CandidateUpdateInformationBySelfInput,
-} from "@/graphql/generated/graphql";
+import { CandidateUpdateInformationBySelfInput } from "@/graphql/generated/graphql";
 
 import {
   FormCivilInformationData,
@@ -102,7 +99,7 @@ export const CivilInformationForm = ({
   const countryIsFrance = country === franceId;
 
   const resetFormData = useCallback(
-    (candidate: Candidate) => {
+    (candidate: CandidateUseProfile) => {
       if (!candidate) return;
       reset({
         firstname: candidate.firstname,
@@ -123,7 +120,7 @@ export const CivilInformationForm = ({
     [reset, franceId],
   );
   useEffect(() => {
-    resetFormData(candidate as Candidate);
+    resetFormData(candidate);
   }, [candidate, resetFormData]);
 
   useEffect(() => {
@@ -255,7 +252,7 @@ export const CivilInformationForm = ({
         onSubmit={handleSubmit(onSubmit, (e) => console.log(e))}
         onReset={(e) => {
           e.preventDefault();
-          resetFormData(candidate as Candidate);
+          resetFormData(candidate);
         }}
         className="flex flex-col gap-6"
         data-testid="civil-information-form"

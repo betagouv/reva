@@ -1,6 +1,6 @@
 import { FancyPreview } from "@/components/fancy-preview/FancyPreview";
 
-import { DffAttachment } from "@/graphql/generated/graphql";
+import { DffAttachment } from "@/graphql/generated/types";
 
 export default function AttachmentsSection({
   attachments,

@@ -1,7 +1,7 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { format } from "date-fns";
 
-import { FeasibilityDecision } from "@/graphql/generated/graphql";
+import { FeasibilityDecision } from "@/graphql/generated/types";
 
 const getDecisionBanner = (
   decision: FeasibilityDecision,

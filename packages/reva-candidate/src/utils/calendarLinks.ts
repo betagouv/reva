@@ -1,4 +1,17 @@
-import { Appointment } from "@/graphql/generated/graphql";
+import {
+  AppointmentDuration,
+  AppointmentType,
+} from "@/graphql/generated/graphql";
+
+type AppointmentForCalendar = {
+  id: string;
+  title: string;
+  date: string;
+  type: AppointmentType;
+  description: string | null;
+  duration: AppointmentDuration | null;
+  location: string | null;
+};
 
 type JuryForCalendar = {
   id: string;
@@ -14,7 +27,7 @@ type JuryForCalendar = {
   };
 };
 
-const durationToMinutes = {
+const durationToMinutes: Record<string, number> = {
   HALF_AN_HOUR: 30,
   ONE_HOUR: 60,
   TWO_HOURS: 120,
@@ -22,9 +35,7 @@ const durationToMinutes = {
   FOUR_HOURS: 240,
 } as const;
 
-const calculateAppointmentEnd = (
-  appointment: Omit<Appointment, "temporalStatus">,
-) => {
+const calculateAppointmentEnd = (appointment: AppointmentForCalendar) => {
   if (!appointment.duration) return appointment.date;
   const appointmentEnd = new Date(appointment.date);
   appointmentEnd.setMinutes(
@@ -34,7 +45,7 @@ const calculateAppointmentEnd = (
 };
 
 export const createGoogleCalendarLink = (
-  appointment: Omit<Appointment, "temporalStatus">,
+  appointment: AppointmentForCalendar,
 ) => {
   const appointmentStart = appointment.date
     .replace(/[-:]/g, "")
@@ -47,7 +58,7 @@ export const createGoogleCalendarLink = (
   );
 };
 export const createOutlookCalendarLink = (
-  appointment: Omit<Appointment, "temporalStatus">,
+  appointment: AppointmentForCalendar,
 ) => {
   const appointmentEnd = calculateAppointmentEnd(appointment);
   return encodeURI(
@@ -55,9 +66,7 @@ export const createOutlookCalendarLink = (
   );
 };
 
-export const createIcsFile = (
-  appointment: Omit<Appointment, "temporalStatus">,
-) => {
+export const createIcsFile = (appointment: AppointmentForCalendar) => {
   const appointmentStart = appointment.date
     .replace(/[-:]/g, "")
     .replace(/00\.000Z$/, "00Z");

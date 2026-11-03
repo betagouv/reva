@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import {
   CertificationCompetenceDetails,
   Experience,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { CertificationCompetenceAccordion } from "./CertificationCompetenceAccordion";
 import { ComplementExperienceParcoursViseAccordion } from "./ComplementExperienceParcoursViseAccordion";

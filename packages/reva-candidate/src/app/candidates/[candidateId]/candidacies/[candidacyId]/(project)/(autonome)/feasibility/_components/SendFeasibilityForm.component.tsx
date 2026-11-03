@@ -19,6 +19,8 @@ import {
 } from "@/components/toast/toast";
 import Tooltip from "@/components/tooltip/Tooltip";
 
+import { Feasibility } from "@/graphql/generated/types";
+
 import { useFeasibilityPage } from "../feasibility.hook";
 
 import { FeasibilityBanner } from "./FeasibilityBanner";
@@ -238,7 +240,7 @@ export const SendFeasibilityForm = (): React.ReactNode => {
 
   return (
     <div className="mt-12">
-      <FeasibilityBanner feasibility={feasibility} />
+      <FeasibilityBanner feasibility={feasibility as Feasibility} />
 
       {hasCertificationRncpExpired &&
         feasibilityDecisionNotFinalOrIncomplete && (

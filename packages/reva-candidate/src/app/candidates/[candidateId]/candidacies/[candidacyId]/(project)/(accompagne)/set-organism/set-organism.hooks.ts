@@ -140,3 +140,12 @@ export const useSetOrganism = ({
     hasSelectedCertification,
   };
 };
+
+type SetOrganismHookReturnType = ReturnType<typeof useSetOrganism>;
+export type Organism = NonNullable<
+  NonNullable<
+    NonNullable<
+      SetOrganismHookReturnType["getRandomOrganismsForCandidacy"]["data"]
+    >["getRandomOrganismsForCandidacy"]
+  >["rows"]
+>[number];

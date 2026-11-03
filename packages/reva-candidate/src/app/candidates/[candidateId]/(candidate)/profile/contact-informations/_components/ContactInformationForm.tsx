@@ -10,10 +10,7 @@ import { FormButtons } from "@/components/form/form-footer/FormButtons";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { GenderEnum } from "@/constants/genders.constant";
 
-import {
-  Candidate,
-  CandidateUpdateInformationBySelfInput,
-} from "@/graphql/generated/graphql";
+import { CandidateUpdateInformationBySelfInput } from "@/graphql/generated/graphql";
 
 import {
   FormContactInformationData,
@@ -77,7 +74,7 @@ export const ContactInformationForm = ({
   });
 
   const resetFormData = useCallback(
-    (candidate: Candidate) => {
+    (candidate: CandidateUseProfile) => {
       if (!candidate) return;
       reset({
         street: candidate.street ?? "",
@@ -91,7 +88,7 @@ export const ContactInformationForm = ({
     [reset],
   );
   useEffect(() => {
-    resetFormData(candidate as Candidate);
+    resetFormData(candidate);
   }, [candidate, resetFormData]);
 
   const onSubmit = async (data: FormContactInformationData) => {
@@ -154,7 +151,7 @@ export const ContactInformationForm = ({
         onSubmit={handleSubmit(onSubmit)}
         onReset={(e) => {
           e.preventDefault();
-          resetFormData(candidate as Candidate);
+          resetFormData(candidate);
         }}
         className="flex flex-col gap-6"
         data-testid="contact-information-form"

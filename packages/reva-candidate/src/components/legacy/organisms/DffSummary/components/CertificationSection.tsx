@@ -2,7 +2,7 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { useMemo } from "react";
 
-import { Prerequisite } from "@/graphql/generated/graphql";
+import { Prerequisite } from "@/graphql/generated/types";
 
 export default function CertificationSection({
   option,

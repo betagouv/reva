@@ -15,7 +15,7 @@ import { Panel } from "@/components/layout/Panel";
 import { FormOptionalFieldsDisclaimer } from "@/components/legacy/atoms/FormOptionalFieldsDisclaimer/FormOptionalFieldsDisclaimer";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 
-import { File as GQLFile } from "@/graphql/generated/graphql";
+import { File as GQLFile } from "@/graphql/generated/types";
 
 import {
   createOrUpdateAttachments,

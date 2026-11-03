@@ -14,7 +14,7 @@ import {
   successToast,
 } from "@/components/toast/toast";
 
-import { Candidacy } from "@/graphql/generated/graphql";
+import { Candidacy } from "@/graphql/generated/types";
 
 import CertificationAuthoritySection from "./_components/CertificationAuthoritySection";
 import { useSendFileCertificationAuthority } from "./_components/sendFileCertificationAuthority.hook";

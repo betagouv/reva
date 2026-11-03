@@ -8,7 +8,7 @@ import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-hi
 import {
   FeasibilityDecision,
   FeasibilityHistory,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 interface Props {
   decision: FeasibilityDecision;

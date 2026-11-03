@@ -2,7 +2,7 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import { formatDate } from "date-fns";
 import { ReactNode } from "react";
 
-import { FeasibilityHistory } from "@/graphql/generated/graphql";
+import { FeasibilityHistory } from "@/graphql/generated/types";
 
 const Info = ({
   title,

@@ -2,7 +2,31 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Card } from "@codegouvfr/react-dsfr/Card";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
 
-import { Organism } from "@/graphql/generated/graphql";
+import {
+  ConformiteNormeAccessibilite,
+  OrganismModaliteAccompagnement,
+} from "@/graphql/generated/graphql";
+
+type Organism = {
+  id: string;
+  label: string;
+  contactAdministrativeEmail: string;
+  contactAdministrativePhone?: string | null;
+  modaliteAccompagnement: OrganismModaliteAccompagnement;
+  website?: string | null;
+  distanceKm?: number | null;
+  isMaisonMereMCFCompatible?: boolean | null;
+  nomPublic?: string | null;
+  telephone?: string | null;
+  siteInternet?: string | null;
+  emailContact?: string | null;
+  adresseNumeroEtNomDeRue?: string | null;
+  adresseInformationsComplementaires?: string | null;
+  adresseCodePostal?: string | null;
+  adresseVille?: string | null;
+  conformeNormesAccessibilite?: ConformiteNormeAccessibilite | null;
+  fermePourAbsenceOuConges?: boolean | null;
+};
 
 const getMandatoryInfo = (organism: Organism) => {
   const { nomPublic, siteInternet, emailContact, telephone } = organism;

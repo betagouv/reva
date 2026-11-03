@@ -12,9 +12,7 @@ import { OrganismFilters } from "@/components/legacy/organisms/OrganismFilters/O
 import { PICTOGRAMS } from "@/components/pictograms/Pictograms";
 import { graphqlErrorToast } from "@/components/toast/toast";
 
-import { Organism } from "@/graphql/generated/graphql";
-
-import { useSetOrganism } from "./set-organism.hooks";
+import { Organism, useSetOrganism } from "./set-organism.hooks";
 
 const RECORDS_PER_PAGE = 10;
 const MAX_RECORDS = 50;

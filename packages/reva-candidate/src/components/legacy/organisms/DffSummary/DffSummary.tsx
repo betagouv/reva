@@ -3,17 +3,17 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-import { UseValidateFeasibilityCandidacy } from "@/app/candidates/[candidateId]/candidacies/[candidacyId]/(project)/(accompagne)/validate-feasibility/validate-feasibility.hooks";
 import { CertificationCard } from "@/components/certification-card/CertificationCard";
 import { PICTOGRAMS } from "@/components/pictograms/Pictograms";
 
 import {
+  Candidacy,
   Candidate,
   DffAttachment,
   DffEligibilityCandidateSituation,
   DffEligibilityRequirement,
   Prerequisite,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import AttachmentsSection from "./components/AttachmentsSection";
 import { BannerSummary } from "./components/BannerSummary";
@@ -27,7 +27,7 @@ import GoalsSection from "./components/GoalsSection";
 import ParcoursSection from "./components/ParcoursSection";
 
 type DffSummaryProps = {
-  candidacy: UseValidateFeasibilityCandidacy;
+  candidacy: Candidacy;
   candidateDecisionComment?: string;
   setCandidateDecisionComment?: (comment: string) => void;
 };

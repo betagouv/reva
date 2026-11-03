@@ -1,13 +1,11 @@
-import { FeasibilityHistory } from "@/graphql/generated/graphql";
-
-import { UseFeasibilityPageFeasibility } from "../feasibility.hook";
+import { Feasibility, FeasibilityHistory } from "@/graphql/generated/types";
 
 import FeasibilityDecisionDisplay from "./FeasibilityDecisionDisplay";
 
 export function FeasibilityBanner({
   feasibility,
 }: {
-  feasibility: UseFeasibilityPageFeasibility;
+  feasibility: Feasibility;
 }) {
   if (!feasibility) {
     return null;

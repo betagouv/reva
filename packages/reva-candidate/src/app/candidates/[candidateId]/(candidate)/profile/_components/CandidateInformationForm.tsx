@@ -12,10 +12,7 @@ import { FormButtons } from "@/components/form/form-footer/FormButtons";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { GenderEnum } from "@/constants/genders.constant";
 
-import {
-  Candidate,
-  CandidateUpdateInformationBySelfInput,
-} from "@/graphql/generated/graphql";
+import { CandidateUpdateInformationBySelfInput } from "@/graphql/generated/graphql";
 
 import {
   FormCandidateInformationData,
@@ -101,7 +98,7 @@ const CandidateInformationForm = ({
   );
 
   const resetFormData = useCallback(
-    (candidate: Candidate) => {
+    (candidate: CandidateUseProfile) => {
       if (!candidate) return;
       reset({
         firstname: candidate.firstname,
@@ -128,7 +125,7 @@ const CandidateInformationForm = ({
     [reset, franceId],
   );
   useEffect(() => {
-    resetFormData(candidate as Candidate);
+    resetFormData(candidate);
   }, [candidate, resetFormData]);
 
   useEffect(() => {
@@ -222,7 +219,7 @@ const CandidateInformationForm = ({
         onSubmit={handleSubmit(onSubmit)}
         onReset={(e) => {
           e.preventDefault();
-          resetFormData(candidate as Candidate);
+          resetFormData(candidate);
         }}
         className="flex flex-col gap-6"
         data-testid="candidate-information-form"

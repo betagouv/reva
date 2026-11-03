@@ -8,7 +8,7 @@ import {
   Candidate,
   CandidateTypology,
   Gender,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 function getGenderPrefix(gender: Gender) {
   switch (gender) {

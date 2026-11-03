@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { WhiteCard } from "@/components/card/white-card/WhiteCard";
 
 import {
-  CandidacyStatus,
   CandidacyStatusStep,
   FeasibilityDecision,
   JuryResult,
@@ -63,7 +62,7 @@ export const CandidacyCard = ({
   vaeCollectiveCohortLabel?: string;
   typeAccompagnement: TypeAccompagnement;
   status: CandidacyStatusStep;
-  statusHistory: Omit<CandidacyStatus, "id">[];
+  statusHistory: { createdAt: number; status: CandidacyStatusStep }[];
   firstAppointmentOccuredAt?: Date;
   feasibility?: Feasibility;
   readyForJuryEstimatedAt?: Date;
