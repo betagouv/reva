@@ -5,11 +5,27 @@ import { format, isAfter, toDate } from "date-fns";
 import {
   CandidacyStatusStep,
   EndAccompagnementStatus,
-  FeasibilityDecision,
-  JuryResult,
   OrganismModaliteAccompagnement,
   TypeAccompagnement,
 } from "@/graphql/generated/graphql";
+
+type FeasibilityDecision =
+  | "ADMISSIBLE"
+  | "COMPLETE"
+  | "DRAFT"
+  | "INCOMPLETE"
+  | "PENDING"
+  | "REJECTED";
+
+type JuryResult =
+  | "CANDIDATE_ABSENT"
+  | "CANDIDATE_EXCUSED"
+  | "FAILURE"
+  | "FULL_SUCCESS_OF_FULL_CERTIFICATION"
+  | "FULL_SUCCESS_OF_PARTIAL_CERTIFICATION"
+  | "PARTIAL_SUCCESS_OF_FULL_CERTIFICATION"
+  | "PARTIAL_SUCCESS_OF_PARTIAL_CERTIFICATION"
+  | "PARTIAL_SUCCESS_PENDING_CONFIRMATION";
 
 type Feasibility = {
   dematerializedFeasibilityFile?: {

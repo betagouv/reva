@@ -16,6 +16,7 @@ const config: CodegenConfig = {
       plugins: [],
       config: {
         enumsAsTypes: true,
+        defaultScalarType: "any",
       },
     },
   },
