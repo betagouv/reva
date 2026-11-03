@@ -426,7 +426,7 @@ test.describe("Dossier de validation v2 page", () => {
     ).toHaveCount(0);
   });
 
-  test("the 'Tous les dossiers' back link points to the candidacies directory", async ({
+  test("the 'Retour' back link points to the candidacies directory", async ({
     page,
     msw,
   }) => {
@@ -437,8 +437,9 @@ test.describe("Dossier de validation v2 page", () => {
 
     await openDossierDeValidationPage(page);
 
-    await expect(
-      page.getByRole("link", { name: "Tous les dossiers" }),
-    ).toHaveAttribute("href", "/admin2/candidacies/annuaire/");
+    await expect(page.getByRole("link", { name: "Retour" })).toHaveAttribute(
+      "href",
+      "/admin2/candidacies/annuaire/",
+    );
   });
 });

@@ -5,7 +5,6 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 
-import { BackButton } from "@/components/back-button/BackButton";
 import { formatIso8601Date } from "@/utils/formatIso8601Date";
 
 import { DossierDeValidationCard } from "./_components/DossierDeValidationCard";
@@ -13,8 +12,6 @@ import { HistoryDossierDeValidationView } from "./_components/HistoryDossierDeVa
 import { useDossierDeValidationPageLogic } from "./dossierDeValidationPageLogic";
 
 const DossierDeValidationPage = () => {
-  const candidaciesUrl = "/candidacies/annuaire";
-
   const { readyForJuryEstimatedAt, dossierDeValidation } =
     useDossierDeValidationPageLogic();
 
@@ -30,7 +27,6 @@ const DossierDeValidationPage = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <BackButton href={candidaciesUrl}>Tous les dossiers</BackButton>
       <h1 className="mb-8">Dossier de validation</h1>
 
       {pageStatus === "SHOW_FULL_WARNING" && (
@@ -61,6 +57,15 @@ const DossierDeValidationPage = () => {
           ]}
         />
       )}
+      <Button
+        priority="secondary"
+        className="mt-6"
+        linkProps={{
+          href: `/candidacies/annuaire`,
+        }}
+      >
+        Retour
+      </Button>
     </div>
   );
 };
