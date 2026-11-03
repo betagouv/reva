@@ -125,6 +125,38 @@ test.describe("Dossier de validation v2 page", () => {
     ).toHaveCount(0);
   });
 
+  test("shows the estimated date and the 'en attente' call-out but no tabs when readyForJuryEstimatedAt is set and no dossier de validation exists yet", async ({
+    page,
+    msw,
+  }) => {
+    msw.use(
+      ...certificateurCommonHandlers,
+      createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: READY_FOR_JURY_ESTIMATED_AT,
+      }),
+    );
+
+    await openDossierDeValidationPage(page);
+
+    await expect(
+      page.getByText("Date prévisionnelle de dépôt du dossier de validation :"),
+    ).toBeVisible();
+    await expect(page.getByText("15/08/2024")).toBeVisible();
+    await expect(
+      page.getByText("Dossier de validation en attente"),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "Une fois le dossier transmis par le candidat, vous devrez lui communiquer une date de passage devant le jury.",
+        { exact: false },
+      ),
+    ).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Dossier" })).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Demander une correction" }),
+    ).toHaveCount(0);
+  });
+
   test("shows the dossier card and the correction link pointing to the v2 problem page when decision is PENDING and no jury", async ({
     page,
     msw,
