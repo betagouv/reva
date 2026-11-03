@@ -106,7 +106,7 @@ export const useAppointments = ({
     getFutureAppointmentsQueryData?.getCandidacyById?.appointments?.rows || [];
 
   const jury = getFutureAppointmentsQueryData?.getCandidacyById?.jury;
-  if (jury && jury.dateOfSession && jury.dateOfSession > Date.now()) {
+  if (jury && jury.dateOfSession && jury.dateOfSession > new Date().getTime()) {
     futureAppointments = [
       ...futureAppointments,
       {
@@ -119,7 +119,11 @@ export const useAppointments = ({
     ].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     ) as Appointment[];
-  } else if (jury && jury.dateOfSession && jury.dateOfSession < Date.now()) {
+  } else if (
+    jury &&
+    jury.dateOfSession &&
+    jury.dateOfSession < new Date().getTime()
+  ) {
     pastAppointments = [
       ...pastAppointments,
       {

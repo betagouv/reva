@@ -43,6 +43,8 @@ interface PageState {
   candidacyFundedByFranceVae: boolean;
 }
 
+type TrainingOptions = { title: string; condition: Condition };
+
 const pageReducer = (state: PageState, action: PageAction) => {
   const newState = { ...state };
   const updateConditionChecked = () => {
@@ -144,13 +146,7 @@ export default function ValidateTraining() {
     }
   };
 
-  const checkboxOption = ({
-    title,
-    condition,
-  }: {
-    title: string;
-    condition: Condition;
-  }) => ({
+  const checkboxOption = ({ title, condition }: TrainingOptions) => ({
     label: title,
     nativeInputProps: {
       checked: pageState[`${condition}Checked`],
@@ -166,7 +162,7 @@ export default function ValidateTraining() {
     },
   });
 
-  const trainingOptions: { title: string; condition: Condition }[] = [
+  const trainingOptions: TrainingOptions[] = [
     {
       title:
         "Je comprends qu’il s’agit d’étapes et de prestations nécessaires pour obtenir mon diplôme.",
@@ -197,37 +193,6 @@ export default function ValidateTraining() {
       condition: "conditionFive",
     },
   ];
-
-  const TrainingValidationForm = () => (
-    <div className="flex flex-col gap-12">
-      <Checkbox
-        data-testid="accept-conditions-checkbox-group"
-        className="mb-0"
-        legend="Conditions générales"
-        options={trainingOptions.map((option) => checkboxOption(option))}
-      />
-      <Alert
-        title="Une fois votre parcours validé, vous ne pourrez plus le changer ! "
-        description="Pensez à lire avec attention le parcours proposé par votre accompagnateur. Si cette proposition ne vous satisfait pas, contactez votre accompagnateur avant de valider "
-        severity="info"
-      />
-      <div className="flex justify-between">
-        <Button priority="secondary" linkProps={{ href: "../" }}>
-          Retour
-        </Button>
-        <Button
-          data-testid="submit-training-program-button"
-          className="justify-center w-[100%]  md:w-fit"
-          nativeButtonProps={{
-            onClick: onSubmit,
-          }}
-          disabled={!pageState.allConditionsChecked}
-        >
-          Valider
-        </Button>
-      </div>
-    </div>
-  );
 
   return (
     <Panel>
@@ -343,7 +308,12 @@ export default function ValidateTraining() {
         </TrainingSection>
       )}
       {!isTrainingConfirmed && !isCandidacyDropOut && (
-        <TrainingValidationForm />
+        <TrainingValidationForm
+          allConditionsChecked={pageState.allConditionsChecked}
+          trainingOptions={trainingOptions}
+          checkboxOption={checkboxOption}
+          onSubmit={onSubmit}
+        />
       )}
       {isTrainingConfirmed && (
         <Button priority="secondary" linkProps={{ href: "../" }}>
@@ -373,4 +343,51 @@ const TrainingSection = ({
     <h2 className="text-dsfrGray-800 text-3xl font-bold mb-3">{title} :</h2>
     {children}
   </section>
+);
+
+const TrainingValidationForm = ({
+  allConditionsChecked,
+  trainingOptions,
+  checkboxOption,
+  onSubmit,
+}: {
+  allConditionsChecked: boolean;
+  trainingOptions: TrainingOptions[];
+  checkboxOption: ({ title, condition }: TrainingOptions) => {
+    label: string;
+    nativeInputProps: {
+      checked: boolean;
+      onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    };
+  };
+  onSubmit: () => void;
+}) => (
+  <div className="flex flex-col gap-12">
+    <Checkbox
+      data-testid="accept-conditions-checkbox-group"
+      className="mb-0"
+      legend="Conditions générales"
+      options={trainingOptions.map((option) => checkboxOption(option))}
+    />
+    <Alert
+      title="Une fois votre parcours validé, vous ne pourrez plus le changer ! "
+      description="Pensez à lire avec attention le parcours proposé par votre accompagnateur. Si cette proposition ne vous satisfait pas, contactez votre accompagnateur avant de valider "
+      severity="info"
+    />
+    <div className="flex justify-between">
+      <Button priority="secondary" linkProps={{ href: "../" }}>
+        Retour
+      </Button>
+      <Button
+        data-testid="submit-training-program-button"
+        className="justify-center w-[100%]  md:w-fit"
+        nativeButtonProps={{
+          onClick: onSubmit,
+        }}
+        disabled={!allConditionsChecked}
+      >
+        Valider
+      </Button>
+    </div>
+  </div>
 );

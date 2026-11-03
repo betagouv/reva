@@ -7,7 +7,6 @@ import {
   InputHTMLAttributes,
   useState,
   useEffect,
-  useRef,
   useCallback,
   useMemo,
 } from "react";
@@ -47,7 +46,7 @@ export const FancyUpload = ({
     [filePreview],
   );
 
-  const refInputId = useRef<string>(v4());
+  const inputId = useMemo(() => v4(), []);
 
   const downloadFiles = useCallback(async () => {
     if (!defaultFile) {
@@ -68,7 +67,7 @@ export const FancyUpload = ({
 
       dataTransfer.items.add(file);
 
-      const inputElement = document.getElementById(refInputId.current);
+      const inputElement = document.getElementById(inputId);
       if (inputElement) {
         const input = inputElement as HTMLInputElement;
         input.files = dataTransfer.files;
@@ -81,14 +80,14 @@ export const FancyUpload = ({
     } catch (error) {
       console.error(error);
     }
-  }, [defaultFile]);
+  }, [defaultFile, inputId]);
 
   useEffect(() => {
     downloadFiles();
   }, [downloadFiles]);
 
   if (filePreview) {
-    const inputElement = document.getElementById(refInputId.current);
+    const inputElement = document.getElementById(inputId);
     if (inputElement) {
       const input = inputElement as HTMLInputElement;
       if (!input.files?.length) {
@@ -144,7 +143,7 @@ export const FancyUpload = ({
         }
         hint={hint}
         nativeInputProps={{
-          id: refInputId.current,
+          id: inputId,
           ...nativeInputProps,
           onChange: (e) => {
             if (e.target.files) {

@@ -5,6 +5,17 @@ import { DfFileAapDecision } from "@/graphql/generated/types";
 
 import { CustomErrorBadge } from "../../CustomErrorBadge/CustomErrorBadge";
 
+const DecisionBadge = ({ decision }: { decision: DfFileAapDecision }) => {
+  if (decision === "FAVORABLE") {
+    return (
+      <Badge severity="success" noIcon>
+        Favorable
+      </Badge>
+    );
+  }
+  return <CustomErrorBadge label="Non favorable" />;
+};
+
 export default function DecisionSection({
   decision,
   decisionComment,
@@ -18,17 +29,6 @@ export default function DecisionSection({
   setCandidateDecisionComment: (comment: string) => void;
   candidateDecisionCommentDisabled: boolean;
 }) {
-  const DecisionBadge = () => {
-    if (decision === "FAVORABLE") {
-      return (
-        <Badge severity="success" noIcon>
-          Favorable
-        </Badge>
-      );
-    }
-    return <CustomErrorBadge label="Non favorable" />;
-  };
-
   if (!decision) {
     return null;
   }
@@ -41,7 +41,7 @@ export default function DecisionSection({
         <h4 className="mb-0">Avis de l'accompagnateur</h4>
       </div>
       <div className="my-4">
-        <DecisionBadge />
+        <DecisionBadge decision={decision} />
       </div>
       {decisionComment && <p>“{decisionComment}”</p>}
       {isDecisionUnfavorable && (

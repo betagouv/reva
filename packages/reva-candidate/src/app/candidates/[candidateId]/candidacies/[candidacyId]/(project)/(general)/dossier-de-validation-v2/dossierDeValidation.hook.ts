@@ -138,7 +138,7 @@ export const useDossierDeValidationPage = () => {
     }) => {
       const formData = new FormData();
 
-      formData.append("candidacyId", candidacy?.id || "");
+      formData.append("candidacyId", candidacyId);
 
       if (data.dossierDeValidationFile?.[0]) {
         formData.append(
@@ -173,7 +173,7 @@ export const useDossierDeValidationPage = () => {
         throw new Error(errorMessage);
       }
     },
-    [accessToken, candidacy?.id],
+    [accessToken, candidacyId],
   );
 
   return {

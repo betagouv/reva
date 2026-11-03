@@ -1,7 +1,7 @@
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import Tile from "@codegouvfr/react-dsfr/Tile";
 import { addMinutes, format } from "date-fns";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 
 import { formatIso8601Date } from "@/utils/formatIso8601Date";
 import { formatIso8601Time } from "@/utils/formatIso8601Time";
@@ -19,8 +19,8 @@ export const GenericAppointmentTile = ({
   type: AppointmentType;
   showTimezone?: boolean;
 }) => {
-  const now = useRef(new Date()).current;
-  const timezoneOffset = useRef(-now.getTimezoneOffset()).current;
+  const now = useMemo(() => new Date(), []);
+  const timezoneOffset = useMemo(() => -now.getTimezoneOffset(), [now]);
 
   const timezoneName = useMemo(() => {
     if (!showTimezone) {

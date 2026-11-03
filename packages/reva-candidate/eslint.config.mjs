@@ -72,6 +72,8 @@ export default defineConfig([
           ignoreRestSiblings: true,
         },
       ],
+
+      "react-hooks/incompatible-library": "off",
     },
   },
   {
