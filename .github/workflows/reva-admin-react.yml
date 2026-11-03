@@ -81,8 +81,10 @@ jobs:
         run: npx cypress install
       - name: Build
         run: npm run build
-      - name: Running Test
-        run: NODE_ENV=production npm run test:ci
+      - name: Start
+        run: NODE_ENV=production npm run start:ci
+      - name: Running Cypress Tests
+        run: NODE_ENV=production npm run cypress:ci
 
   playwright:
     timeout-minutes: 30

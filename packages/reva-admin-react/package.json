@@ -13,12 +13,12 @@
     "prebuild": "react-dsfr update-icons && npm ci --include=dev --prefix ../reva-api && npm run graphql:generate --prefix ../reva-api && graphql-codegen --config codegen.ts",
     "build": "next build && node copy-assets.js",
     "start": "HOSTNAME=0.0.0.0 node .next/standalone/packages/reva-admin-react/server.js",
+    "start:ci": "HOSTNAME=localhost PORT=3003 node .next/standalone/packages/reva-admin-react/server.js",
     "lint": "eslint --color src cypress",
     "graphql:generate": "graphql-codegen --config codegen.ts",
     "graphql:watch": "graphql-codegen --config codegen.ts --watch",
     "cypress:open": "cross-env TZ=Europe/Paris cypress open",
     "cypress:ci": "cross-env TZ=Europe/Paris cypress run",
-    "test:ci": "start-server-and-test 'PORT=3003 node .next/standalone/packages/reva-admin-react/server.js' http://localhost:3003/admin2/ cypress:ci",
     "test": "playwright test --project=chromium",
     "test:ui": "playwright test --ui"
   },
@@ -80,7 +80,6 @@
     "postcss-url": "^10.1.3",
     "prettier": "^3.5.3",
     "sass": "^1.89.1",
-    "start-server-and-test": "^2.0.12",
     "tailwindcss": "^3.4.17",
     "typescript": "5.8.3"
   },
