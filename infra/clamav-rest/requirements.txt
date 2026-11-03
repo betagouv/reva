@@ -24,7 +24,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 locust==2.44.4
 MarkupSafe==3.0.3
-msgpack==1.2.1
+msgpack==1.2.3
 packaging==26.2
 passlib==1.7.4
 pluggy==1.6.0
