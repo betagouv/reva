@@ -24,8 +24,6 @@ export default function SetGoals() {
     candidacy?.goals.map((goal) => goal.id) || [],
   );
 
-  console.log("formShouldBeDisabled", formShouldBeDisabled);
-
   useEffect(() => {
     setSelectedGoalIds(candidacy?.goals.map((goal) => goal.id) || []);
   }, [candidacy?.goals]);

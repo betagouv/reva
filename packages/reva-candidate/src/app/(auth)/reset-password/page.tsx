@@ -65,7 +65,6 @@ export default function ResetPassword() {
       if (errorMessage == "Error while parsing JWT token") {
         setIsInvalidLink(true);
       } else {
-        console.log(errorMessage);
         graphqlErrorToast(error);
       }
     }

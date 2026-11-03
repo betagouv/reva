@@ -192,8 +192,6 @@ const CandidateInformationForm = ({
     }
   };
 
-  console.log("errors", errors);
-
   const handleOnAddressSelection = ({
     street,
     zip,
