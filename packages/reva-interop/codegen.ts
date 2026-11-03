@@ -17,6 +17,14 @@ const config: CodegenConfig = {
       plugins: [],
       config: {
         enumsAsTypes: true,
+        defaultScalarType: "any",
+      },
+    },
+    "./graphql/generated/types.ts": {
+      plugins: ["typescript"],
+      config: {
+        enumsAsTypes: true,
+        defaultScalarType: "any",
       },
     },
   },

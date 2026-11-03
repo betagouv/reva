@@ -1,6 +1,6 @@
 import { FromSchema } from "json-schema-to-ts";
 
-import { FeasibilityHistory } from "../../../../graphql/generated/graphql.js";
+import { FeasibilityHistory } from "../../../../graphql/generated/types.js";
 import { GetGqlResponseType } from "../../../../utils/types.js";
 import { dossierDeFaisabiliteDecisionsResponseSchema } from "../../responseSchemas.js";
 import {
