@@ -46,6 +46,9 @@ const CandidacyPageLayout = ({ children }: { children: ReactNode }) => {
     "JURY_RESULTS_BY_BLOCK",
   );
 
+  const isNewDossierDeValidationPageFeatureActive =
+    isFeatureActive("NEW_DV_PAGE");
+
   const { data: getCandidacyResponse, isLoading: isLoadingMenu } = useQuery({
     queryKey: [candidacyId, "getCandidacyQuery"],
     queryFn: () =>
@@ -79,7 +82,9 @@ const CandidacyPageLayout = ({ children }: { children: ReactNode }) => {
     menuItem("Étude de faisabilité", `/candidacies/${candidacyId}/feasibility`),
     menuItem(
       "Dossier de validation",
-      `/candidacies/${candidacyId}/dossier-de-validation`,
+      isNewDossierDeValidationPageFeatureActive
+        ? `/candidacies/${candidacyId}/dossier-de-validation-v2`
+        : `/candidacies/${candidacyId}/dossier-de-validation`,
     ),
   ];
 
