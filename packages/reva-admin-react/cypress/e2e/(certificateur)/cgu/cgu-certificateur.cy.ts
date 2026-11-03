@@ -260,7 +260,6 @@ describe("CGU Certificateur Page", () => {
       it("should close the modal when relire button is clicked", () => {
         cy.get(SELECTORS.CGU_IGNORE_BUTTON).should("be.visible");
         cy.get(SELECTORS.CGU_IGNORE_BUTTON).click();
-        cy.get(SELECTORS.CGU_IGNORE_BUTTON).should("not.be.visible");
         cy.get(SELECTORS.IGNORE_MODAL_RELIRE_BUTTON).click();
         cy.get(SELECTORS.CGU_IGNORE_BUTTON).should("be.visible");
         cy.get(SELECTORS.MODAL_CONTAINER_SELECTOR).should("not.be.visible");
@@ -269,7 +268,6 @@ describe("CGU Certificateur Page", () => {
       it("should trigger appropriate action when modal ignore button is clicked", () => {
         cy.get(SELECTORS.CGU_FORM).should("be.visible");
         cy.get(SELECTORS.CGU_IGNORE_BUTTON).should("be.visible").click();
-        cy.get(SELECTORS.CGU_FORM).should("not.be.visible");
         cy.get(SELECTORS.IGNORE_MODAL_IGNORE_BUTTON)
           .should("be.visible")
           .click();

@@ -21,6 +21,12 @@ function visitReorientation({
       stubQuery(req, "getAccountInfo", "account/admin-info.json");
     }
 
+    stubQuery(req, "candidacy_canAccessCandidacy", {
+      data: {
+        candidacy_canAccessCandidacy: true,
+      },
+    });
+
     stubQuery(req, "getCandidacyForReorientation", candidacyFixture);
     stubQuery(
       req,
@@ -67,12 +73,13 @@ const candidacyScenarios = [
 describe("Certification reorientation page", () => {
   candidacyScenarios.forEach((scenario) => {
     context(scenario.description, () => {
-      it("should display selected certification and search result", () => {
+      it(`should display selected certification and search result ${scenario.description}`, () => {
         visitReorientation({
           userProfile: scenario.userProfile,
           candidacyFixture: scenario.candidacyFixture,
         });
 
+        cy.wait("@candidacy_canAccessCandidacy");
         cy.wait("@getCandidacyForReorientation");
         cy.wait("@getCertificationsForCandidate");
 

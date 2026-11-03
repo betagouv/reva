@@ -22,6 +22,12 @@ function visitArchive({
 
       stubQuery(req, "getAccountInfo", "account/admin-info.json");
 
+      stubQuery(req, "candidacy_canAccessCandidacy", {
+        data: {
+          candidacy_canAccessCandidacy: true,
+        },
+      });
+
       stubQuery(req, "getCandidacyForArchivePage", candidacy);
       stubMutation(req, "archiveCandidacyById", {
         data: {
@@ -45,6 +51,7 @@ function visitArchive({
 context("Admin", () => {
   it("display the page when i access it", function () {
     visitArchive({ userProfile: "admin" });
+    cy.wait("@candidacy_canAccessCandidacy");
     cy.wait("@getCandidacyForArchivePage");
     cy.get('[data-testid="archive-candidacy-title"]').should(
       "have.text",
@@ -63,6 +70,7 @@ context("Admin", () => {
     (status: CandidacyStatusStep) => {
       it(`shows the correct archival reasons when the feasibility result is not known and the candidacy status is ${status}`, function () {
         visitArchive({ userProfile: "admin", candidacyStatus: status });
+        cy.wait("@candidacy_canAccessCandidacy");
         cy.wait("@getCandidacyForArchivePage");
         cy.get('[data-testid="archiving-reason-radio-buttons"]').should(
           "exist",
@@ -101,6 +109,7 @@ context("Admin", () => {
     (status: CandidacyStatusStep) => {
       it(`shows the correct archival reasons when the feasibility result is known and the candidacy status is ${status}`, function () {
         visitArchive({ userProfile: "admin", candidacyStatus: status });
+        cy.wait("@candidacy_canAccessCandidacy");
         cy.wait("@getCandidacyForArchivePage");
         cy.get('[data-testid="archiving-reason-radio-buttons"]').should(
           "exist",
@@ -132,6 +141,7 @@ context("Admin", () => {
       userProfile: "admin",
       candidacyStatus: "PARCOURS_CONFIRME",
     });
+    cy.wait("@candidacy_canAccessCandidacy");
     cy.wait("@getCandidacyForArchivePage");
     cy.get("button").contains("Enregistrer").click({ force: true });
     cy.get("p.fr-message--error").contains("Merci de remplir ce champ");
@@ -142,6 +152,7 @@ context("Admin", () => {
       userProfile: "admin",
       candidacyStatus: "PARCOURS_CONFIRME",
     });
+    cy.wait("@candidacy_canAccessCandidacy");
     cy.wait("@getCandidacyForArchivePage");
     cy.get(
       '[data-testid="archiving-reason-radio-button-INACTIVITE_CANDIDAT"]',
@@ -161,6 +172,7 @@ context("Admin", () => {
       userProfile: "admin",
       candidacyStatus: "DOSSIER_FAISABILITE_ENVOYE",
     });
+    cy.wait("@candidacy_canAccessCandidacy");
     cy.wait("@getCandidacyForArchivePage");
     cy.get('[data-testid="candidacy-cannot-be-archived-alert"]').should(
       "exist",
@@ -174,6 +186,7 @@ context("Admin", () => {
 context("AAP", () => {
   it("display the page when i access it", function () {
     visitArchive({ userProfile: "aap" });
+    cy.wait("@candidacy_canAccessCandidacy");
     cy.wait("@getCandidacyForArchivePage");
     cy.get('[data-testid="archive-candidacy-title"]').should(
       "have.text",
@@ -191,6 +204,7 @@ context("AAP", () => {
     (status: CandidacyStatusStep) => {
       it(`shows the correct archival reasons when the feasibility result is not known and the candidacy status is ${status}`, function () {
         visitArchive({ userProfile: "aap", candidacyStatus: status });
+        cy.wait("@candidacy_canAccessCandidacy");
         cy.wait("@getCandidacyForArchivePage");
         cy.get('[data-testid="archiving-reason-radio-buttons"]').should(
           "exist",
@@ -231,6 +245,7 @@ context("AAP", () => {
   statusesAfterFeasibilityHasBeenSent.forEach((status: CandidacyStatusStep) => {
     it(`shows me an alert when the feasibility result is known and the candidacy status is ${status}`, function () {
       visitArchive({ userProfile: "aap", candidacyStatus: status });
+      cy.wait("@candidacy_canAccessCandidacy");
       cy.wait("@getCandidacyForArchivePage");
       cy.get('[data-testid="candidacy-cannot-be-archived-alert"]').should(
         "exist",
@@ -242,6 +257,7 @@ context("AAP", () => {
   });
   it.skip("does not let me validate the form when the archiving reason is not selected", function () {
     visitArchive({ userProfile: "aap", candidacyStatus: "PARCOURS_CONFIRME" });
+    cy.wait("@candidacy_canAccessCandidacy");
     cy.wait("@getCandidacyForArchivePage");
     cy.get("button").contains("Enregistrer").click({ force: true });
     cy.get("p.fr-message--error").contains("Merci de remplir ce champ");
@@ -249,6 +265,7 @@ context("AAP", () => {
 
   it("let me validate the form when the archiving reason is  selected", function () {
     visitArchive({ userProfile: "aap", candidacyStatus: "PARCOURS_CONFIRME" });
+    cy.wait("@candidacy_canAccessCandidacy");
     cy.wait("@getCandidacyForArchivePage");
     cy.get(
       '[data-testid="archiving-reason-radio-button-INACTIVITE_CANDIDAT"]',

@@ -67,7 +67,7 @@
     "@types/react-dom": "^19",
     "autoprefixer": "^10",
     "cross-env": "^10.1.0",
-    "cypress": "^14.4.1",
+    "cypress": "^16.2.1",
     "dotenv": "^16.6.1",
     "eslint": "^9",
     "eslint-config-next": "^16.2.6",
