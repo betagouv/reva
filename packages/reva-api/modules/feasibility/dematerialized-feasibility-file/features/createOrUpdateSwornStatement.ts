@@ -14,6 +14,8 @@ import { DematerializedFeasibilityFileCreateOrUpdateSwornStatementInput } from "
 
 import { getDematerializedFeasibilityFileByCandidacyId } from "./getDematerializedFeasibilityFileByCandidacyId";
 
+const MAX_UPLOAD_SIZE = 2 * 1024 * 1024; // 2MB
+
 export const createOrUpdateSwornStatement = async ({
   input: { swornStatement },
   candidacyId,
@@ -58,6 +60,12 @@ export const createOrUpdateSwornStatement = async ({
       name: swornStatementFile.filename,
       allowedFileTypes: allowFileTypeByDocumentType.swornStatementFile,
     };
+
+    if (swornStatementFile._buf.length > MAX_UPLOAD_SIZE) {
+      throw new Error(
+        `Le fichier ${swornStatementFile.filename} est trop volumineux (${(swornStatementFile._buf.length / 1024 / 1024).toFixed(2)} Mo). La taille maximale autorisée est de ${MAX_UPLOAD_SIZE / 1024 / 1024} Mo.`,
+      );
+    }
 
     await uploadFilesToS3([fileAndId]);
 
