@@ -385,4 +385,11 @@ SET
 UPDATE amenagement_specifique
 SET justification_description = 'Justification anonymisée';
 
+-- candidacy_on_candidacy_financing_method
+UPDATE candidacy_on_candidacy_financing_method
+SET
+  additional_information = CASE
+    WHEN additional_information IS NOT NULL THEN 'Information anonymisée'
+  END;
+
 COMMIT;
