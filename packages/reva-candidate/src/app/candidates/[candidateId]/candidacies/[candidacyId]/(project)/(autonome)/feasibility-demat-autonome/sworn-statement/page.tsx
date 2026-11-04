@@ -14,6 +14,7 @@ import { useUrqlClient } from "@/components/graphql/urql-client/UrqlClient";
 import { Panel } from "@/components/layout/Panel";
 import { FormOptionalFieldsDisclaimer } from "@/components/legacy/atoms/FormOptionalFieldsDisclaimer/FormOptionalFieldsDisclaimer";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
+import { fileWithMaxMBSize } from "@/utils/input-sanitization";
 
 import { File as GQLFile } from "@/graphql/generated/types";
 
@@ -25,7 +26,7 @@ import {
 const schema = z
   .object({
     swornStatement: z.object({
-      0: z.instanceof(File, { message: "Merci de remplir ce champ" }),
+      0: fileWithMaxMBSize(2),
     }),
   })
   .superRefine(({ swornStatement }, { addIssue }) => {

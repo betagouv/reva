@@ -13,6 +13,7 @@ import { FormButtons } from "@/components/form/form-footer/FormButtons";
 import { FormOptionalFieldsDisclaimer } from "@/components/form-optional-fields-disclaimer/FormOptionalFieldsDisclaimer";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { useUrqlClient } from "@/components/urql-client";
+import { fileWithMaxMBSize } from "@/utils/input-sanitization";
 
 import { File as GQLFile } from "@/graphql/generated/graphql";
 
@@ -24,7 +25,7 @@ import {
 const schema = z
   .object({
     swornStatement: z.object({
-      0: z.instanceof(File, { message: "Merci de remplir ce champ" }),
+      0: fileWithMaxMBSize(2),
     }),
   })
   .superRefine(({ swornStatement }, { addIssue }) => {
@@ -54,7 +55,10 @@ export default function SwornStatementPage() {
   }, [swornStatementFile]);
 
   useEffect(() => {
-    resetFiles();
+    const doResetFiles = () => {
+      resetFiles();
+    };
+    doResetFiles();
   }, [resetFiles]);
 
   const defaultValues = useMemo(
@@ -102,7 +106,10 @@ export default function SwornStatementPage() {
   }, [defaultValues, reset, resetFiles]);
 
   useEffect(() => {
-    resetForm();
+    const doReset = () => {
+      resetForm();
+    };
+    doReset();
   }, [resetForm]);
 
   const swornStatementDefaultFile = useMemo(

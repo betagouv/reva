@@ -160,3 +160,13 @@ export const sanitizedOptionalUrl = () => {
       "Le champ doit contenir une URL valide",
     );
 };
+
+export const fileWithMaxMBSize = (maxSizeMB: number) => {
+  return z
+    .instanceof(File, {
+      message: "Merci de remplir ce champ",
+    })
+    .refine((file) => file.size <= maxSizeMB * 1024 * 1024, {
+      message: `Le fichier ne doit pas dépasser ${maxSizeMB}Mo`,
+    });
+};
