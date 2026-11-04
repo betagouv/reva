@@ -285,6 +285,26 @@ SET
     WHEN information_of_result IS NOT NULL THEN 'Information anonymisée'
   END;
 
+-- payment_request
+UPDATE payment_request
+SET
+  invoice_number = 'Facture-' || LEFT(id::text, 8);
+
+-- payment_request_batch (content embeds the invoice number as NumFacture, among other data)
+UPDATE payment_request_batch
+SET
+  content = '{}'::jsonb;
+
+-- payment_request_unifvae
+UPDATE payment_request_unifvae
+SET
+  invoice_number = 'Facture-' || LEFT(id::text, 8);
+
+-- payment_request_batch_unifvae (content embeds the invoice number as NumFacture, among other data)
+UPDATE payment_request_batch_unifvae
+SET
+  content = '{}'::jsonb;
+
 -- maison_mere_aap
 UPDATE maison_mere_aap
 SET
