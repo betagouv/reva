@@ -381,4 +381,8 @@ SET
     WHEN comments_for_aap IS NOT NULL THEN 'Commentaire anonymisé'
   END;
 
+-- amenagement_specifique (justification may contain health/disability-related information)
+UPDATE amenagement_specifique
+SET justification_description = 'Justification anonymisée';
+
 COMMIT;
