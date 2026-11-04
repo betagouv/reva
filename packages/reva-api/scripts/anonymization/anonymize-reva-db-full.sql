@@ -234,7 +234,8 @@ SET
 -- funding_request
 UPDATE funding_request
 SET
-  other_training = 'Formation anonymisée';
+  other_training = 'Formation anonymisée',
+  certificate_skills = 'Compétences anonymisées';
 
 -- funding_request_batch
 UPDATE funding_request_batch
@@ -257,6 +258,7 @@ SET
     WHEN candidate_thirdname IS NOT NULL THEN 'Prénom3-' || LEFT(id::text, 8)
   END,
   candidate_lastname = 'Nom-' || LEFT(id::text, 8),
+  certificate_skills = 'Compétences anonymisées',
   funding_contact_firstname = CASE
     WHEN funding_contact_firstname IS NOT NULL THEN 'Prénom-' || LEFT(id::text, 8)
   END,
