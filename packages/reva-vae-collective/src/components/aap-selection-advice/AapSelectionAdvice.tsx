@@ -9,7 +9,7 @@ export const AapSelectionAdvice = ({
     <a
       className="fr-link"
       style={{ fontSize: "inherit" }}
-      href={`${process.env.NEXT_PUBLIC_METABASE_BASE_URL}/public/question/edc0faa3-08b0-492f-b58a-e97c8ecf1301`}
+      href={`${process.env.NEXT_PUBLIC_METABASE_BASE_URL}/public/dashboard/a8c95110-94d7-4add-8eaa-4931ca6214fb`}
       target="_blank"
     >
       la liste des AAP référencés sur France VAE
