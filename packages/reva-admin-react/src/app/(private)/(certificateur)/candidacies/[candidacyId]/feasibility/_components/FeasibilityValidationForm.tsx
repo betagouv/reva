@@ -2,7 +2,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
@@ -84,9 +84,7 @@ const DecisionWarningModal = ({
 const schema = z
   .object({
     decision: z.enum(["ADMISSIBLE", "REJECTED"], {
-      errorMap: () => {
-        return { message: "Merci de remplir ce champ" };
-      },
+      error: "Merci de remplir ce champ",
     }),
     comment: sanitizedOptionalTextAllowSpecialCharacters(),
     infoFile: z.object({ 0: z.instanceof(File).optional() }),
@@ -97,7 +95,7 @@ const schema = z
         path: ["comment"],
         code: "too_small",
         minimum: 1,
-        type: "string",
+        origin: "string",
         inclusive: true,
         message: "Merci de remplir ce champ",
       });
@@ -124,7 +122,9 @@ export const FeasibilityValidationForm = ({
     formState: { errors, isDirty, isSubmitting },
     trigger,
     watch,
-  } = useForm<FeasibilityValidationFormData>({ resolver: zodResolver(schema) });
+  } = useForm<FeasibilityValidationFormData>({
+    resolver: standardSchemaResolver(schema),
+  });
 
   const handleFormSubmit = handleSubmit((data) => onSubmit?.(data));
 

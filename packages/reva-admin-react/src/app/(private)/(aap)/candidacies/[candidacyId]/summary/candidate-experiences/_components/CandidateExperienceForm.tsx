@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -53,7 +53,7 @@ const schema = z
   .superRefine((data, ctx) => {
     if (data.startedAt > new Date().toISOString()) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["startedAt"],
         message: "La date de début ne peut pas se situer dans le futur.",
       });
@@ -61,7 +61,7 @@ const schema = z
 
     if (data.duration === "unknown") {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["duration"],
         message: "Ce champ est obligatoire",
       });
@@ -92,7 +92,7 @@ export const CandidateExperienceForm = ({
   }>();
 
   const methods = useForm<CandidateExperienceFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues: {
       ...editedExperience,
       duration: editedExperience?.duration || "unknown",

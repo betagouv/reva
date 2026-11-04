@@ -3,7 +3,7 @@
 import Breadcrumb from "@codegouvfr/react-dsfr/Breadcrumb";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -104,12 +104,12 @@ const getSchema = ({
           addIssue({
             path: ["dossierDeValidationTemplate[0]"],
             message: "Vous devez renseigner au moins un de ces deux champs",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
           addIssue({
             path: ["dossierDeValidationLink"],
             message: "Vous devez renseigner au moins un de ces deux champs",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
       },
@@ -169,7 +169,7 @@ const AdditionalInfoForm = ({
     formState: { errors, isDirty, isSubmitting },
     watch,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues: {
       linkToReferential: certification.additionalInfo?.linkToReferential || "",
       linkToCorrespondenceTable:

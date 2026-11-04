@@ -1,6 +1,6 @@
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
@@ -46,14 +46,14 @@ const schema = z
           addIssue({
             path: ["lettreDeDelegation[0]"],
             message: "Merci de remplir ce champ",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
         if (!justificatifIdentiteDelegataire?.[0]) {
           addIssue({
             path: ["justificatifIdentiteDelegataire[0]"],
             message: "Merci de remplir ce champ",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
       }
@@ -75,7 +75,7 @@ export const LegalInformationUpdateForm = ({
     control,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
 
   const { delegataire } = useWatch({ control });

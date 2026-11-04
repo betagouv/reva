@@ -1,6 +1,6 @@
 "use client";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -28,7 +28,7 @@ const DossierDeValidationProblemPage = () => {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting, isValid },
   } = useForm<DossierDeValidationProblemFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
 
   const handleFormSubmit = handleSubmit(async (data) => {

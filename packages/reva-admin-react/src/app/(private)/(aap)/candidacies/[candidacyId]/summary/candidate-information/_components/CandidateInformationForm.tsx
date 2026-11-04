@@ -2,7 +2,7 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -72,7 +72,9 @@ const CandidateInformationForm = ({
     clearErrors,
     handleSubmit,
   } = useForm<FormCandidateInformationData>({
-    resolver: zodResolver(candidateInformationSchema({ isBirthPlaceEnabled })),
+    resolver: standardSchemaResolver(
+      candidateInformationSchema({ isBirthPlaceEnabled }),
+    ),
     defaultValues: {
       firstname: candidate?.firstname,
       lastname: candidate?.lastname,

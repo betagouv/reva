@@ -1,7 +1,7 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { isBefore, parseISO, startOfToday } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -35,7 +35,7 @@ const appointmentFormSchema = z
   .superRefine((data, ctx) => {
     if (isBefore(parseISO(data.date), startOfToday())) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["date"],
         message: "La date ne doit pas être dans le passé",
       });
@@ -61,7 +61,7 @@ export const AppointmentForm = ({
     formState: { isDirty, isSubmitting, errors },
     getValues,
   } = useForm<AppointmentFormData>({
-    resolver: zodResolver(appointmentFormSchema),
+    resolver: standardSchemaResolver(appointmentFormSchema),
     defaultValues,
   });
 

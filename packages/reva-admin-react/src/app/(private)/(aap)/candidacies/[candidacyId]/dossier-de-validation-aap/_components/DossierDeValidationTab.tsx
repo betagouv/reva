@@ -1,6 +1,6 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useCallback } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,9 +15,7 @@ import { HistoryDossierDeValidationView } from "./HistoryDossierDeValidationView
 
 const dossierDeValidationSchema = z.object({
   dossierDeValidationChecked: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher la case",
-    }),
+    error: "Veuillez cocher la case",
   }),
   dossierDeValidationFile: z.object({
     0: z.instanceof(File, { message: "Merci de remplir ce champ" }),
@@ -51,7 +49,7 @@ export const DossierDeValidationTab = (props: Props) => {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<DossierDeValidationFormData>({
-    resolver: zodResolver(dossierDeValidationSchema),
+    resolver: standardSchemaResolver(dossierDeValidationSchema),
     shouldUnregister: true,
     defaultValues: { dossierDeValidationOtherFiles: [{}] },
   });
@@ -151,7 +149,7 @@ export const DossierDeValidationTab = (props: Props) => {
                       ) {
                         insertDossierDeValidationOtherFiles(
                           dossierDeValidationOtherFilesFields.length,
-                          [{}],
+                          [{ 0: undefined }],
                         );
                       }
                     } else {

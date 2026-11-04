@@ -3,7 +3,7 @@ import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Fragment, useCallback } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -18,25 +18,19 @@ import { OTHER_FINANCING_METHOD_ID } from "../trainingPage.hook";
 const trainingFormSchema = z.object({
   individualHourCount: z
     .number({
-      errorMap: () => ({
-        message: "Ce champ doit être un entier compris entre 0 et 100.",
-      }),
+      error: "Ce champ doit être un entier compris entre 0 et 100.",
     })
     .min(0)
     .max(100),
   collectiveHourCount: z
     .number({
-      errorMap: () => ({
-        message: "Ce champ doit être un entier compris entre 0 et 100.",
-      }),
+      error: "Ce champ doit être un entier compris entre 0 et 100.",
     })
     .min(0)
     .max(100),
   additionalHourCount: z
     .number({
-      errorMap: () => ({
-        message: "Ce champ doit être un entier supérieur ou égal à zéro.",
-      }),
+      error: "Ce champ doit être un entier supérieur ou égal à zéro.",
     })
     .min(0),
 
@@ -50,9 +44,7 @@ const trainingFormSchema = z.object({
   certificateSkills: sanitizedOptionalText(),
   otherTraining: sanitizedOptionalText(),
   certificationScope: z.enum(["PARTIAL", "COMPLETE"], {
-    errorMap: () => ({
-      message: "Merci de remplir ce champ",
-    }),
+    error: "Merci de remplir ce champ",
   }),
   candidacyFinancingMethods: z
     .object({
@@ -61,9 +53,7 @@ const trainingFormSchema = z.object({
       aapDescription: sanitizedOptionalTextAllowSpecialCharacters().nullable(),
       amount: z
         .number({
-          errorMap: () => ({
-            message: "Ce champ doit être un entier supérieur ou égal à zéro",
-          }),
+          error: "Ce champ doit être un entier supérieur ou égal à zéro",
         })
         .min(0)
         .max(10000, "La valeur de ce champ est trop élevée"),
@@ -127,7 +117,7 @@ export const TrainingForm = ({
     setError,
     formState: { errors, isSubmitting },
   } = useForm<TrainingFormData>({
-    resolver: zodResolver(trainingFormSchema),
+    resolver: standardSchemaResolver(trainingFormSchema),
     defaultValues: {
       individualHourCount: defaultValues.individualHourCount || 0,
       collectiveHourCount: defaultValues.collectiveHourCount || 0,

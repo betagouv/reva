@@ -2,7 +2,7 @@
 
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -18,14 +18,14 @@ import { useDecision } from "./_components/decision.hook";
 const schema = z
   .object({
     aapDecision: z.enum(["FAVORABLE", "UNFAVORABLE"], {
-      invalid_type_error: "Veuillez sélectionner un avis",
+      error: "Veuillez sélectionner un avis",
     }),
     aapDecisionComment: sanitizedTextAllowSpecialCharacters(),
   })
   .superRefine(({ aapDecision }, ctx) => {
     if (!aapDecision) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Veuillez sélectionner un avis",
         path: ["decision"],
       });
@@ -54,7 +54,7 @@ export default function DecisionPage() {
     formState: { errors, isDirty, isSubmitting },
   } = useForm<DecisionForm>({
     defaultValues,
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
 
   const handleFormSubmit = async ({

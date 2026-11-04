@@ -2,7 +2,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm } from "react-hook-form";
 
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
@@ -38,7 +38,7 @@ export default function ValidationDecisionForm({
     formState: { errors, isSubmitting },
     handleSubmit,
   } = useForm<ValidationDecisionFormData>({
-    resolver: zodResolver(validationDecisionFormSchema),
+    resolver: standardSchemaResolver(validationDecisionFormSchema),
     defaultValues: {
       decision: undefined,
       motiveKeys: [],

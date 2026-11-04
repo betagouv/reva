@@ -2,7 +2,7 @@
 
 import Input from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, parse, toDate } from "date-fns";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -60,7 +60,7 @@ const ExamInfoPage = () => {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ExamInfoFormData>({
-    resolver: zodResolver(examInfoSchema),
+    resolver: standardSchemaResolver(examInfoSchema),
     shouldUnregister: true,
     defaultValues,
   });

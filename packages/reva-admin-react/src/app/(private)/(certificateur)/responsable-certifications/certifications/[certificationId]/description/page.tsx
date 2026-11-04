@@ -6,7 +6,7 @@ import Notice from "@codegouvfr/react-dsfr/Notice";
 import Select from "@codegouvfr/react-dsfr/Select";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import { TZDate } from "@date-fns/tz";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, toDate } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { ReactNode, useMemo } from "react";
@@ -89,7 +89,7 @@ const getZodSchema = ({
             path: ["juryTypeOfTest"],
             message:
               "Veuillez renseigner au moins un type d’épreuve pour le jury de cette certification",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
 
@@ -97,14 +97,14 @@ const getZodSchema = ({
           addIssue({
             path: ["juryFrequency"],
             message: "Veuillez renseigner ce champ",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
           return;
         } else if (juryFrequency == "Autre" && !juryFrequencyOther) {
           addIssue({
             path: ["juryFrequencyOther"],
             message: "Veuillez renseigner ce champ",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
 
           return;
@@ -114,7 +114,7 @@ const getZodSchema = ({
           addIssue({
             path: ["startOfVisibility"],
             message: "Veuillez renseigner ce champ",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
       },
@@ -222,7 +222,7 @@ const PageContent = ({
     setValue,
     reset,
   } = useForm<CertificationDescriptionFormSchema>({
-    resolver: zodResolver(zodSchema),
+    resolver: standardSchemaResolver(zodSchema),
     defaultValues,
   });
 

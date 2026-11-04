@@ -1,6 +1,6 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -19,6 +19,8 @@ const schema = z.object({
   otherReasonContent: sanitizedOptionalTextAllowSpecialCharacters(),
   dropOutReasonId: sanitizedText(),
 });
+
+type DropoutFormData = z.infer<typeof schema>;
 
 export const DropoutForm = ({
   activeDropoutReasons,
@@ -42,9 +44,9 @@ export const DropoutForm = ({
     register,
     reset,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm({
+  } = useForm<DropoutFormData>({
     defaultValues,
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     mode: "all",
     reValidateMode: "onChange",
   });

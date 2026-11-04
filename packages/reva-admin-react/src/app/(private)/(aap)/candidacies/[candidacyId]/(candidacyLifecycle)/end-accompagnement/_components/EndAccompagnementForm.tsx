@@ -3,7 +3,7 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, isAfter, toDate } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
@@ -46,7 +46,7 @@ const schema = z
       const dateIsInFuture = isAfter(endAccompagnementDate, new Date());
       if (dateIsInFuture) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message:
             "La date de fin d'accompagnement ne peut pas être dans le futur",
           path: ["endAccompagnementDate"],
@@ -55,7 +55,7 @@ const schema = z
 
       if (!endAccompagnementReason) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Veuillez sélectionner un motif",
           path: ["endAccompagnementReason"],
         });
@@ -63,7 +63,7 @@ const schema = z
 
       if (isCandidateDropOut && !endAccompagnementCandidateDropOutReasonId) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Veuillez sélectionner un motif",
           path: ["endAccompagnementCandidateDropOutReasonId"],
         });
@@ -97,7 +97,7 @@ export const EndAccompagnementForm = () => {
     reset,
     getValues,
   } = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues: {
       endAccompagnementDate: candidacy?.endAccompagnementDate
         ? format(candidacy?.endAccompagnementDate, "yyyy-MM-dd")

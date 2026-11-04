@@ -5,7 +5,7 @@ import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { isAfter, sub } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -94,7 +94,7 @@ const PaymentRequestUniFvaeInvoicePage = () => {
     setError,
     setFocus,
   } = useForm<PaymentRequestUniFvaeInvoiceFormData>({
-    resolver: zodResolver(paymentRequestUniFvaeInvoiceSchema),
+    resolver: standardSchemaResolver(paymentRequestUniFvaeInvoiceSchema),
     defaultValues,
     disabled: paymentRequestAlreadySent,
   });

@@ -2,7 +2,7 @@
 
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -33,40 +33,40 @@ const candidacyFundingSchema = z.object({
   candidateThirdname: sanitizedOptionalText(),
   candidateGender: z.nativeEnum(GenderEnum).default(GenderEnum.undisclosed),
   individualHourCount: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   individualCost: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   collectiveHourCount: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   collectiveCost: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   basicSkillsHourCount: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   basicSkillsCost: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   mandatoryTrainingsHourCount: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   mandatoryTrainingsCost: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   certificateSkillsHourCount: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   certificateSkillsCost: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   otherTrainingHourCount: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   otherTrainingCost: z.number({
-    invalid_type_error: errorNumber,
+    error: errorNumber,
   }),
   fundingContactFirstname: sanitizedOptionalText(),
   fundingContactLastname: sanitizedOptionalText(),
@@ -142,7 +142,7 @@ const FundingPage = () => {
   );
 
   const methods = useForm<CandidacyFundingFormData>({
-    resolver: zodResolver(candidacyFundingSchema),
+    resolver: standardSchemaResolver(candidacyFundingSchema),
     defaultValues: candidacyFormData,
   });
 

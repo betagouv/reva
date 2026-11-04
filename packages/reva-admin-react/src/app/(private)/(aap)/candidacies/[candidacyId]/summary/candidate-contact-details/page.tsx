@@ -1,7 +1,7 @@
 "use client";
 
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -78,7 +78,7 @@ const CandidateContactDetailsForm = ({
     formState: { isDirty, isSubmitting, errors },
     handleSubmit,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 

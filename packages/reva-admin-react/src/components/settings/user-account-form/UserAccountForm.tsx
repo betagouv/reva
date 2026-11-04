@@ -1,5 +1,5 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -29,7 +29,7 @@ export const UserAccountForm = ({
   const submitButtonLabel = defaultValues ? "Enregistrer" : "Créer";
 
   const methods = useForm<UserAccountFormData>({
-    resolver: zodResolver(userAccountFormSchema),
+    resolver: standardSchemaResolver(userAccountFormSchema),
     defaultValues,
   });
 

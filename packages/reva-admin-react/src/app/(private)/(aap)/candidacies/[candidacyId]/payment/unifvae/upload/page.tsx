@@ -1,7 +1,7 @@
 "use client";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
@@ -33,21 +33,15 @@ const paymentRequestUniFvaeUploadSchema = z.object({
     .array(),
 
   confirmation1Checked: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher toutes les cases",
-    }),
+    error: "Veuillez cocher toutes les cases",
   }),
 
   confirmation2Checked: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher toutes les cases",
-    }),
+    error: "Veuillez cocher toutes les cases",
   }),
 
   confirmation3Checked: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher toutes les cases",
-    }),
+    error: "Veuillez cocher toutes les cases",
   }),
 });
 
@@ -71,7 +65,7 @@ const PaymentRequestUniFvaeUploadPage = () => {
     formState: { errors, isDirty, isSubmitting },
     handleSubmit,
   } = useForm<PaymentRequestUniFvaeUploadFormData>({
-    resolver: zodResolver(paymentRequestUniFvaeUploadSchema),
+    resolver: standardSchemaResolver(paymentRequestUniFvaeUploadSchema),
     defaultValues: { contractorInvoiceFiles: [{}] },
   });
 
@@ -191,7 +185,7 @@ const PaymentRequestUniFvaeUploadPage = () => {
                       if (i == contractorInvoiceFilesFields.length - 1) {
                         insertContractorInvoiceFiles(
                           contractorInvoiceFilesFields.length,
-                          [{}],
+                          [{ 0: undefined }],
                         );
                       }
                     } else {

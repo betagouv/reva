@@ -5,7 +5,7 @@ import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { isAfter, startOfDay } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -196,7 +196,7 @@ export const Resultat = () => {
     getValues,
     formState: { errors, isValid, isSubmitting },
   } = useForm<ResultatFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
 
   const {
@@ -204,7 +204,9 @@ export const Resultat = () => {
     handleSubmit: handleRevokeSubmit,
     formState: { isSubmitting: isRevokeSubmitting },
     reset: resetRevokeForm,
-  } = useForm<RevokeFormData>({ resolver: zodResolver(revokeSchema) });
+  } = useForm<RevokeFormData>({
+    resolver: standardSchemaResolver(revokeSchema),
+  });
 
   const handleFormSubmit = handleSubmit(() => {
     modal.open();

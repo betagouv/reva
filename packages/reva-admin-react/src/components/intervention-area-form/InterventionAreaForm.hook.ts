@@ -1,27 +1,23 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMemo } from "react";
 import { useController, useForm } from "react-hook-form";
 import { z } from "zod";
 
 const schema = z.object({
-  regions: z
-    .array(
-      z.object({
-        id: z.string(),
-        label: z.string(),
-        selected: z.boolean(),
-        children: z
-          .array(
-            z.object({
-              id: z.string(),
-              label: z.string(),
-              selected: z.boolean(),
-            }),
-          )
-          .default([]),
-      }),
-    )
-    .default([]),
+  regions: z.array(
+    z.object({
+      id: z.string(),
+      label: z.string(),
+      selected: z.boolean(),
+      children: z.array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          selected: z.boolean(),
+        }),
+      ),
+    }),
+  ),
 });
 
 export type InterventionAreaFormData = z.infer<typeof schema>;
@@ -45,7 +41,7 @@ export const useInterventionAreaFormLogic = ({
 }) => {
   const regionItems: InterventionAreaFormData["regions"] = useMemo(
     () =>
-      regions?.map((r) => {
+      regions.map((r) => {
         const departmentItems = r.departments.map((d) => ({
           id: d.id,
           label: `${d.label} (${d.code})`,
@@ -62,7 +58,7 @@ export const useInterventionAreaFormLogic = ({
   );
 
   const methods = useForm<InterventionAreaFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues: {
       regions: regionItems,
     },

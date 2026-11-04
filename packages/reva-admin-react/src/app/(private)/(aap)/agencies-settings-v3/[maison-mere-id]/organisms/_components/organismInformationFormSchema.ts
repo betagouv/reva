@@ -29,7 +29,7 @@ export const organismInformationFormSchema = z
       .superRefine((val, ctx) => {
         if (val === "") {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "Ce champ est obligatoire",
           });
         }
@@ -38,7 +38,7 @@ export const organismInformationFormSchema = z
   .superRefine((val, ctx) => {
     if (!val.adresseFragments) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["adresseComplete"],
         message: "Veuillez saisir puis sélectionner une adresse.",
       });
@@ -53,7 +53,7 @@ export const organismInformationFormSchema = z
       adresseNumeroEtNomDeRue: sanitizedText(),
       adresseCodePostal: sanitizedZipCode(),
       adresseVille: sanitizedText(),
-      adresseInformationsComplementaires: sanitizedOptionalText(),
+      adresseInformationsComplementaires: sanitizedText({ minLength: 0 }),
       nomPublic: sanitizedText(),
       telephone: sanitizedPhone(),
       siteInternet: sanitizedOptionalUrl(),

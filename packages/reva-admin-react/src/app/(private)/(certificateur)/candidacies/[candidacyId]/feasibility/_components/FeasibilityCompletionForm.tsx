@@ -1,7 +1,7 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -17,9 +17,7 @@ const completeConfirmationModal = createModal({
 const schema = z
   .object({
     decision: z.enum(["COMPLETE", "INCOMPLETE"], {
-      errorMap: () => {
-        return { message: "Merci de remplir ce champ" };
-      },
+      error: "Merci de remplir ce champ",
     }),
     comment: sanitizedOptionalTextAllowSpecialCharacters(),
   })
@@ -29,7 +27,7 @@ const schema = z
         path: ["comment"],
         code: "too_small",
         minimum: 1,
-        type: "string",
+        origin: "string",
         inclusive: true,
         message: "Merci de remplir ce champ",
       });
@@ -106,7 +104,9 @@ export const FeasibilityCompletionForm = ({
     control,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<FeasibilityCompletionFormData>({ resolver: zodResolver(schema) });
+  } = useForm<FeasibilityCompletionFormData>({
+    resolver: standardSchemaResolver(schema),
+  });
 
   const handleFormSubmit = handleSubmit((data) => {
     if (data.decision === "COMPLETE") {

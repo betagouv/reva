@@ -2,7 +2,7 @@
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import {
   add,
   endOfDay,
@@ -43,14 +43,14 @@ const schema = z
       ctx.addIssue({
         path: ["date"],
         message: "La date est obligatoire",
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
     if (isAfter(toDate(date), endOfDay(add(new Date(), { years: 2 })))) {
       ctx.addIssue({
         path: ["date"],
         message: "La date doit être inférieure à 2 ans",
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
   });
@@ -67,7 +67,7 @@ export const DateDeJury = () => {
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
   } = useForm<DateDeJuryFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     mode: "all",
   });
 

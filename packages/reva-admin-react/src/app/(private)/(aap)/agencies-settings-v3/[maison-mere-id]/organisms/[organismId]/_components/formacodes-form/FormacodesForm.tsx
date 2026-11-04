@@ -4,7 +4,7 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import SearchBar from "@codegouvfr/react-dsfr/SearchBar";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -67,7 +67,7 @@ export const FormacodesForm = ({ organismId }: { organismId: string }) => {
     watch,
     setValue,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
   });
 
   const watchedOrganismFormacodes = watch("organismFormacodes");

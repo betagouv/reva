@@ -1,4 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
@@ -32,7 +32,7 @@ const buildSchema = (requiredDocuments: DocumentKey[]) =>
           addIssue({
             path: [`${document}[0]`],
             message: "Merci de remplir ce champ",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
       }
@@ -42,7 +42,7 @@ export type DocumentsFormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 export const useDocumentsForm = (requiredDocuments: DocumentKey[]) =>
   useForm<DocumentsFormValues>({
-    resolver: zodResolver(buildSchema(requiredDocuments)),
+    resolver: standardSchemaResolver(buildSchema(requiredDocuments)),
   });
 
 const identityDocumentDescription = (person: string) => (

@@ -1,6 +1,6 @@
 "use client";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,7 @@ type CertificationAuthorityStructureFormValues = z.infer<
 export default function AddCertificationAuthorityStructurePage() {
   const { register, handleSubmit, formState, reset } =
     useForm<CertificationAuthorityStructureFormValues>({
-      resolver: zodResolver(certificationAuthorityStructureSchema),
+      resolver: standardSchemaResolver(certificationAuthorityStructureSchema),
       defaultValues: { label: "" },
     });
   const { graphqlClient } = useGraphQlClient();

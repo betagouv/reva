@@ -3,7 +3,7 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -32,7 +32,7 @@ export function CguCertificateurForm() {
     handleSubmit,
     formState: { isValid },
   } = useForm<CguCertificateurFormSchema>({
-    resolver: zodResolver(zodSchema),
+    resolver: standardSchemaResolver(zodSchema),
   });
 
   const { acceptCertificateurCgu } = useCguCertificateur();

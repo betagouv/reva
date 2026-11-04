@@ -5,7 +5,7 @@ import { sanitizedOptionalTextAllowSpecialCharacters } from "@/utils/input-sanit
 export const validationDecisionFormSchema = z
   .object({
     decision: z.enum(["VALIDE", "DEMANDE_DE_PRECISION"], {
-      invalid_type_error: "Veuillez sélectionner une décision",
+      error: "Veuillez sélectionner une décision",
     }),
     motiveKeys: z.array(z.string()).default([]),
     aapComment: sanitizedOptionalTextAllowSpecialCharacters(),
@@ -18,13 +18,12 @@ export const validationDecisionFormSchema = z
       data.aapComment === ""
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message:
           "Veuillez sélectionner au moins un motif de non-conformité ou renseigner un commentaire",
         path: ["aapComment"],
       });
     }
-    return data;
   });
 
 export type ValidationDecisionFormData = z.infer<

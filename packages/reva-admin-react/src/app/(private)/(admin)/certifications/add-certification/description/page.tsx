@@ -3,7 +3,7 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Tag from "@codegouvfr/react-dsfr/Tag";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format } from "date-fns";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -34,7 +34,7 @@ export default function CertificationDescriptionPage() {
     formState: { isSubmitting, errors },
     watch,
   } = useForm<CompanySiretStepFormSchema>({
-    resolver: zodResolver(zodSchema),
+    resolver: standardSchemaResolver(zodSchema),
     defaultValues: { rncp: "" },
   });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -17,7 +17,6 @@ const schema = z.object({
   accountFirstname: sanitizedOptionalText(),
   accountLastname: sanitizedText({ minLength: 2 }),
   accountEmail: sanitizedEmail(),
-
   contactFullName: sanitizedText(),
   contactEmail: sanitizedEmail(),
   contactPhone: sanitizedOptionalPhone(),
@@ -44,11 +43,11 @@ export const CertificationAuthorityLocalAccountGeneralInformationForm = ({
     formState,
     formState: { errors },
   } = useForm<LocalAccountFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 
-  const handleFormSubmit = handleSubmit(onSubmit, (e) => console.log(e));
+  const handleFormSubmit = handleSubmit(onSubmit);
 
   return (
     <form className={className || ""} onSubmit={handleFormSubmit}>

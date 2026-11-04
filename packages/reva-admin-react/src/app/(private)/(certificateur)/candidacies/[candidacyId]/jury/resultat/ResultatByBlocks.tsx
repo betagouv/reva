@@ -5,7 +5,7 @@ import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { isAfter, startOfDay } from "date-fns";
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
@@ -173,7 +173,7 @@ export const ResultatByBlocks = () => {
             data.validatedBlocks.length === 0
           ) {
             ctx.addIssue({
-              code: z.ZodIssueCode.custom,
+              code: "custom",
               message:
                 "NO_BLOCKS_CHECKED_FOR_SUCCESS_RESULT" as ResultInconsistencyType,
               path: ["validatedBlocks"],
@@ -185,7 +185,7 @@ export const ResultatByBlocks = () => {
             data.validatedBlocks.length === blocksTargetedForThisSession.length
           ) {
             ctx.addIssue({
-              code: z.ZodIssueCode.custom,
+              code: "custom",
               message:
                 "ALL_BLOCKS_CHECKED_FOR_PARTIAL_RESULT" as ResultInconsistencyType,
               path: ["validatedBlocks"],
@@ -217,7 +217,7 @@ export const ResultatByBlocks = () => {
     formState: { errors, isSubmitting },
     control,
   } = useForm<ResultatFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues: {
       validatedBlocks: [],
     },
@@ -229,7 +229,9 @@ export const ResultatByBlocks = () => {
     handleSubmit: handleRevokeSubmit,
     formState: { isSubmitting: isRevokeSubmitting },
     reset: resetRevokeForm,
-  } = useForm<RevokeFormData>({ resolver: zodResolver(revokeSchema) });
+  } = useForm<RevokeFormData>({
+    resolver: standardSchemaResolver(revokeSchema),
+  });
 
   const handleFormSubmit = handleSubmit(
     () => {

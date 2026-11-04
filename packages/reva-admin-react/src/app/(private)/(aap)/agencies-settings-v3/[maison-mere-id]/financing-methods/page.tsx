@@ -2,7 +2,7 @@
 
 import { Breadcrumb } from "@codegouvfr/react-dsfr/Breadcrumb";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -121,7 +121,7 @@ const FinancingMethodsForm = ({
     formState: { errors, isDirty, isSubmitting },
   } = useForm<FinancingMethodsFormData>({
     defaultValues,
-    resolver: zodResolver(financingMethodsFormSchema),
+    resolver: standardSchemaResolver(financingMethodsFormSchema),
   });
 
   return (

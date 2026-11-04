@@ -1,4 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -264,7 +264,7 @@ export const useGeneralInformationPage = () => {
   );
 
   const formHook = useForm<GeneralInformationFormValues>({
-    resolver: zodResolver(generalInformationSchema),
+    resolver: standardSchemaResolver(generalInformationSchema),
     mode: "onChange",
   });
   const { watch, reset } = formHook;

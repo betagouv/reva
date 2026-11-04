@@ -1,7 +1,7 @@
 import Breadcrumb from "@codegouvfr/react-dsfr/Breadcrumb";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import Image from "next/image";
 import { useCallback, useEffect } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
@@ -58,7 +58,7 @@ export const StructureForm = ({
     reset,
     getValues,
   } = useForm<CertificationStructureFormData>({
-    resolver: zodResolver(certificationStructureFormSchema),
+    resolver: standardSchemaResolver(certificationStructureFormSchema),
     defaultValues: {
       certificationAuthorityStructureId:
         certification.certificationAuthorityStructure?.id,

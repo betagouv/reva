@@ -1,6 +1,6 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -34,7 +34,7 @@ export const PrerequisitesForm = ({
   onDeletePrerequisitesButtonClick?: () => void;
 }) => {
   const methods = useForm<PrerequisitesFormData>({
-    resolver: zodResolver(prerequisitesFormSchema),
+    resolver: standardSchemaResolver(prerequisitesFormSchema),
     defaultValues,
   });
 

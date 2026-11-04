@@ -1,6 +1,6 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -13,6 +13,8 @@ import { CertificationAuthorityLocalAccountCard } from "./CertificationAuthority
 const schema = z.object({
   reason: sanitizedTextAllowSpecialCharacters(),
 });
+
+type CertificationAuthorityLocalAccountValidationData = z.infer<typeof schema>;
 
 export const CertificationAuthorityLocalAccountValidation = ({
   certificationAuthorityLocalAccount,
@@ -29,7 +31,10 @@ export const CertificationAuthorityLocalAccountValidation = ({
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm({ resolver: zodResolver(schema), defaultValues: { reason: "" } });
+  } = useForm<CertificationAuthorityLocalAccountValidationData>({
+    resolver: standardSchemaResolver(schema),
+    defaultValues: { reason: "" },
+  });
 
   return (
     <>

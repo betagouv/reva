@@ -50,7 +50,7 @@ export const informationRemoteFormSchema = z
           addIssue({
             path: [fieldName],
             message: "Merci de remplir ce champ",
-            code: z.ZodIssueCode.custom,
+            code: "custom",
           });
         }
       };
@@ -82,7 +82,7 @@ export const informationRemoteFormSchema = z
         addIssue({
           path: ["isRemoteFranceMetropolitaine"],
           message: "Au moins une case doit être cochée",
-          code: z.ZodIssueCode.custom,
+          code: "custom",
         });
       }
     },

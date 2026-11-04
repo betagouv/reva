@@ -2,7 +2,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -77,7 +77,7 @@ export const SendFeasibilityForm = (props: Props): React.ReactNode => {
     control,
     formState: { errors },
   } = useForm<FeasibilityFormData>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     mode: "all",
     defaultValues: {
       requirements: [

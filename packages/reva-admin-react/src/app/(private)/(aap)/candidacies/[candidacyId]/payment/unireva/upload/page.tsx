@@ -1,6 +1,6 @@
 "use client";
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -43,7 +43,7 @@ const PaymentRequestUniRevaUploadPage = () => {
     formState: { errors, isDirty, isSubmitting },
     handleSubmit,
   } = useForm<PaymentRequestUniRevaUploadFormData>({
-    resolver: zodResolver(paymentRequestUniRevaUploadSchema),
+    resolver: standardSchemaResolver(paymentRequestUniRevaUploadSchema),
   });
 
   const handleFormSubmit = handleSubmit(

@@ -3,7 +3,7 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -33,7 +33,7 @@ const TypologyPage = () => {
 
   const { register, control, setValue, handleSubmit, reset } =
     useForm<TypologyFormData>({
-      resolver: zodResolver(typologyFormSchema),
+      resolver: standardSchemaResolver(typologyFormSchema),
       defaultValues: {
         typology:
           (candidacy?.typology as TypologyFormData["typology"]) ||

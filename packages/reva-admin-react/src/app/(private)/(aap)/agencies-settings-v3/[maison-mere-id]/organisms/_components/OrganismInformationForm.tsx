@@ -3,7 +3,7 @@
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -97,7 +97,7 @@ const OrganismInformationForm = ({
     OrganismInformationOutputData
   >({
     defaultValues,
-    resolver: zodResolver(organismInformationFormSchema),
+    resolver: standardSchemaResolver(organismInformationFormSchema),
   });
 
   const {

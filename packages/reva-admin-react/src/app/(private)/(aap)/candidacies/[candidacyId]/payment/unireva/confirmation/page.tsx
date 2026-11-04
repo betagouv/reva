@@ -2,7 +2,7 @@
 
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
@@ -22,9 +22,7 @@ import { usePaymentRequestUniRevaConfirmationPage } from "./paymentRequestUniRev
 
 const paymentRequestUniRevaConfirmationSchema = z.object({
   payementRequestConfirmation: z.literal(true, {
-    errorMap: () => ({
-      message: "Veuillez cocher la case",
-    }),
+    error: "Veuillez cocher la case",
   }),
 });
 
@@ -50,7 +48,7 @@ const PaymentRequestUniRevaConfirmationPage = () => {
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<PaymentRequestUniRevaConfirmationFormData>({
-    resolver: zodResolver(paymentRequestUniRevaConfirmationSchema),
+    resolver: standardSchemaResolver(paymentRequestUniRevaConfirmationSchema),
   });
 
   const handleFormSubmit = handleSubmit(

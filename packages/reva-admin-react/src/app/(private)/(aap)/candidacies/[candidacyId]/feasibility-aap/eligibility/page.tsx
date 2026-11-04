@@ -6,7 +6,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format, isBefore, parseISO, toDate } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
@@ -38,7 +38,7 @@ const schema = z
         "DETENTEUR_RECEVABILITE_AVEC_REV_SANS_CHGT_REFERENTIEL",
       ],
       {
-        invalid_type_error: "Veuillez sélectionner une situation",
+        error: "Veuillez sélectionner une situation",
       },
     ),
     eligibilityValidUntil: sanitizedOptionalText(),
@@ -46,7 +46,7 @@ const schema = z
   .superRefine(({ eligibility, eligibilityValidUntil }, ctx) => {
     if (!eligibility) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Veuillez sélectionner une situation",
         path: ["eligibility"],
       });
@@ -58,13 +58,13 @@ const schema = z
     ) {
       if (!eligibilityValidUntil) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Veuillez sélectionner une date de fin de validité",
           path: ["eligibilityValidUntil"],
         });
       } else if (isBefore(toDate(eligibilityValidUntil), new Date())) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Merci d'indiquer une date postérieure à la date du jour",
           path: ["eligibilityValidUntil"],
         });
@@ -119,7 +119,7 @@ export default function EligibilityPage() {
     formState: { errors, isDirty, isSubmitting },
     watch,
   } = useForm<DecisionForm>({
-    resolver: zodResolver(schema),
+    resolver: standardSchemaResolver(schema),
     defaultValues,
   });
 

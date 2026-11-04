@@ -3,7 +3,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -85,7 +85,7 @@ export const ArchiveCandidacyForm = ({
     setError,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ArchiveFormData>({
-    resolver: zodResolver(archiveSchema),
+    resolver: standardSchemaResolver(archiveSchema),
     shouldUnregister: true, //update the form when the archiving reason changes from "AUTRE" to another reason and reset the additional information field.
   });
 

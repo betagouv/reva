@@ -3,7 +3,7 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -92,7 +92,7 @@ const PaymentRequestUniRevaInvoicePage = () => {
     setError,
     setFocus,
   } = useForm<PaymentRequestUniRevaInvoiceFormData>({
-    resolver: zodResolver(paymentRequestUniRevaInvoiceSchema),
+    resolver: standardSchemaResolver(paymentRequestUniRevaInvoiceSchema),
     defaultValues,
     disabled: paymentRequestAlreadySent,
   });

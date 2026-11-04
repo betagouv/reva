@@ -4,7 +4,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Tag from "@codegouvfr/react-dsfr/Tag";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { format } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { ReactNode } from "react";
@@ -43,7 +43,7 @@ export default function ReplaceCertificationPage() {
     formState: { isSubmitting, errors },
     watch,
   } = useForm<ReplaceCertificationFormSchema>({
-    resolver: zodResolver(zodSchema),
+    resolver: standardSchemaResolver(zodSchema),
     defaultValues: { rncp: "" },
   });
 

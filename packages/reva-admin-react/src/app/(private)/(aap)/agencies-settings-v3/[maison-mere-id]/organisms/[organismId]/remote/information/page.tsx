@@ -3,7 +3,7 @@
 import { Breadcrumb } from "@codegouvfr/react-dsfr/Breadcrumb";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect } from "react";
@@ -40,7 +40,7 @@ const InformationsRemotePage = () => {
     reset,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<InformationRemoteFormData>({
-    resolver: zodResolver(informationRemoteFormSchema),
+    resolver: standardSchemaResolver(informationRemoteFormSchema),
   });
 
   const handleReset = useCallback(() => {
