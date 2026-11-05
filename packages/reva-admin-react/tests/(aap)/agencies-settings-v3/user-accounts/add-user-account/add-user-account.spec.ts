@@ -60,11 +60,10 @@ test.describe("Settings Add user account", () => {
           "/admin2/agencies-settings-v3/a8e32301-86b8-414b-8b55-af86d289adee/user-accounts/add-user-account/",
         );
         await waitForPageQueries(page);
-        await page
-          .getByRole("button", { name: "Retour à la page précédente" })
-          .click();
 
-        await await page.getByRole("button", { name: "Quitter" }).click();
+        const backButton = page.getByTestId("back-button");
+        await backButton.click();
+
         await expect(page).toHaveURL("/admin2/agencies-settings-v3/");
       });
 
@@ -76,12 +75,30 @@ test.describe("Settings Add user account", () => {
           "/admin2/agencies-settings-v3/a8e32301-86b8-414b-8b55-af86d289adee/user-accounts/add-user-account/",
         );
         await waitForPageQueries(page);
+
+        await page
+          .getByTestId("lastname-input")
+          .locator("input")
+          .fill("Lastname");
+
+        await page.getByRole("button", { name: "Créer" }).click();
+
+        await expect(page.getByTestId("firstname-input")).toHaveClass(
+          /fr-input-group--error/,
+        );
+        await expect(page.getByTestId("email-input")).toHaveClass(
+          /fr-input-group--error/,
+        );
+
+        await page.getByTestId("lastname-input").locator("input").fill("");
+        await page
+          .getByTestId("firstname-input")
+          .locator("input")
+          .fill("Firstname");
+
         await page.getByRole("button", { name: "Créer" }).click();
 
         await expect(page.getByTestId("lastname-input")).toHaveClass(
-          /fr-input-group--error/,
-        );
-        await expect(page.getByTestId("firstname-input")).toHaveClass(
           /fr-input-group--error/,
         );
         await expect(page.getByTestId("email-input")).toHaveClass(
