@@ -5,7 +5,7 @@ import { SearchList } from "@/components/search/search-list/SearchList";
 import {
   CertificationAuthority,
   CertificationAuthorityPaginated,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { CertificationAuthorityCard } from "./CertificationAuthorityCard";
 

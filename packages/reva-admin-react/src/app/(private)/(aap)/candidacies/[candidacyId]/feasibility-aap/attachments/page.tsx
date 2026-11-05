@@ -14,7 +14,7 @@ import { FormOptionalFieldsDisclaimer } from "@/components/form-optional-fields-
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { useUrqlClient } from "@/components/urql-client";
 
-import { File as GQLFile } from "@/graphql/generated/graphql";
+import { File as GQLFile } from "@/graphql/generated/types";
 
 import {
   createOrUpdateAttachments,

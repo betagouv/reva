@@ -13,7 +13,7 @@ import { FormButtons } from "@/components/form/form-footer/FormButtons";
 import { FormOptionalFieldsDisclaimer } from "@/components/form-optional-fields-disclaimer/FormOptionalFieldsDisclaimer";
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 
-import type { Organism } from "@/graphql/generated/graphql";
+import type { Organism } from "@/graphql/generated/types";
 
 import { useOrganismInformationForm } from "./organismInformationForm.hook";
 import {

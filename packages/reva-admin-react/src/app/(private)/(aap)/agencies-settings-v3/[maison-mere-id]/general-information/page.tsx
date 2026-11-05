@@ -16,7 +16,7 @@ import {
 } from "@/components/toast/toast";
 import { formatSiret } from "@/utils/formatSiret";
 
-import { StatutValidationInformationsJuridiquesMaisonMereAap } from "@/graphql/generated/graphql";
+import { StatutValidationInformationsJuridiquesMaisonMereAap } from "@/graphql/generated/types";
 
 import {
   AccountInfoRows,
@@ -30,6 +30,7 @@ import { LegalInformationTile } from "./_components/LegalInformationTile";
 import { SiretInformationCard } from "./_components/SiretInformationCard";
 import {
   buildLegalInformationPayload,
+  Etablissement,
   useGeneralInformationPage,
 } from "./generalInformationPage.hook";
 
@@ -115,7 +116,7 @@ const GeneralInformationPage = () => {
       try {
         payload = buildLegalInformationPayload({
           data,
-          etablissement,
+          etablissement: etablissement as Etablissement,
           maisonMereAAPId,
           currentSiret: maisonMereAAP?.siret,
         });
@@ -233,7 +234,7 @@ const GeneralInformationPage = () => {
           </InfoRow>
           <SiretInformationCard
             siret={siret}
-            etablissement={etablissement}
+            etablissement={etablissement as Etablissement}
             isLoading={etablissementIsFetching}
           />
           <AccountInfoRows

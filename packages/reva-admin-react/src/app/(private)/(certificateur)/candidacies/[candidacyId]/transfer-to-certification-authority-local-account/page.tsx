@@ -8,7 +8,7 @@ import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import {
   CertificationAuthorityLocalAccount,
   CertificationAuthorityLocalAccountPaginated,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { CertificationAuthorityLocalAccountSearchList } from "./_components/CertificationAuthorityLocalAccountSearchList";
 import { CertificationAuthorityLocalAccountValidation } from "./_components/CertificationAuthorityLocalAccountValidation";

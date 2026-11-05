@@ -8,7 +8,7 @@ import { useFeatureflipping } from "@/components/feature-flipping/featureFlippin
 import {
   CandidacyCountByStatus,
   CandidacyStatusFilter,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { MaisonMereAAP } from "./MaisonMereAAP";
 

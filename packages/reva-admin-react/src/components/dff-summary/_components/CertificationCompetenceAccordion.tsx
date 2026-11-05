@@ -5,7 +5,7 @@ import {
   CertificationCompetence,
   CertificationCompetenceDetails,
   DffCertificationCompetenceDetailsState,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 const getStateFromCompetence = ({
   competence,

@@ -5,7 +5,8 @@ import { EnhancedSectionCard } from "@/components/card/enhanced-section-card/Enh
 import {
   Certification,
   DematerializedFeasibilityFile,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
+
 export const CertificationSection = ({
   isFeasibilityEditable,
   dematerializedFeasibilityFile,

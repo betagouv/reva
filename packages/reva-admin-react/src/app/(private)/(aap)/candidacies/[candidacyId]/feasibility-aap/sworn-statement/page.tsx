@@ -15,7 +15,7 @@ import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 import { useUrqlClient } from "@/components/urql-client";
 import { fileWithMaxMBSize } from "@/utils/input-sanitization";
 
-import { File as GQLFile } from "@/graphql/generated/graphql";
+import { File as GQLFile } from "@/graphql/generated/types";
 
 import {
   createOrUpdateSwornStatement,

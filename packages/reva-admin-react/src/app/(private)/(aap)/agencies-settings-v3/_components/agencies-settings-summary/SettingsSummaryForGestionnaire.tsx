@@ -8,7 +8,7 @@ import { EnhancedSectionCard } from "@/components/card/enhanced-section-card/Enh
 import { AAPSettingsSummarySectionRemote } from "@/components/settings/aap-settings-summary-section-remote/AAPSettingsSummarySectionRemote";
 import { SmallNotice } from "@/components/small-notice/SmallNotice";
 
-import { Account, MaisonMereAap, Organism } from "@/graphql/generated/graphql";
+import { Account, MaisonMereAap, Organism } from "@/graphql/generated/types";
 
 import { AAPSettingsSectionOnSite } from "../AAPSettingsSectionOnSite";
 

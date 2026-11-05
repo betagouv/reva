@@ -16,7 +16,7 @@ import { GenderEnum } from "@/constants/genders.constant";
 import {
   Candidate,
   CandidateUpdateInformationInput,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import {
   FormCandidateInformationData,

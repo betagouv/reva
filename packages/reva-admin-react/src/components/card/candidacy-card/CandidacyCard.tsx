@@ -12,7 +12,7 @@ import {
   JuryResult,
   OrganismModaliteAccompagnement,
   TypeAccompagnement,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { CandidacyTagsAap } from "../../candidacy-tags-aap/CandidacyTagsAap";
 

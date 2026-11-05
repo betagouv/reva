@@ -18,7 +18,7 @@ import {
   DffCertificationCompetenceBloc,
   FeasibilityDecision,
   Prerequisite,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { AttachmentsSection } from "./_components/AttachmentsSection";
 import { CandidateDecisionCommentSection } from "./_components/CandidateDecisionCommentSection";

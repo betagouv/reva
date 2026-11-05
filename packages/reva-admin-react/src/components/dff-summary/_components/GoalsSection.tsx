@@ -1,4 +1,4 @@
-import { Goal } from "@/graphql/generated/graphql";
+import { Goal } from "@/graphql/generated/types";
 
 export default function GoalsSection({ goals }: { goals: Goal[] }) {
   return (

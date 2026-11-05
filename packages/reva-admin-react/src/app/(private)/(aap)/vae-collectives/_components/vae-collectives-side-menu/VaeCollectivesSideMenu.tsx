@@ -3,7 +3,7 @@ import { SideMenu, SideMenuProps } from "@codegouvfr/react-dsfr/SideMenu";
 import {
   CandidacyCountByStatus,
   CandidacyStatusFilter,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 export const VaeCollectivesSideMenu = ({
   cohortes,

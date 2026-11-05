@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { EnhancedSectionCard } from "@/components/card/enhanced-section-card/EnhancedSectionCard";
 import { FancyPreview } from "@/components/fancy-preview/FancyPreview";
 
-import { DffAttachment } from "@/graphql/generated/graphql";
+import { DffAttachment } from "@/graphql/generated/types";
 
 export const AttachmentsSection = ({
   attachmentsPartComplete,

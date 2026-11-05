@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 
 import { useFeatureflipping } from "@/components/feature-flipping/featureFlipping";
 
-import { Candidacy } from "@/graphql/generated/graphql";
+import { Candidacy } from "@/graphql/generated/types";
 
 const genders = [
   { label: "Madame", value: "woman" },

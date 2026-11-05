@@ -1,4 +1,4 @@
-import { Candidate } from "@/graphql/generated/graphql";
+import { Candidate } from "@/graphql/generated/types";
 
 export const checkCandidateFields = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

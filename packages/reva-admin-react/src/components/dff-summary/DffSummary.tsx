@@ -15,7 +15,7 @@ import {
   DffEligibilityCandidateSituation,
   DffEligibilityRequirement,
   Prerequisite,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { ContactInfosSection } from "../../app/contact-infos-section/ContactInfosSection";
 import { PICTOGRAMS } from "../pictograms/Pictograms";

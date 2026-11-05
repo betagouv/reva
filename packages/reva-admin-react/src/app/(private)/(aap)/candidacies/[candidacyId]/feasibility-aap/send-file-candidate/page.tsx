@@ -14,7 +14,7 @@ import { isSentToCandidateOutdatedAfterIncomplete } from "@/utils/feasibilityInc
 import {
   Candidacy,
   DematerializedFeasibilityFile,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { useSendFileCandidate } from "./_components/sendFileCandidate.hook";
 

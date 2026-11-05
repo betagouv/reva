@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 import { EnhancedSectionCard } from "@/components/card/enhanced-section-card/EnhancedSectionCard";
 
-import { Prerequisite } from "@/graphql/generated/graphql";
+import { Prerequisite } from "@/graphql/generated/types";
 
 export const PrerequisitesSection = ({
   prerequisites,

@@ -8,7 +8,7 @@ import { useFeatureflipping } from "@/components/feature-flipping/featureFlippin
 import {
   FeasibilityDecision,
   FeasibilityHistory,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 interface Props {
   decision: FeasibilityDecision;

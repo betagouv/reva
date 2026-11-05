@@ -15,7 +15,7 @@ import {
   Candidacy,
   DematerializedFeasibilityFile,
   FeasibilityDecision,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import {
   FeasibilityCompletionForm,

@@ -18,7 +18,7 @@ import {
   sanitizedOptionalText,
 } from "@/utils/input-sanitization";
 
-import { Candidacy } from "@/graphql/generated/graphql";
+import { Candidacy } from "@/graphql/generated/types";
 
 import { ChoixCandidatBlock } from "./_components/ChoixCandidatBlock";
 import { InformationCandidatBlock } from "./_components/InformationCandidatBlock";

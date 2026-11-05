@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { sanitizedTextAllowSpecialCharacters } from "@/utils/input-sanitization";
 
-import { CertificationAuthority } from "@/graphql/generated/graphql";
+import { CertificationAuthority } from "@/graphql/generated/types";
 
 import { CertificationAuthorityCard } from "./CertificationAuthorityCard";
 

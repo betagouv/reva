@@ -9,7 +9,7 @@ import {
   DffCertificationCompetenceBloc,
   CertificationCompetenceBloc,
   Certification,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 export const DFF_FULL_ELIGIBILITY =
   "FULL_ELIGIBILITY_REQUIREMENT" as DffEligibilityRequirement;

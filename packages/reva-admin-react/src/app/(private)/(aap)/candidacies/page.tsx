@@ -19,7 +19,7 @@ import {
   CandidacyCountByStatus,
   CandidacySortByFilter,
   CandidacyStatusFilter,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import { useCandidacies } from "./_components/candidacies.hook";
 import { CandidaciesLayout } from "./_components/CandidaciesLayout";

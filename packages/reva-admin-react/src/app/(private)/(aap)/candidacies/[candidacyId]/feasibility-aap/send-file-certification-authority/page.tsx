@@ -19,7 +19,7 @@ import {
   Candidacy,
   DematerializedFeasibilityFile,
   FeasibilityDecision,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 import CertificationAuthoritySection from "./_components/CertificationAuthoritySection";
 import { useSendFileCertificationAuthority } from "./_components/sendFileCertificationAuthority.hook";

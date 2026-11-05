@@ -1,4 +1,4 @@
-import { Appointment } from "@/graphql/generated/graphql";
+import { Appointment } from "@/graphql/generated/types";
 
 const durationToMinutes = {
   HALF_AN_HOUR: 30,

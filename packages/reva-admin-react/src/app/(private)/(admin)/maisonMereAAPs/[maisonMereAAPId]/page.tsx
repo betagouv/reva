@@ -12,6 +12,7 @@ import {
 } from "@/app/(private)/(aap)/agencies-settings-v3/[maison-mere-id]/general-information/_components/AccountInfoRows";
 import { InfoRow } from "@/app/(private)/(aap)/agencies-settings-v3/[maison-mere-id]/general-information/_components/InfoRow";
 import { SiretInformationCard } from "@/app/(private)/(aap)/agencies-settings-v3/[maison-mere-id]/general-information/_components/SiretInformationCard";
+import { Etablissement } from "@/app/(private)/(aap)/agencies-settings-v3/[maison-mere-id]/general-information/generalInformationPage.hook";
 import { useEtablissement } from "@/components/company-preview/CompanyPreview.hooks";
 import { useGraphQlClient } from "@/components/graphql/graphql-client/GraphqlClient";
 import { LegalDocumentList } from "@/components/legal-document-list/LegalDocumentList";
@@ -181,7 +182,7 @@ const MaisonMereAAPPage = () => {
         <div>
           <SiretInformationCard
             siret={targetedSiret}
-            etablissement={etablissement}
+            etablissement={etablissement as Etablissement}
             isLoading={etablissementIsLoading}
           />
           {!!etablissement?.kbis?.mandatairesSociaux?.length && (

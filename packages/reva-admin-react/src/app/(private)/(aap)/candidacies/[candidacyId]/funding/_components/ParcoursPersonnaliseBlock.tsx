@@ -2,7 +2,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { Candidacy } from "@/graphql/generated/graphql";
+import { Candidacy } from "@/graphql/generated/types";
 
 export const ParcoursPersonnaliseBlock = ({
   candidacy,

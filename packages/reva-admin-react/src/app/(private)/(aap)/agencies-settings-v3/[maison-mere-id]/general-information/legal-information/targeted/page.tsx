@@ -11,10 +11,11 @@ import { SettingsPageHeader } from "@/components/settings/settings-page-header/S
 import { errorToast, graphqlErrorToast } from "@/components/toast/toast";
 import { REST_API_URL } from "@/config/config";
 
-import { UpdateMaisonMereLegalInformationInput } from "@/graphql/generated/graphql";
+import { UpdateMaisonMereLegalInformationInput } from "@/graphql/generated/types";
 
 import {
   buildLegalInformationPayload,
+  Etablissement,
   GeneralInformationFormValues,
   generalInformationSchema,
   useGeneralInformationPage,
@@ -207,7 +208,7 @@ const TargetedLegalInformationUpdatePage = () => {
     try {
       return buildLegalInformationPayload({
         data,
-        etablissement,
+        etablissement: etablissement as Etablissement,
         maisonMereAAPId,
         currentSiret: maisonMereAAP?.siret,
       });
@@ -431,7 +432,7 @@ const TargetedLegalInformationUpdatePage = () => {
         {currentStep === "identity" && (
           <SiretAndManagerStep
             formHook={formHook}
-            etablissement={etablissement}
+            etablissement={etablissement as Etablissement}
             etablissementIsFetching={etablissementIsFetching}
             siretNotFound={siretNotFound}
             siretIsSelected={siretIsEditable}

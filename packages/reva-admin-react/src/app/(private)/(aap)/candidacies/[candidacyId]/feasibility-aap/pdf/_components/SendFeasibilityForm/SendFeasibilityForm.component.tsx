@@ -13,7 +13,7 @@ import { FancyUpload } from "@/components/fancy-upload/FancyUpload";
 import { FeasibilityDecisionHistory } from "@/components/feasibility-decision-history/FeasibilityDecisionHistory";
 import { errorToast, graphqlErrorToast } from "@/components/toast/toast";
 
-import { FeasibilityHistory } from "@/graphql/generated/graphql";
+import { FeasibilityHistory } from "@/graphql/generated/types";
 
 import { useSendFeasibilityForm } from "./SendFeasibilityForm.hooks";
 

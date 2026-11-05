@@ -15,12 +15,12 @@ import {
 } from "@/utils/input-sanitization";
 
 import { graphql } from "@/graphql/generated";
+import { GetEtablissementForAgenciesSettingsQuery } from "@/graphql/generated/graphql";
 import {
-  GetEtablissementForAgenciesSettingsQuery,
   LegalStatus,
   MaisonMereAap,
   UpdateMaisonMereLegalInformationInput,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 const generalInformationQueries = graphql(`
   query getAccountMaisonMereGeneralInformation {

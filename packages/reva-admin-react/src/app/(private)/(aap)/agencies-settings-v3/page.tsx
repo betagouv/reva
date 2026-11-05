@@ -7,7 +7,7 @@ import { SettingsSummaryForGestionnaire } from "@/app/(private)/(aap)/agencies-s
 import { useAuth } from "@/components/auth/auth";
 import { useFeatureflipping } from "@/components/feature-flipping/featureFlipping";
 
-import { MaisonMereAap, Organism } from "@/graphql/generated/graphql";
+import { MaisonMereAap, Organism } from "@/graphql/generated/types";
 
 import { useGestionnaireMaisonMereAAPSettings } from "./_components/agencies-settings-summary/settingsForGestionnaire.hook";
 import { useAgenciesSettingsPage } from "./agenciesSettingsPage.hook";

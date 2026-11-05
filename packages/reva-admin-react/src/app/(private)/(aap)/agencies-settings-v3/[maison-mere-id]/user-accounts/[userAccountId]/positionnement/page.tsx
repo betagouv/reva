@@ -6,7 +6,7 @@ import { useMemo } from "react";
 
 import { MultiSelectList } from "@/components/multi-select-list/MultiSelectList";
 
-import { Organism } from "@/graphql/generated/graphql";
+import { Organism } from "@/graphql/generated/types";
 
 import { SettingsBreadcrumb } from "../../_components/SettingsBreadcrumb";
 

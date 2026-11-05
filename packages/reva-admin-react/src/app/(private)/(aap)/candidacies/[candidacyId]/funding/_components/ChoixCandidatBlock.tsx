@@ -1,4 +1,4 @@
-import { Candidacy } from "@/graphql/generated/graphql";
+import { Candidacy } from "@/graphql/generated/types";
 
 export const ChoixCandidatBlock = ({ candidacy }: { candidacy: Candidacy }) => {
   return (

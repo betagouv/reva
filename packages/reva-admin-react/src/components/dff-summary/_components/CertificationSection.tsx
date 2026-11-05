@@ -6,7 +6,7 @@ import {
   CertificationCompetenceBloc,
   DffCertificationCompetenceBloc,
   Prerequisite,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 export default function CertificationSection({
   option,

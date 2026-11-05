@@ -11,7 +11,7 @@ import {
   createOutlookCalendarLink,
 } from "@/utils/calendarLinks";
 
-import { Appointment } from "@/graphql/generated/graphql";
+import { Appointment } from "@/graphql/generated/types";
 
 interface AddToCalendarProps {
   event: Omit<Appointment, "temporalStatus" | "type">;

@@ -12,7 +12,7 @@ import {
   CandidacyStatus,
   CandidacyStatusStep,
   TypeAccompagnement,
-} from "@/graphql/generated/graphql";
+} from "@/graphql/generated/types";
 
 export const CandidacyCard = ({
   candidateFullName,

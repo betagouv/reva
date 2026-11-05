@@ -9,7 +9,7 @@ import { useFeatureflipping } from "@/components/feature-flipping/featureFlippin
 import { Impersonate } from "@/components/impersonate/Impersonate.component";
 import { successToast } from "@/components/toast/toast";
 
-import { MaisonMereAap, Organism } from "@/graphql/generated/graphql";
+import { MaisonMereAap, Organism } from "@/graphql/generated/types";
 
 import { useMaisonMereAAP } from "./_components/maisonMereAAP.hook";
 

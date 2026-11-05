@@ -22,7 +22,7 @@ import {
   sanitizedUrl,
 } from "@/utils/input-sanitization";
 
-import { File as GQLFile } from "@/graphql/generated/graphql";
+import { File as GQLFile } from "@/graphql/generated/types";
 
 import { useUpdateAdditionalInfoPage } from "./useCertificationAdditionalInfo.hook";
 
