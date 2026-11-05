@@ -89,7 +89,9 @@ export const useInterventionAreaFormLogic = ({
   };
 
   const toggleRegion = (regionId: string) => {
-    const newValues = [...regionsAndDeparmController.field.value];
+    const newValues = regionsAndDeparmController.field.value.map((r) => {
+      return { ...r, children: r.children.map((d) => ({ ...d })) };
+    });
     const regionIndex = newValues.findIndex((r) => r.id === regionId);
     const region = newValues[regionIndex];
     region.selected = !region.selected;
@@ -100,7 +102,9 @@ export const useInterventionAreaFormLogic = ({
   };
 
   const toggleDepartment = (departmentId: string) => {
-    const newValues = [...regionsAndDeparmController.field.value];
+    const newValues = regionsAndDeparmController.field.value.map((r) => {
+      return { ...r, children: r.children.map((d) => ({ ...d })) };
+    });
     const regionIndex = newValues.findIndex(
       (r) => !!r.children.find((d) => d.id === departmentId),
     );
@@ -117,7 +121,9 @@ export const useInterventionAreaFormLogic = ({
   };
 
   const toggleAllRegionsAndDepartments = (selected: boolean) => {
-    const newValues = [...regionsAndDeparmController.field.value];
+    const newValues = regionsAndDeparmController.field.value.map((r) => {
+      return { ...r, children: r.children.map((d) => ({ ...d })) };
+    });
     for (const v of newValues) {
       v.selected = selected;
       for (const dv of v.children) {
