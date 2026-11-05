@@ -21,40 +21,35 @@ export const DossierDeValidationCard = (props: Props) => {
   } = props;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2">
-        <p className="m-0">
-          Dossier déposé le :
-          <br />
-          <strong>{format(sentAt, "dd/MM/yyyy")}</strong>
-        </p>
-
-        {decision == "INCOMPLETE" && decisionSentAt && (
-          <p className="m-0">
-            Dossier signalé le :
-            <br />
-            <strong>{format(sentAt, "dd/MM/yyyy")}</strong>
-          </p>
-        )}
-
-        {decision == "COMPLETE" && decisionSentAt && (
-          <p className="m-0">
-            Dossier vérifié le :
-            <br />
-            <strong>{format(sentAt, "dd/MM/yyyy")}</strong>
-          </p>
-        )}
-      </div>
+    <div className="flex flex-col gap-2">
+      <hr className="pb-1.5 mt-2" />
+      <InfoLine
+        label="Dossier déposé le :"
+        value={format(sentAt, "dd/MM/yyyy")}
+      />
 
       {decision == "INCOMPLETE" && decisionSentAt && (
-        <p className="m-0">
-          Motif du signalement :
-          <br />
-          <strong>{decisionComment || "Non renseignée"}</strong>
-        </p>
+        <InfoLine
+          label="Dossier signalé le :"
+          value={format(sentAt, "dd/MM/yyyy")}
+        />
       )}
-      <div>
-        <p className="m-0">Contenu du dossier :</p>
+
+      {decision == "COMPLETE" && decisionSentAt && (
+        <InfoLine
+          label="Dossier vérifié le :"
+          value={format(sentAt, "dd/MM/yyyy")}
+        />
+      )}
+
+      {decision == "INCOMPLETE" && decisionSentAt && (
+        <InfoLine
+          label="Motif du signalement :"
+          value={decisionComment || "Non renseignée"}
+        />
+      )}
+      <div className="mt-6">
+        <InfoLine label="Contenu du dossier :" value="" />
         {file.previewUrl && (
           <FancyPreview
             key={file.url}
@@ -79,3 +74,15 @@ export const DossierDeValidationCard = (props: Props) => {
     </div>
   );
 };
+
+const InfoLine = ({ label, value }: { label: string; value: string }) => (
+  <div className="flex flex-col">
+    <div className="flex flex-col md:flex-row justify-between">
+      <p className="m-0 ml-4">{label}</p>
+      <span className="ml-auto mr-4">
+        <strong>{value}</strong>
+      </span>
+    </div>
+    <hr className="pb-1.5 mt-2" />
+  </div>
+);

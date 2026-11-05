@@ -14,7 +14,7 @@ export const HistoryDossierDeValidationView = (props: Props) => {
   if (historyDossierDeValidation.length == 0) return null;
 
   return (
-    <Accordion label="Voir les précédents dossiers de validation">
+    <Accordion label="Voir les anciens dossiers de validation">
       <div className="flex flex-col gap-6">
         {historyDossierDeValidation.map((dossierDeValidation) => (
           <div key={dossierDeValidation.id}>

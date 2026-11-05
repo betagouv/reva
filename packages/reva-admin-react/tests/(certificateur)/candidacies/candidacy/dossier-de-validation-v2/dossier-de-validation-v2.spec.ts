@@ -102,7 +102,7 @@ test.describe("Dossier de validation v2 page", () => {
     candidateLastname: "Durand",
   });
 
-  test("shows the 'en attente' call-out and no tabs when readyForJuryEstimatedAt is not set", async ({
+  test("shows the 'en attente' call-out when readyForJuryEstimatedAt is not set", async ({
     page,
     msw,
   }) => {
@@ -119,13 +119,12 @@ test.describe("Dossier de validation v2 page", () => {
     await expect(
       page.getByText("Dossier de validation en attente"),
     ).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Dossier" })).toHaveCount(0);
     await expect(
       page.getByRole("link", { name: "Demander une correction" }),
     ).toHaveCount(0);
   });
 
-  test("shows the estimated date and the 'en attente' call-out but no tabs when readyForJuryEstimatedAt is set and no dossier de validation exists yet", async ({
+  test("shows the estimated date and the 'en attente' call-out when readyForJuryEstimatedAt is set and no dossier de validation exists yet", async ({
     page,
     msw,
   }) => {
@@ -151,7 +150,6 @@ test.describe("Dossier de validation v2 page", () => {
         { exact: false },
       ),
     ).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Dossier" })).toHaveCount(0);
     await expect(
       page.getByRole("link", { name: "Demander une correction" }),
     ).toHaveCount(0);
@@ -177,16 +175,9 @@ test.describe("Dossier de validation v2 page", () => {
 
     await openDossierDeValidationPage(page);
 
-    await expect(
-      page.getByText(
-        "Retrouvez ici les documents liés au dossier de validation du candidat.",
-      ),
-    ).toBeVisible();
     await expect(page.getByText("Dossier déposé le :")).toBeVisible();
     await expect(page.getByText("29/05/2024")).toBeVisible();
 
-    // Regression for the v2 routing fix: the button must link to the
-    // dossier-de-validation-v2 problem page, not the legacy folder.
     await expect(
       page.getByRole("link", { name: "Demander une correction" }),
     ).toHaveAttribute("href", CORRECTION_PAGE_HREF);
@@ -243,8 +234,6 @@ test.describe("Dossier de validation v2 page", () => {
     await expect(page.getByText("Dossier signalé le :")).toBeVisible();
     await expect(page.getByText("Motif du signalement :")).toBeVisible();
     await expect(page.getByText("Pièce manquante : CV à jour.")).toBeVisible();
-    // Existing behavior: the "signalé le" date is the deposit date
-    // (sentAt), not decisionSentAt. Asserting the actual rendering.
     await expect(page.getByText("29/05/2024")).toHaveCount(2);
     // decision isn't PENDING, so no correction link should show.
     await expect(
@@ -390,7 +379,7 @@ test.describe("Dossier de validation v2 page", () => {
     await openDossierDeValidationPage(page);
 
     const accordionButton = page.getByRole("button", {
-      name: "Voir les précédents dossiers de validation",
+      name: "Voir les anciens dossiers de validation",
     });
     await expect(accordionButton).toBeVisible();
 
@@ -422,16 +411,11 @@ test.describe("Dossier de validation v2 page", () => {
     await openDossierDeValidationPage(page);
 
     await expect(
-      page.getByText("Voir les précédents dossiers de validation"),
+      page.getByText("Voir les anciens dossiers de validation"),
     ).toHaveCount(0);
   });
 
-  // There is no test for the "Attente de la date prévisionnelle" alert
-  // inside this tab: the tabs only render once readyForJuryEstimatedAt is
-  // set (see pageStatus "SHOW_DV" in page.tsx), so that alert's branch is
-  // currently unreachable through the page.
-
-  test("'Date prévisionnelle' tab shows the formatted date when it is set", async ({
+  test("does not show the ready-for-jury estimated date once a dossier de validation exists", async ({
     page,
     msw,
   }) => {
@@ -450,12 +434,7 @@ test.describe("Dossier de validation v2 page", () => {
 
     await openDossierDeValidationPage(page);
 
-    await page.getByRole("tab", { name: "Date prévisionnelle" }).click();
-
-    await expect(page.getByText("15/08/2024")).toBeVisible();
-    await expect(
-      page.getByText("Attente de la date prévisionnelle"),
-    ).toHaveCount(0);
+    await expect(page.getByText("15/08/2024")).toHaveCount(0);
   });
 
   test("the 'Retour' back link points to the candidacies directory", async ({
