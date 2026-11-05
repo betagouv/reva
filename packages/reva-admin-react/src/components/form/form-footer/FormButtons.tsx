@@ -47,7 +47,7 @@ export const FormButtons = ({
   backUrl,
   submitButtonLabel = "Enregistrer",
   backButtonLabel = "Retour",
-  formState: { isDirty, isSubmitting, canSubmit = true },
+  formState: { isDirty = true, isSubmitting, canSubmit = true },
   className,
   disabled,
   hideResetButton,
