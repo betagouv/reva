@@ -61,8 +61,7 @@ test.describe("Settings Add user account", () => {
         );
         await waitForPageQueries(page);
 
-        const backButton = page.getByTestId("back-button");
-        await backButton.click();
+        await page.getByTestId("back-button").click();
 
         await expect(page).toHaveURL("/admin2/agencies-settings-v3/");
       });

@@ -30,7 +30,11 @@ export const UserAccountForm = ({
 
   const methods = useForm<UserAccountFormData>({
     resolver: standardSchemaResolver(userAccountFormSchema),
-    defaultValues,
+    defaultValues: defaultValues ?? {
+      firstname: "",
+      lastname: "",
+      email: "",
+    },
   });
 
   const {
@@ -43,7 +47,13 @@ export const UserAccountForm = ({
   const handleFormSubmit = handleSubmit((data) => onSubmit?.(data));
 
   const handleReset = useCallback(() => {
-    reset(defaultValues);
+    reset(
+      defaultValues ?? {
+        firstname: "",
+        lastname: "",
+        email: "",
+      },
+    );
   }, [defaultValues, reset]);
 
   return (
