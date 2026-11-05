@@ -144,6 +144,9 @@ test.describe("Shows available parcours", () => {
       page.getByRole("link", { name: "Certification Authority" }),
     ).toHaveAttribute("href", "https://www.certification-authority.com");
     await expect(page.getByText("Parcours 1")).toBeVisible();
+    await expect(
+      page.getByText("Certification Authority Without Parcours"),
+    ).toHaveCount(0);
   });
 });
 

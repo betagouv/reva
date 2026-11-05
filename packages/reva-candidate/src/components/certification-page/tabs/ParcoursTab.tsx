@@ -34,30 +34,32 @@ export const ParcoursTab = ({
       </p>
       {parcoursByCertificationAuthorities &&
       parcoursByCertificationAuthorities.length > 0 ? (
-        parcoursByCertificationAuthorities.map((pba) => (
-          <div
-            key={pba.certificationAuthority.label}
-            data-testid={`parcours-by-certification-authority-${pba.certificationAuthority.label}`}
-          >
-            {pba.certificationAuthority.websiteUrl ? (
-              <a
-                href={pba.certificationAuthority.websiteUrl}
-                target="_blank"
-                className="fr-link"
-              >
-                {pba.certificationAuthority.label}
-              </a>
-            ) : (
-              <span>{pba.certificationAuthority.label}</span>
-            )}
+        parcoursByCertificationAuthorities
+          .filter((pba) => pba.parcours.length > 0)
+          .map((pba) => (
+            <div
+              key={pba.certificationAuthority.label}
+              data-testid={`parcours-by-certification-authority-${pba.certificationAuthority.label}`}
+            >
+              {pba.certificationAuthority.websiteUrl ? (
+                <a
+                  href={pba.certificationAuthority.websiteUrl}
+                  target="_blank"
+                  className="fr-link"
+                >
+                  {pba.certificationAuthority.label}
+                </a>
+              ) : (
+                <span>{pba.certificationAuthority.label}</span>
+              )}
 
-            <ul className="ml-2">
-              {pba.parcours.map((p) => (
-                <li key={p.id}>{p.label}</li>
-              ))}
-            </ul>
-          </div>
-        ))
+              <ul className="ml-2">
+                {pba.parcours.map((p) => (
+                  <li key={p.id}>{p.label}</li>
+                ))}
+              </ul>
+            </div>
+          ))
       ) : (
         <p>Il n'y a pas d'établissements pour ce diplôme.</p>
       )}

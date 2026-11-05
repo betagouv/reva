@@ -90,6 +90,14 @@ export function createCertificationForReducedRequirementsScenario({
               },
             ],
           },
+          {
+            certificationAuthority: createCertificationAuthorityEntity({
+              id: "cert-authority-without-parcours",
+              label: "Certification Authority Without Parcours",
+              websiteUrl: "https://www.without-parcours.com",
+            }),
+            parcours: [],
+          },
         ]
       : [],
     certificationAuthorityStructure:

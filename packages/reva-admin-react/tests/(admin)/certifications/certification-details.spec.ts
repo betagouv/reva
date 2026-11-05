@@ -80,6 +80,14 @@ function createCertificationDetailsHandlers({
                       },
                     ],
                   },
+                  {
+                    certificationAuthority: {
+                      id: "certification-authority-without-parcours-id",
+                      label: "Certification Authority Without Parcours",
+                      websiteUrl: "https://www.without-parcours.com",
+                    },
+                    parcours: [],
+                  },
                 ]
               : [],
         },
@@ -187,5 +195,8 @@ test.describe("admin certification details page", () => {
       parcoursCard.getByRole("link", { name: "Certification Authority" }),
     ).toHaveAttribute("href", "https://www.certification-authority.com");
     await expect(parcoursCard.getByText("Parcours 1")).toBeVisible();
+    await expect(
+      parcoursCard.getByText("Certification Authority Without Parcours"),
+    ).toHaveCount(0);
   });
 });
