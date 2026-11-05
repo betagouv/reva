@@ -353,6 +353,10 @@ SET
     WHEN certificate_skills IS NOT NULL AND certificate_skills != '' THEN 'Compétences anonymisées'
     ELSE certificate_skills
   END,
+  other_training = CASE
+    WHEN other_training IS NOT NULL AND other_training != '' THEN 'Formation anonymisée'
+    ELSE other_training
+  END,
   funding_contact_firstname = CASE
     WHEN funding_contact_firstname IS NOT NULL AND funding_contact_firstname != '' THEN 'Prénom-' || LEFT(id::text, 8)
     ELSE funding_contact_firstname
