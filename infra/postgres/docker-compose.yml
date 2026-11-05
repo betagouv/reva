@@ -7,5 +7,6 @@ services:
       POSTGRES_DB: reva
       POSTGRES_USER: reva
       POSTGRES_PASSWORD: password
+    shm_size: "1gb"
     ports:
       - 5444:5432
