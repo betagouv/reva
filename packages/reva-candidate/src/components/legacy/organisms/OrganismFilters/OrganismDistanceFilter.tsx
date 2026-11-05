@@ -29,6 +29,7 @@ export const OrganismDistanceFilter = ({
       <fieldset>
         <AutocompleteAddress
           label="Où souhaitez-vous réaliser votre accompagnement ?"
+          hintText="Indiquez un code postal"
           disabled={disabled}
           onOptionSelection={(selectedOption) => {
             onChangeSearchZip(selectedOption?.zip ?? "");

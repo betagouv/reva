@@ -15,6 +15,7 @@ import {
 
 export const AutocompleteAddress = ({
   label,
+  hintText,
   onOptionSelection,
   className,
   nativeInputProps,
@@ -26,6 +27,7 @@ export const AutocompleteAddress = ({
   onClearSelection,
 }: {
   label?: string;
+  hintText?: React.ReactNode;
   displayMode?: "street" | "birthPlace";
   onOptionSelection: (
     selectedOption: AddressOption,
@@ -198,7 +200,7 @@ export const AutocompleteAddress = ({
         state={state}
         stateRelatedMessage={stateRelatedMessage}
         label={label ?? "Adresse"}
-        hintText="Indiquez un code postal"
+        hintText={hintText}
         data-testid="autocomplete-input"
         iconId="fr-icon-map-pin-2-fill"
       />
