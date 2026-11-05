@@ -14,9 +14,15 @@ export const getAdditionalDocumentsFilaNamesAndUrlsByCertificationAdditionalInfo
         },
       );
 
-    return additionalDocuments.map((additionalDocument) =>
-      getFileNameAndUrl({
-        fileId: additionalDocument.fileId,
-      }),
+    const files = await Promise.all(
+      additionalDocuments.map((additionalDocument) =>
+        getFileNameAndUrl({
+          fileId: additionalDocument.fileId,
+        }),
+      ),
     );
+
+    const nonNullFiles = files.filter((file) => file !== null);
+
+    return nonNullFiles;
   };

@@ -134,11 +134,20 @@ const unsafeReferentialResolvers = {
       getFormacodesByCertificationId({ certificationId }),
   },
   CertificationAdditionalInfo: {
-    dossierDeValidationTemplate: ({
+    dossierDeValidationTemplate: async ({
       dossierDeValidationTemplateFileId,
     }: {
       dossierDeValidationTemplateFileId: string;
-    }) => getFileNameAndUrl({ fileId: dossierDeValidationTemplateFileId }),
+    }) => {
+      const file = await getFileNameAndUrl({
+        fileId: dossierDeValidationTemplateFileId,
+      });
+      if (!file?.url) {
+        return null;
+      }
+
+      return file;
+    },
     additionalDocuments: ({
       id: certificationAdditionalInfoId,
     }: {
