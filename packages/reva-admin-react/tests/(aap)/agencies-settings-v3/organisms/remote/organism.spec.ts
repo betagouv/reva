@@ -178,16 +178,6 @@ test.describe("VAE collective toggle", () => {
 
       await toggle.click();
 
-      await waitGraphQL(
-        page,
-        "updateOrganismDisponiblePourVaeCollectiveMutation",
-      );
-
-      await waitGraphQL(
-        page,
-        "getOrganismForOrganismDisponiblePourVaeCollectiveToggle",
-      );
-
       await expect(
         page.getByText("Disponibilité pour la VAE collective mise à jour"),
       ).toBeVisible();
@@ -234,11 +224,6 @@ test.describe("VAE collective toggle", () => {
       const toggle = page.getByTitle(VAE_COLLECTIVE_TOGGLE_TITLE);
 
       await toggle.click();
-
-      await waitGraphQL(
-        page,
-        "updateOrganismDisponiblePourVaeCollectiveMutation",
-      );
 
       await waitGraphQL(
         page,

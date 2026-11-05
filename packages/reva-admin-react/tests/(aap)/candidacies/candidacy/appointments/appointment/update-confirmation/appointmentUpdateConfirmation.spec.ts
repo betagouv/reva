@@ -90,6 +90,7 @@ test.describe("when I access the update appointment confirmation page", () => {
         "appointment-update-confirmation-page-go-back-to-appointments-button",
       )
       .click();
+
     await expect(page).toHaveURL(
       `/admin2/candidacies/${CANDIDACY_ID}/appointments/`,
     );
