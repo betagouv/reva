@@ -264,7 +264,10 @@ test.describe("Dossier de validation v2 page", () => {
     await expect(page.getByText("Dossier signalé le :")).toBeVisible();
     await expect(page.getByText("Motif du signalement :")).toBeVisible();
     await expect(page.getByText("Pièce manquante : CV à jour.")).toBeVisible();
-    await expect(page.getByText("29/05/2024")).toHaveCount(2);
+    // "Dossier déposé le" shows the deposit date, "Dossier signalé le" shows
+    // the decision date — they must not collapse onto the same value.
+    await expect(page.getByText("29/05/2024")).toHaveCount(1);
+    await expect(page.getByText("05/06/2024")).toHaveCount(1);
     // decision isn't PENDING, so no correction link should show.
     await expect(
       page.getByRole("link", { name: "Demande de correction" }),

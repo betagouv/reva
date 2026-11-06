@@ -31,14 +31,14 @@ export const DossierDeValidationCard = (props: Props) => {
       {decision == "INCOMPLETE" && decisionSentAt && (
         <InfoLine
           label="Dossier signalé le :"
-          value={format(sentAt, "dd/MM/yyyy")}
+          value={format(decisionSentAt, "dd/MM/yyyy")}
         />
       )}
 
       {decision == "COMPLETE" && decisionSentAt && (
         <InfoLine
           label="Dossier vérifié le :"
-          value={format(sentAt, "dd/MM/yyyy")}
+          value={format(decisionSentAt, "dd/MM/yyyy")}
         />
       )}
 
