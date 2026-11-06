@@ -159,9 +159,9 @@ export const ContactInformationForm = ({
         className="flex flex-col gap-6"
         data-testid="contact-information-form"
       >
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 md:gap-6">
           <div className="col-span-3 flex flex-col gap-6">
-            <div className="grid grid-cols-3 gap-6 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
               {manualAddressSelected ? (
                 <Input
                   label="Adresse complète"
@@ -208,8 +208,8 @@ export const ContactInformationForm = ({
             </div>
 
             {manualAddressSelected && (
-              <div className="grid grid-cols-3 gap-6 items-end">
-                <div className="flex flex-row gap-6 col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                <div className="flex flex-col md:flex-row gap-6 col-span-2">
                   <Input
                     label="Code postal"
                     className="flex-[1] mb-0"
@@ -230,7 +230,7 @@ export const ContactInformationForm = ({
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-6 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 items-start">
               <Input
                 label="Adresse électronique de connexion"
                 className="col-span-2 mb-0"
@@ -241,7 +241,7 @@ export const ContactInformationForm = ({
               />
               <Input
                 label="Numéro de téléphone"
-                className="col-span-1 mb-0"
+                className="col-span-1 mb-0 mt-6 md:mt-0"
                 nativeInputProps={register("phone")}
                 state={errors.phone ? "error" : "default"}
                 stateRelatedMessage={errors.phone?.message}
@@ -250,7 +250,7 @@ export const ContactInformationForm = ({
             </div>
           </div>
 
-          <div className="col-span-1">
+          <div className="col-span-1 w-full md:w-auto mt-6 md:mt-0">
             <div className="flex flex-col px-4 pt-6 bg-dsfr-light-decisions-background-background-alt-blue-france">
               <h6>Ressources :</h6>
               <div>
