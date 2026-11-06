@@ -14,16 +14,19 @@ export const HistoryDossierDeValidationView = (props: Props) => {
   if (historyDossierDeValidation.length == 0) return null;
 
   return (
-    <Accordion label="Voir les anciens dossiers de validation">
-      <div className="flex flex-col gap-6">
-        {historyDossierDeValidation.map((dossierDeValidation) => (
-          <div key={dossierDeValidation.id}>
-            <DossierDeValidationCard
-              dossierDeValidation={dossierDeValidation}
-            />
-          </div>
-        ))}
-      </div>
-    </Accordion>
+    <>
+      <Accordion label="Voir les anciens dossiers de validation">
+        <div className="flex flex-col gap-6">
+          {historyDossierDeValidation.map((dossierDeValidation) => (
+            <div key={dossierDeValidation.id}>
+              <DossierDeValidationCard
+                dossierDeValidation={dossierDeValidation}
+              />
+            </div>
+          ))}
+        </div>
+      </Accordion>
+      <span /> {/* quirk: needed for the accordion bottom hr to be displayed */}
+    </>
   );
 };
