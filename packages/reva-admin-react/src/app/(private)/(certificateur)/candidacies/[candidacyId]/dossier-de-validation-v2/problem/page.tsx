@@ -49,10 +49,9 @@ const DossierDeValidationProblemPage = () => {
         <h1>Demander une correction</h1>
         <FormOptionalFieldsDisclaimer />
         <p className="text-xl mb-12">
-          Vous avez observé un ou plusieurs problèmes ou éléments manquants dans
-          le dossier ? Décrivez-les dans l’encart ci-dessous et faites parvenir
-          vos remarques à la personne concernée. Une fois modifié, le dossier de
-          validation mis à jour vous sera renvoyé.
+          Après correction, l’ensemble des éléments requis devront vous être
+          renvoyés : dossier de validation, et, le cas échéant, documents
+          complémentaires et demande d’aménagement de jury.
         </p>
         <form className="flex flex-col w-full" onSubmit={handleFormSubmit}>
           <div className="flex justify-between gap-2 mb-6 border-y py-2">
