@@ -257,7 +257,7 @@ export const CivilInformationForm = ({
         className="flex flex-col gap-6"
         data-testid="civil-information-form"
       >
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 md:gap-6">
           <div className="col-span-3 flex flex-col gap-6">
             <RadioButtons
               className="mb-0 w-full"
@@ -275,7 +275,7 @@ export const CivilInformationForm = ({
               stateRelatedMessage={errors.gender?.message}
             />
 
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
                 label="Nom de naissance"
                 className="w-full mb-0"
@@ -317,7 +317,7 @@ export const CivilInformationForm = ({
                 />
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Input
                   label="Prénom principal"
                   className="w-full mb-0"
@@ -343,7 +343,7 @@ export const CivilInformationForm = ({
                 />
               </div>
             )}
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
                 label="Date de naissance"
                 className="mb-0"
@@ -390,7 +390,7 @@ export const CivilInformationForm = ({
                   )}
 
                   <Checkbox
-                    className="mb-0 w-full mt-12"
+                    className="mb-0 w-full mt-2 md:mt-12"
                     small
                     options={[
                       {
@@ -408,7 +408,7 @@ export const CivilInformationForm = ({
             </div>
 
             {!isBirthPlaceEnabled && (
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Select
                   className="w-full mb-0"
                   label="Pays de naissance"
@@ -455,7 +455,7 @@ export const CivilInformationForm = ({
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Input
                 label="Nationalité"
                 className="w-full mb-0"
@@ -467,7 +467,7 @@ export const CivilInformationForm = ({
             </div>
           </div>
 
-          <div className="col-span-1">
+          <div className="col-span-1 w-full md:w-auto mt-6 md:mt-0">
             <div className="flex flex-col px-4 pt-6 bg-dsfr-light-decisions-background-background-alt-blue-france">
               <h6>Ressources :</h6>
 

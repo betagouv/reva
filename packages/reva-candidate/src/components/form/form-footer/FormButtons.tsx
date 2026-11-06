@@ -81,17 +81,22 @@ export const FormButtons = ({
   return (
     <>
       <div
-        className={`flex gap-4 items-center justify-between mt-10 ${className || ""}`}
+        className={`flex flex-col md:flex-row w-full md:w-auto gap-4 items-center justify-between mt-10 ${className || ""}`}
         data-testid="form-buttons"
         role="group"
         aria-label="Actions du formulaire"
       >
         {backUrl && (
-          <BackButton navigateBack={navigateBack} title={backLabel} />
+          <BackButton
+            className="w-full md:w-auto justify-center"
+            navigateBack={navigateBack}
+            title={backLabel}
+          />
         )}
-        <div className="flex gap-x-2 ml-auto">
+        <div className="flex flex-col w-full md:w-auto md:flex-row gap-4 ml-auto">
           {!hideResetButton && (
             <Button
+              className="w-full md:w-auto justify-center"
               type="reset"
               priority="tertiary no outline"
               disabled={!isDirty}
@@ -101,6 +106,7 @@ export const FormButtons = ({
             </Button>
           )}
           <Button
+            className="w-full md:w-auto justify-center"
             type="submit"
             disabled={isSubmitting || !isDirty || !canSubmit}
             aria-label={`${submitButtonLabel} le formulaire`}

@@ -67,7 +67,7 @@ export const NonVaeCollectiveDashboard = ({
                   </div>
                 }
                 small
-                className="h-24"
+                className="md:h-24"
                 orientation="horizontal"
                 buttonProps={{
                   onClick: () => {
@@ -86,7 +86,7 @@ export const NonVaeCollectiveDashboard = ({
                   </div>
                 }
                 small
-                className="h-24"
+                className="md:h-24"
                 orientation="horizontal"
                 buttonProps={{
                   onClick: () => {
@@ -107,7 +107,7 @@ export const NonVaeCollectiveDashboard = ({
                   </div>
                 }
                 small
-                className="h-24"
+                className="md:h-24"
                 orientation="horizontal"
                 buttonProps={{
                   onClick: modalDistanceInfo.open,
