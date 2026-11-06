@@ -59,10 +59,7 @@ export const useDossierDeValidationPageLogic = () => {
     candidacyId: string;
   }>();
 
-  const {
-    data: getDossierDeValidationResponse,
-    status: getDossierDeValidationStatus,
-  } = useQuery({
+  const { data: getDossierDeValidationResponse } = useQuery({
     queryKey: ["getCandidacyWithDossierDeValidation", candidacyId],
     refetchInterval: PREVIEW_URL_REFETCH_INTERVAL_MS,
     queryFn: () =>
@@ -82,7 +79,6 @@ export const useDossierDeValidationPageLogic = () => {
   const canSignalProblem = dossierDeValidation?.decision === "PENDING" && !jury;
 
   return {
-    getDossierDeValidationStatus,
     dossierDeValidation,
     historyDossierDeValidation,
     candidacy,

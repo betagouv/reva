@@ -16,7 +16,6 @@ const DossierDeValidationPage = () => {
     dossierDeValidation,
     historyDossierDeValidation,
     candidacy,
-    getDossierDeValidationStatus,
     canSignalProblem,
   } = useDossierDeValidationPageLogic();
 
@@ -25,14 +24,14 @@ const DossierDeValidationPage = () => {
     | "SHOW_DV_WARNING_AND_READY_FOR_JURY_ESTIMATED_DATE"
     | "SHOW_DV" = "SHOW_FULL_WARNING";
 
-  if (readyForJuryEstimatedAt) {
-    if (dossierDeValidation) {
-      pageStatus = "SHOW_DV";
-    } else {
-      pageStatus = "SHOW_DV_WARNING_AND_READY_FOR_JURY_ESTIMATED_DATE";
-    }
+  if (dossierDeValidation) {
+    pageStatus = "SHOW_DV";
   } else {
-    pageStatus = "SHOW_FULL_WARNING";
+    if (readyForJuryEstimatedAt) {
+      pageStatus = "SHOW_DV_WARNING_AND_READY_FOR_JURY_ESTIMATED_DATE";
+    } else {
+      pageStatus = "SHOW_FULL_WARNING";
+    }
   }
 
   return (
@@ -81,12 +80,27 @@ const DossierDeValidationPage = () => {
         </>
       )}
 
-      {pageStatus === "SHOW_DV" &&
-        getDossierDeValidationStatus === "success" &&
-        dossierDeValidation && (
-          <div className="flex flex-col gap-10 flex-1 mb-2 overflow-auto">
-            <DossierDeValidationCard
-              dossierDeValidation={{
+      {pageStatus === "SHOW_DV" && dossierDeValidation && (
+        <div className="flex flex-col gap-10 flex-1 mb-2 overflow-auto">
+          <DossierDeValidationCard
+            dossierDeValidation={{
+              id: dossierDeValidation.id,
+              sentAt: dossierDeValidation.dossierDeValidationSentAt,
+              file: dossierDeValidation.dossierDeValidationFile,
+              otherFiles: dossierDeValidation.dossierDeValidationOtherFiles,
+              decision: dossierDeValidation.decision,
+              decisionSentAt: dossierDeValidation.decisionSentAt,
+              decisionComment: dossierDeValidation.decisionComment,
+            }}
+          />
+
+          {canSignalProblem && candidacy && (
+            <RequestCorrectionTile candidacyId={candidacy.id} />
+          )}
+
+          <HistoryDossierDeValidationView
+            historyDossierDeValidation={historyDossierDeValidation.map(
+              (dossierDeValidation) => ({
                 id: dossierDeValidation.id,
                 sentAt: dossierDeValidation.dossierDeValidationSentAt,
                 file: dossierDeValidation.dossierDeValidationFile,
@@ -94,28 +108,11 @@ const DossierDeValidationPage = () => {
                 decision: dossierDeValidation.decision,
                 decisionSentAt: dossierDeValidation.decisionSentAt,
                 decisionComment: dossierDeValidation.decisionComment,
-              }}
-            />
-
-            {canSignalProblem && candidacy && (
-              <RequestCorrectionTile candidacyId={candidacy.id} />
+              }),
             )}
-
-            <HistoryDossierDeValidationView
-              historyDossierDeValidation={historyDossierDeValidation.map(
-                (dossierDeValidation) => ({
-                  id: dossierDeValidation.id,
-                  sentAt: dossierDeValidation.dossierDeValidationSentAt,
-                  file: dossierDeValidation.dossierDeValidationFile,
-                  otherFiles: dossierDeValidation.dossierDeValidationOtherFiles,
-                  decision: dossierDeValidation.decision,
-                  decisionSentAt: dossierDeValidation.decisionSentAt,
-                  decisionComment: dossierDeValidation.decisionComment,
-                }),
-              )}
-            />
-          </div>
-        )}
+          />
+        </div>
+      )}
       <Button
         priority="secondary"
         className="mt-6"

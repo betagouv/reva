@@ -155,6 +155,36 @@ test.describe("Dossier de validation v2 page", () => {
     ).toHaveCount(0);
   });
 
+  test("shows the dossier card even when readyForJuryEstimatedAt is empty", async ({
+    page,
+    msw,
+  }) => {
+    msw.use(
+      ...certificateurCommonHandlers,
+      createDossierDeValidationHandler({
+        readyForJuryEstimatedAt: null,
+        activeDossierDeValidation: {
+          id: "ddv-1",
+          decision: "PENDING",
+          dossierDeValidationSentAt: SENT_AT,
+          dossierDeValidationFile: file("dossier.pdf"),
+        },
+        jury: null,
+      }),
+    );
+
+    await openDossierDeValidationPage(page);
+
+    await expect(page.getByText("Dossier déposé le :")).toBeVisible();
+    await expect(page.getByText("29/05/2024")).toBeVisible();
+    await expect(
+      page.getByText("Dossier de validation en attente"),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Demande de correction" }),
+    ).toHaveAttribute("href", CORRECTION_PAGE_HREF);
+  });
+
   test("shows the dossier card and the correction link pointing to the v2 problem page when decision is PENDING and no jury", async ({
     page,
     msw,
