@@ -123,7 +123,7 @@ export const TypologyAndCollectiveAgreementForm = ({
         className="flex flex-col gap-6"
         data-testid="contact-information-form"
       >
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 md:gap-6">
           <div className="col-span-3 flex flex-col">
             <Select
               className="w-full"
@@ -179,7 +179,7 @@ export const TypologyAndCollectiveAgreementForm = ({
             )}
           </div>
 
-          <div className="col-span-1">
+          <div className="col-span-1 w-full md:w-auto mt-6 md:mt-0">
             <div className="flex flex-col px-4 pt-6 bg-dsfr-light-decisions-background-background-alt-blue-france">
               <h6>Ressources :</h6>
               <div>
