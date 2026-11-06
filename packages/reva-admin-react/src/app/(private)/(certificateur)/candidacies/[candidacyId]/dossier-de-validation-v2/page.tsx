@@ -7,6 +7,7 @@ import { formatIso8601Date } from "@/utils/formatIso8601Date";
 
 import { DossierDeValidationCard } from "./_components/DossierDeValidationCard";
 import { HistoryDossierDeValidationView } from "./_components/HistoryDossierDeValidationView";
+import { RequestCorrectionTile } from "./_components/RequestCorrectionTile";
 import { useDossierDeValidationPageLogic } from "./dossierDeValidationPageLogic";
 
 const DossierDeValidationPage = () => {
@@ -96,16 +97,8 @@ const DossierDeValidationPage = () => {
               }}
             />
 
-            {canSignalProblem && (
-              <Button
-                priority="secondary"
-                className="mt-10 ml-auto"
-                linkProps={{
-                  href: `/candidacies/${candidacy?.id}/dossier-de-validation-v2/problem`,
-                }}
-              >
-                Demander une correction
-              </Button>
+            {canSignalProblem && candidacy && (
+              <RequestCorrectionTile candidacyId={candidacy.id} />
             )}
 
             <HistoryDossierDeValidationView

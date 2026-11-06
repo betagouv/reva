@@ -120,7 +120,7 @@ test.describe("Dossier de validation v2 page", () => {
       page.getByText("Dossier de validation en attente"),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Demander une correction" }),
+      page.getByRole("link", { name: "Demande de correction" }),
     ).toHaveCount(0);
   });
 
@@ -151,7 +151,7 @@ test.describe("Dossier de validation v2 page", () => {
       ),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Demander une correction" }),
+      page.getByRole("link", { name: "Demande de correction" }),
     ).toHaveCount(0);
   });
 
@@ -179,7 +179,7 @@ test.describe("Dossier de validation v2 page", () => {
     await expect(page.getByText("29/05/2024")).toBeVisible();
 
     await expect(
-      page.getByRole("link", { name: "Demander une correction" }),
+      page.getByRole("link", { name: "Demande de correction" }),
     ).toHaveAttribute("href", CORRECTION_PAGE_HREF);
   });
 
@@ -205,7 +205,7 @@ test.describe("Dossier de validation v2 page", () => {
 
     await expect(page.getByText("Dossier déposé le :")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Demander une correction" }),
+      page.getByRole("link", { name: "Demande de correction" }),
     ).toHaveCount(0);
   });
 
@@ -237,7 +237,7 @@ test.describe("Dossier de validation v2 page", () => {
     await expect(page.getByText("29/05/2024")).toHaveCount(2);
     // decision isn't PENDING, so no correction link should show.
     await expect(
-      page.getByRole("link", { name: "Demander une correction" }),
+      page.getByRole("link", { name: "Demande de correction" }),
     ).toHaveCount(0);
   });
 
