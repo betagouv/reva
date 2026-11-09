@@ -3,6 +3,7 @@ import { FeasibilityFormat, FeasibilityStatus } from "@prisma/client";
 import { prismaClient } from "@/prisma/client";
 import { createCandidacyHelper } from "@/test/helpers/entities/create-candidacy-helper";
 import { createCertificationAuthorityHelper } from "@/test/helpers/entities/create-certification-authority-helper";
+import { createParcoursCertificationHelper } from "@/test/helpers/entities/create-parcours-certification-helper";
 import { getCandidateDepartmentIdOrThrow } from "@/test/helpers/entities/get-candidate-department-id-or-throw";
 
 import { refreshCertificationAuthorityOfCandidacy } from "./refreshCertificationAuthorityOfCandidacy";
@@ -141,6 +142,72 @@ describe("refreshCertificationAuthorityOfCandidacy", () => {
         where: { id: candidacy.id },
       });
       expect(updated?.certificationAuthorityId).toEqual(ca.id);
+    });
+  });
+
+  describe("when the certification has parcours", () => {
+    const createCertificationAuthorityOnParcours = async (
+      candidacy: Candidacy,
+      parcoursCertificationId: string,
+    ) =>
+      createCertificationAuthorityHelper({
+        certificationAuthorityOnCertification: {
+          create: {
+            certificationId: candidacy.certificationId!,
+            certificationAuthorityOnCertificationOnParcoursCertifications: {
+              create: { parcoursCertificationId },
+            },
+          },
+        },
+        certificationAuthorityOnDepartment: {
+          create: {
+            departmentId: getCandidateDepartmentIdOrThrow(candidacy.candidate),
+          },
+        },
+      });
+
+    test("should set certificationAuthorityId when exactly one CA is linked to a parcours", async () => {
+      const candidacy = await createCandidacyHelper();
+      const parcoursCertification = await createParcoursCertificationHelper({
+        certificationId: candidacy.certificationId!,
+      });
+      const ca = await createCertificationAuthorityOnParcours(
+        candidacy,
+        parcoursCertification.id,
+      );
+      // Linked to the certification and the department, but not to a parcours.
+      await createMatchingCertificationAuthority(candidacy);
+
+      await refreshCertificationAuthorityOfCandidacy({
+        candidacyId: candidacy.id,
+      });
+
+      const updated = await prismaClient.candidacy.findUnique({
+        where: { id: candidacy.id },
+      });
+      expect(updated?.certificationAuthorityId).toEqual(ca.id);
+    });
+
+    test("should set certificationAuthorityId to null when no CA is linked to a parcours", async () => {
+      const candidacy = await createCandidacyHelper();
+      await createParcoursCertificationHelper({
+        certificationId: candidacy.certificationId!,
+      });
+      const caWithoutParcours =
+        await createMatchingCertificationAuthority(candidacy);
+      await prismaClient.candidacy.update({
+        where: { id: candidacy.id },
+        data: { certificationAuthorityId: caWithoutParcours.id },
+      });
+
+      await refreshCertificationAuthorityOfCandidacy({
+        candidacyId: candidacy.id,
+      });
+
+      const updated = await prismaClient.candidacy.findUnique({
+        where: { id: candidacy.id },
+      });
+      expect(updated?.certificationAuthorityId).toBeNull();
     });
   });
 });

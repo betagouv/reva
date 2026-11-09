@@ -8,6 +8,7 @@ import { createCandidacyHelper } from "@/test/helpers/entities/create-candidacy-
 import { createCertificationAuthorityHelper } from "@/test/helpers/entities/create-certification-authority-helper";
 import { createCertificationHelper } from "@/test/helpers/entities/create-certification-helper";
 import { createFeasibilityUploadedPdfHelper } from "@/test/helpers/entities/create-feasibility-uploaded-pdf-helper";
+import { createParcoursCertificationHelper } from "@/test/helpers/entities/create-parcours-certification-helper";
 import { getCandidateDepartmentIdOrThrow } from "@/test/helpers/entities/get-candidate-department-id-or-throw";
 import { injectGraphql } from "@/test/helpers/graphql-helper";
 import { getGraphQLClient } from "@/test/test-graphql-client";
@@ -675,4 +676,102 @@ test("should only return the certification authorities available for the departm
     res.candidate_getCandidateWithCandidacy.candidacy
       .certificationAuthorities[0].id,
   ).toBe(certificationAuthorityWithDepartment.id);
+});
+
+/**
+ * When a certification has parcours, a certification authority is available
+ * only if it is linked to one of those parcours and to the candidate's department.
+ */
+test("should only return the certification authorities linked to a parcours when the certification has parcours", async () => {
+  const certification = await createCertificationHelper();
+  const parcoursCertification = await createParcoursCertificationHelper({
+    certificationId: certification.id,
+  });
+
+  const candidacy = await createCandidacyHelper({
+    candidacyArgs: {
+      certificationId: certification.id,
+    },
+  });
+  const departmentId = getCandidateDepartmentIdOrThrow(candidacy.candidate);
+  const otherDepartment = await prismaClient.department.findFirstOrThrow({
+    where: { id: { not: departmentId } },
+  });
+
+  const certificationAuthorityWithParcours =
+    await createCertificationAuthorityHelper({
+      certificationAuthorityOnCertification: {
+        create: {
+          certificationId: certification.id,
+          certificationAuthorityOnCertificationOnParcoursCertifications: {
+            create: {
+              parcoursCertificationId: parcoursCertification.id,
+            },
+          },
+        },
+      },
+      certificationAuthorityOnDepartment: {
+        create: { departmentId },
+      },
+    });
+
+  // Linked to the certification and the department, but not to a parcours.
+  await createCertificationAuthorityHelper({
+    certificationAuthorityOnCertification: {
+      create: { certificationId: certification.id },
+    },
+    certificationAuthorityOnDepartment: {
+      create: { departmentId },
+    },
+  });
+
+  // Linked to a parcours, but not to the candidate's department.
+  await createCertificationAuthorityHelper({
+    certificationAuthorityOnCertification: {
+      create: {
+        certificationId: certification.id,
+        certificationAuthorityOnCertificationOnParcoursCertifications: {
+          create: {
+            parcoursCertificationId: parcoursCertification.id,
+          },
+        },
+      },
+    },
+    certificationAuthorityOnDepartment: {
+      create: { departmentId: otherDepartment.id },
+    },
+  });
+
+  const graphqlClient = getGraphQLClient({
+    headers: {
+      authorization: authorizationHeaderForUser({
+        role: "candidate",
+        keycloakId: candidacy?.candidate?.keycloakId,
+      }),
+    },
+  });
+
+  const getCandidacy = graphql(`
+    query candidate_getCandidateWithCandidacyAndCertificationAuthroites {
+      candidate_getCandidateWithCandidacy {
+        candidacy {
+          certificationId
+          certificationAuthorities {
+            id
+            label
+          }
+        }
+      }
+    }
+  `);
+
+  const res = await graphqlClient.request(getCandidacy);
+  expect(
+    res.candidate_getCandidateWithCandidacy.candidacy.certificationAuthorities
+      .length,
+  ).toBe(1);
+  expect(
+    res.candidate_getCandidateWithCandidacy.candidacy
+      .certificationAuthorities[0].id,
+  ).toBe(certificationAuthorityWithParcours.id);
 });

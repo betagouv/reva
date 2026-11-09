@@ -81,16 +81,47 @@ export const getCertificationAuthorities = async ({
   const certificationId = candidacy?.certificationId;
   const departmentId = candidacy?.candidate?.departmentId;
 
-  return certificationId && departmentId
-    ? prismaClient.certificationAuthority.findMany({
-        where: {
-          certificationAuthorityOnDepartment: { some: { departmentId } },
-          certificationAuthorityOnCertification: {
-            some: { certificationId },
+  if (!certificationId || !departmentId) {
+    return [];
+  }
+
+  const certificationOnParcoursCertifications =
+    await prismaClient.parcoursCertification.findMany({
+      where: {
+        certificationId,
+      },
+    });
+
+  // If the certification has parcours certifications, we need to filter the certification authorities by the parcours certifications
+  if (certificationOnParcoursCertifications.length > 0) {
+    return prismaClient.certificationAuthority.findMany({
+      where: {
+        certificationAuthorityOnDepartment: { some: { departmentId } },
+        certificationAuthorityOnCertification: {
+          some: {
+            certificationAuthorityOnCertificationOnParcoursCertifications: {
+              some: {
+                parcoursCertification: {
+                  certificationId,
+                },
+              },
+            },
           },
         },
-      })
-    : [];
+      },
+    });
+  }
+
+  return prismaClient.certificationAuthority.findMany({
+    where: {
+      certificationAuthorityOnDepartment: { some: { departmentId } },
+      certificationAuthorityOnCertification: {
+        some: {
+          certificationId,
+        },
+      },
+    },
+  });
 };
 
 export const createFeasibility = async ({
