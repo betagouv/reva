@@ -7,7 +7,7 @@ import { PREVIEW_URL_REFETCH_INTERVAL_MS } from "@/constants/previewUrl.constant
 import { graphql } from "@/graphql/generated";
 
 const getCandidacyWithDossierDeValidationQuery = graphql(`
-  query getCandidacyWithDossierDeValidation($candidacyId: ID!) {
+  query getCandidacyWithDossierDeValidationV2($candidacyId: ID!) {
     getCandidacyById(id: $candidacyId) {
       id
       readyForJuryEstimatedAt
@@ -28,9 +28,19 @@ const getCandidacyWithDossierDeValidationQuery = graphql(`
           url
           previewUrl
         }
+        amenagementSpecifique {
+          id
+          justificationDescription
+          justificationFile {
+            name
+            url
+            previewUrl
+          }
+        }
       }
       jury {
         id
+        result
       }
       historyDossierDeValidation {
         id
@@ -60,7 +70,7 @@ export const useDossierDeValidationPageLogic = () => {
   }>();
 
   const { data: getDossierDeValidationResponse } = useQuery({
-    queryKey: ["getCandidacyWithDossierDeValidation", candidacyId],
+    queryKey: ["getCandidacyWithDossierDeValidationV2", candidacyId],
     refetchInterval: PREVIEW_URL_REFETCH_INTERVAL_MS,
     queryFn: () =>
       graphqlClient.request(getCandidacyWithDossierDeValidationQuery, {
@@ -78,7 +88,12 @@ export const useDossierDeValidationPageLogic = () => {
 
   const canSignalProblem = dossierDeValidation?.decision === "PENDING" && !jury;
 
+  const amenagementSpecifique = jury?.result
+    ? null
+    : dossierDeValidation?.amenagementSpecifique;
+
   return {
+    amenagementSpecifique,
     dossierDeValidation,
     historyDossierDeValidation,
     candidacy,

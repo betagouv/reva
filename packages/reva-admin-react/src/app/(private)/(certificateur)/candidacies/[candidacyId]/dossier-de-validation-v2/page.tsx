@@ -5,6 +5,7 @@ import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 
 import { formatIso8601Date } from "@/utils/formatIso8601Date";
 
+import { AmenagementSpecifiqueBlock } from "./_components/AmenagementSpecifiqueBlock";
 import { DossierDeValidationCard } from "./_components/DossierDeValidationCard";
 import { HistoryDossierDeValidationView } from "./_components/HistoryDossierDeValidationView";
 import { RequestCorrectionTile } from "./_components/RequestCorrectionTile";
@@ -12,6 +13,7 @@ import { useDossierDeValidationPageLogic } from "./dossierDeValidationPageLogic"
 
 const DossierDeValidationPage = () => {
   const {
+    amenagementSpecifique,
     readyForJuryEstimatedAt,
     dossierDeValidation,
     historyDossierDeValidation,
@@ -81,7 +83,7 @@ const DossierDeValidationPage = () => {
       )}
 
       {pageStatus === "SHOW_DV" && dossierDeValidation && (
-        <div className="flex flex-col gap-10 flex-1 mb-2 overflow-auto">
+        <div className="flex flex-col gap-10 flex-1 mb-2 -mx-2 px-2 overflow-auto">
           <DossierDeValidationCard
             dossierDeValidation={{
               id: dossierDeValidation.id,
@@ -93,6 +95,13 @@ const DossierDeValidationPage = () => {
               decisionComment: dossierDeValidation.decisionComment,
             }}
           />
+
+          {amenagementSpecifique && (
+            <AmenagementSpecifiqueBlock
+              description={amenagementSpecifique.justificationDescription}
+              justificatif={amenagementSpecifique.justificationFile}
+            />
+          )}
 
           {canSignalProblem && candidacy && (
             <RequestCorrectionTile candidacyId={candidacy.id} />

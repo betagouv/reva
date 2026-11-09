@@ -40,7 +40,21 @@ type DossierDeValidationFixture = {
     url: string;
     previewUrl?: string | null;
   }[];
+  amenagementSpecifique?: {
+    id: string;
+    justificationDescription: string;
+    justificationFile: {
+      name: string;
+      url: string;
+      previewUrl?: string | null;
+    } | null;
+  } | null;
 };
+
+const AMENAGEMENT_TITLE =
+  "Demande d’aménagement pour le passage devant le jury :";
+const AMENAGEMENT_DESCRIPTION = "Besoin d'un temps de passage majoré.";
+const JUSTIFICATIF_TEST_ID = "feasibility-files-preview-Justificatif";
 
 const file = (
   name: string,
@@ -59,11 +73,11 @@ function createDossierDeValidationHandler({
 }: {
   readyForJuryEstimatedAt?: string | null;
   activeDossierDeValidation?: DossierDeValidationFixture | null;
-  jury?: { id: string } | null;
+  jury?: { id: string; result?: string | null } | null;
   historyDossierDeValidation?: DossierDeValidationFixture[];
 }) {
   return fvae.query(
-    "getCandidacyWithDossierDeValidation",
+    "getCandidacyWithDossierDeValidationV2",
     graphQLResolver({
       getCandidacyById: {
         id: CANDIDACY_ID,
@@ -91,7 +105,7 @@ async function openDossierDeValidationPage(page: Page) {
   await Promise.all([
     waitGraphQL(page, "activeFeaturesForConnectedUser"),
     waitGraphQL(page, "getCandidacyWithCandidateInfoForLayout"),
-    waitGraphQL(page, "getCandidacyWithDossierDeValidation"),
+    waitGraphQL(page, "getCandidacyWithDossierDeValidationV2"),
   ]);
 }
 
@@ -468,6 +482,228 @@ test.describe("Dossier de validation v2 page", () => {
     await openDossierDeValidationPage(page);
 
     await expect(page.getByText("15/08/2024")).toHaveCount(0);
+  });
+
+  test.describe("amenagement specifique block", () => {
+    const dossierWithAmenagement = ({
+      decision = "PENDING",
+      justificationDescription = AMENAGEMENT_DESCRIPTION,
+      justificationFile = file("justificatif.pdf"),
+    }: {
+      decision?: DossierDeValidationDecision;
+      justificationDescription?: string;
+      justificationFile?: ReturnType<typeof file> | null;
+    } = {}): DossierDeValidationFixture => ({
+      id: "ddv-1",
+      decision,
+      dossierDeValidationSentAt: SENT_AT,
+      dossierDeValidationFile: file("dossier.pdf"),
+      amenagementSpecifique: {
+        id: "amenagement-1",
+        justificationDescription,
+        justificationFile,
+      },
+    });
+
+    test("is hidden when the dossier has no amenagement", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: {
+            ...dossierWithAmenagement(),
+            amenagementSpecifique: null,
+          },
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText("Dossier déposé le :")).toBeVisible();
+      await expect(page.getByText(AMENAGEMENT_TITLE)).toHaveCount(0);
+    });
+
+    test("shows the description and the justificatif for a pending dossier", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement(),
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText(AMENAGEMENT_TITLE)).toBeVisible();
+      await expect(page.getByText(AMENAGEMENT_DESCRIPTION)).toBeVisible();
+      await expect(page.getByTestId(JUSTIFICATIF_TEST_ID)).toBeVisible();
+    });
+
+    test("is placed before the correction tile", async ({ page, msw }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement(),
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      const blockBox = await page
+        .getByTestId("amenagement-specifique-block")
+        .boundingBox();
+      const tileBox = await page
+        .getByRole("link", { name: "Demande de correction" })
+        .boundingBox();
+
+      expect(blockBox!.y).toBeLessThan(tileBox!.y);
+    });
+
+    test("shows the description and the justificatif when the decision is INCOMPLETE", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: {
+            ...dossierWithAmenagement({ decision: "INCOMPLETE" }),
+            decisionSentAt: DECISION_SENT_AT,
+            decisionComment: "Pièce manquante",
+          },
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText(AMENAGEMENT_DESCRIPTION)).toBeVisible();
+      await expect(page.getByTestId(JUSTIFICATIF_TEST_ID)).toBeVisible();
+    });
+
+    test("shows the description without a justificatif when there is no file", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement({
+            justificationFile: null,
+          }),
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText(AMENAGEMENT_DESCRIPTION)).toBeVisible();
+      await expect(page.getByTestId(JUSTIFICATIF_TEST_ID)).toHaveCount(0);
+    });
+
+    test("shows the description without a justificatif when the file has no previewUrl", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement({
+            justificationFile: file("justificatif.pdf", null),
+          }),
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText(AMENAGEMENT_DESCRIPTION)).toBeVisible();
+      await expect(page.getByTestId(JUSTIFICATIF_TEST_ID)).toHaveCount(0);
+    });
+
+    test("is entirely hidden, including the justificatif, when a jury result exists", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement(),
+          jury: { id: "jury-1", result: "FULL_SUCCESS_OF_FULL_CERTIFICATION" },
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText("Dossier déposé le :")).toBeVisible();
+      await expect(page.getByText(AMENAGEMENT_TITLE)).toHaveCount(0);
+      await expect(page.getByText(AMENAGEMENT_DESCRIPTION)).toHaveCount(0);
+      await expect(page.getByTestId(JUSTIFICATIF_TEST_ID)).toHaveCount(0);
+    });
+
+    test("is still shown when a jury exists without a result", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement(),
+          jury: { id: "jury-1", result: null },
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText(AMENAGEMENT_DESCRIPTION)).toBeVisible();
+      await expect(page.getByTestId(JUSTIFICATIF_TEST_ID)).toBeVisible();
+    });
+
+    test("expands and collapses a long description", async ({ page, msw }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement({
+            justificationDescription: "Besoin d'un aménagement. ".repeat(100),
+          }),
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await page.getByRole("button", { name: "En voir plus" }).click();
+
+      const collapseButton = page.getByRole("button", {
+        name: "En voir moins",
+      });
+      await expect(collapseButton).toHaveAttribute("aria-expanded", "true");
+
+      await collapseButton.click();
+
+      await expect(
+        page.getByRole("button", { name: "En voir plus" }),
+      ).toHaveAttribute("aria-expanded", "false");
+    });
+
+    test("does not show the toggle for a short description", async ({
+      page,
+      msw,
+    }) => {
+      msw.use(
+        ...certificateurCommonHandlers,
+        createDossierDeValidationHandler({
+          activeDossierDeValidation: dossierWithAmenagement(),
+        }),
+      );
+
+      await openDossierDeValidationPage(page);
+
+      await expect(page.getByText(AMENAGEMENT_DESCRIPTION)).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "En voir plus" }),
+      ).toHaveCount(0);
+    });
   });
 
   test("the 'Retour' back link points to the candidacies directory", async ({
