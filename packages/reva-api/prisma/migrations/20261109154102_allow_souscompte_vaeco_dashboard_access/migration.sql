@@ -1,0 +1,1 @@
+insert into "public"."role_permission_vae_collective" ("permission", "role") values ('VOIR_STATISTIQUES', 'SOUS_COMPTE_VAE_COLLECTIVE')

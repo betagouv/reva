@@ -27,6 +27,7 @@ type SousCompteVaeCollective {
   canCreateCohorteVaeCollective: Boolean!
   rolesSpecificToCohorte(cohorteVaeCollectiveId: ID!): [RoleVaeCollective!]!
   isAAPAccount: Boolean!
+  metabaseDashboardIframeUrl: String
 }
 
 type SousCompteVaeCollectivePage {
@@ -111,6 +112,7 @@ type Query {
     commanditaireVaeCollectiveId: ID!
     sousCompteVaeCollectiveId: ID!
   ): SousCompteVaeCollective!
+  vaeCollective_getSousCompteVaeCollectiveForConnectedUser: SousCompteVaeCollective!
 }
 
 input SousCompteVaeCollectiveAndRoleInput {

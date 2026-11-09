@@ -28,10 +28,12 @@ import { getCohorteVAECollectiveById } from "./features/getCohorteVAECollectiveB
 import { getCommanditaireVaeCollectiveById } from "./features/getCommanditaireVaeCollectiveById";
 import { getCommanditaireVaeCollectiveForAccountId } from "./features/getCommanditaireVaeCollectiveForAccountId";
 import { getCommanditaireVaeCollectives } from "./features/getCommanditaireVaeCollectives";
+import { getMetabaseDashboardIframeUrlForSousCompteVaeCollective } from "./features/getMetabaseDashboardIframeUrlSousCompteVaeCollective";
 import { getMetabaseDashboardIframeUrlVaeCollective } from "./features/getMetabaseDashboardIframeUrlVaeCollective";
 import { getRolesSpecificToSousCompteAndCohorteVaeCollective } from "./features/getRolesSpecificToSousCompteAndCohorteVaeCollective";
 import { getSousComptesByCommanditaireVaeCollectiveId } from "./features/getSousComptesByCommanditaireVaeCollectiveId";
 import { getSousCompteVaeCollectiveById } from "./features/getSousCompteVaeCollectiveById";
+import { getSousCompteVaeCollectiveForConnectedUser } from "./features/getSousCompteVaeCollectiveForConnectedUser";
 import { getUserPermissions } from "./features/getUserPermissions";
 import { publishCohorteVAECollective } from "./features/publishCohorteVAECollective";
 import { updateCohorteVAECollectiveCertification } from "./features/updateCohorteVAECollectiveCertification";
@@ -102,6 +104,14 @@ const unsafeResolvers = {
       getRolesSpecificToSousCompteAndCohorteVaeCollective({
         sousCompteVaeCollectiveId,
         cohorteVaeCollectiveId,
+      }),
+    metabaseDashboardIframeUrl: async ({
+      id: sousCompteVaeCollectiveId,
+    }: {
+      id: string;
+    }) =>
+      getMetabaseDashboardIframeUrlForSousCompteVaeCollective({
+        sousCompteVaeCollectiveId,
       }),
   },
   Candidacy: {
@@ -182,6 +192,14 @@ const unsafeResolvers = {
             userRoles: context.auth.userInfo?.realm_access?.roles || [],
           },
         ),
+    vaeCollective_getSousCompteVaeCollectiveForConnectedUser: async (
+      _parent: unknown,
+      _args: unknown,
+      context: GraphqlContext,
+    ) =>
+      getSousCompteVaeCollectiveForConnectedUser({
+        keycloakId: context.auth.userInfo?.sub || "",
+      }),
     vaeCollective_getCohorteVaeCollectiveById: async (
       _parent: unknown,
       { cohorteVaeCollectiveId }: { cohorteVaeCollectiveId: string },
@@ -391,6 +409,7 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     canCreateCohorteVaeCollective: isAnyone,
     // Uniquement accessible via CommanditaireVaeCollective.sousComptes, déjà protégé ci-dessous.
     rolesSpecificToCohorte: isAnyone,
+    metabaseDashboardIframeUrl: hasVaeCollectivePermission("VOIR_STATISTIQUES"),
   },
   Candidacy: {
     // Champ d'une candidature déjà protégée par la policy de son parent.
@@ -416,6 +435,7 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     vaeCollective_getUserPermissions: isAnyone,
     vaeCollective_getSousCompteVaeCollective:
       hasVaeCollectivePermission("VOIR_SOUS_COMPTE"),
+    vaeCollective_getSousCompteVaeCollectiveForConnectedUser: isAnyone,
   },
   Mutation: {
     vaeCollective_createCohorteVaeCollective:
