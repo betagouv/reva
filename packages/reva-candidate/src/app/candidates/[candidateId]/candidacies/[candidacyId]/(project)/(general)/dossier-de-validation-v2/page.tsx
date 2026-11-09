@@ -86,8 +86,8 @@ export default function DossierDeValidationPag() {
                 }
               />
             ) : (
-              <>
-                <div>
+              <div className="flex flex-row gap-4">
+                <div className="lg:basis-9/12">
                   {hasFailedJuryResult && (
                     <>
                       <Alert
@@ -123,54 +123,56 @@ export default function DossierDeValidationPag() {
                           </div>
                         }
                       />
-                      {dossierDeValidation?.dossierDeValidationSentAt && (
+                    </>
+                  )}
+                  {dossierDeValidation?.decision === "INCOMPLETE" &&
+                    currentProblem && (
+                      <>
+                        <Alert
+                          data-testid="dossier-de-validation-signale-alert"
+                          className="mb-6"
+                          severity="warning"
+                          title={`Dossier de validation signalé par le certificateur le ${format(currentProblem.decisionSentAt, "dd/MM/yyyy")}`}
+                          description={
+                            <div className="flex flex-col gap-6">
+                              <p>
+                                Ce dossier de validation a été signalé comme
+                                comportant des erreurs par le certificateur.
+                              </p>
+                              <p>
+                                <span className="font-semibold">
+                                  Motif du signalement :{" "}
+                                </span>
+                                {currentProblem.decisionComment}
+                              </p>
+                              <p className="font-semibold">
+                                Nous vous invitons à retourner dès que possible
+                                un dossier corrigé.
+                              </p>
+                            </div>
+                          }
+                        />
+                      </>
+                    )}
+                  <DateAndSubmissionTiles
+                    readyForJuryEstimatedAt={
+                      readyForJuryEstimatedAt
+                        ? format(readyForJuryEstimatedAt, "dd/MM/yyyy")
+                        : undefined
+                    }
+                  />
+                  {hasFailedJuryResult &&
+                    dossierDeValidation?.dossierDeValidationSentAt && (
+                      <div className="mt-6">
                         <PreviousDossierAccordion
                           dossierDeValidation={dossierDeValidation}
                           juryDateOfResult={jury?.dateOfResult}
                         />
-                      )}
-                    </>
-                  )}
-                </div>
-                <div className="flex flex-row gap-4">
-                  <div className="lg:basis-9/12">
-                    {dossierDeValidation?.decision === "INCOMPLETE" &&
-                      currentProblem && (
-                        <>
-                          <Alert
-                            data-testid="dossier-de-validation-signale-alert"
-                            className="mb-6"
-                            severity="warning"
-                            title={`Dossier de validation signalé par le certificateur le ${format(currentProblem.decisionSentAt, "dd/MM/yyyy")}`}
-                            description={
-                              <div className="flex flex-col gap-6">
-                                <p>
-                                  Ce dossier de validation a été signalé comme
-                                  comportant des erreurs par le certificateur.
-                                </p>
-                                <p>
-                                  <span className="font-semibold">
-                                    Motif du signalement :{" "}
-                                  </span>
-                                  {currentProblem.decisionComment}
-                                </p>
-                                <p className="font-semibold">
-                                  Nous vous invitons à retourner dès que
-                                  possible un dossier corrigé.
-                                </p>
-                              </div>
-                            }
-                          />
-                        </>
-                      )}
-                    <DateAndSubmissionTiles
-                      readyForJuryEstimatedAt={
-                        readyForJuryEstimatedAt
-                          ? format(readyForJuryEstimatedAt, "dd/MM/yyyy")
-                          : undefined
-                      }
-                    />
-                    {previousProblems.length > 0 && (
+                      </div>
+                    )}
+                  {dossierDeValidation?.decision === "INCOMPLETE" &&
+                    currentProblem &&
+                    previousProblems.length > 0 && (
                       <div className="fr-accordions-group mt-6">
                         <Accordion label="Voir les anciens dossiers de validation">
                           <ul className="flex flex-col gap-8 pl-0">
@@ -196,12 +198,11 @@ export default function DossierDeValidationPag() {
                         </Accordion>
                       </div>
                     )}
-                  </div>
-                  <div className="lg:basis-3/12">
-                    <ResourcesSection certification={certification} />
-                  </div>
                 </div>
-              </>
+                <div className="lg:basis-3/12">
+                  <ResourcesSection certification={certification} />
+                </div>
+              </div>
             )}
           </>
         )}
