@@ -196,17 +196,9 @@ export const ResultatByBlocks = () => {
   );
 
   let availableResultOptions: JuryResult[] = [];
-  if (candidacy?.typeAccompagnement === "AUTONOME") {
-    availableResultOptions = [...ALL_OPTIONS];
-  } else if (
-    candidacy?.typeAccompagnement === "ACCOMPAGNE" &&
-    candidacy?.isCertificationPartial
-  ) {
+  if (candidacy?.isCertificationPartial === true) {
     availableResultOptions = [...PARTIAL_CERTIFICATION_OPTIONS];
-  } else if (
-    candidacy?.typeAccompagnement === "ACCOMPAGNE" &&
-    !candidacy?.isCertificationPartial
-  ) {
+  } else if (candidacy?.isCertificationPartial === false) {
     availableResultOptions = [...FULL_CERTIFICATION_OPTIONS];
   }
   const {
