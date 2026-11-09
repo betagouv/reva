@@ -127,9 +127,9 @@ export default function AttachmentsPage() {
   } = useForm<FormData>({
     resolver: standardSchemaResolver(schema),
     defaultValues: {
-      idCard: undefined,
-      equivalenceOrExemptionProof: undefined,
-      trainingCertificate: undefined,
+      idCard: { 0: undefined },
+      equivalenceOrExemptionProof: { 0: undefined },
+      trainingCertificate: { 0: undefined },
       additionalFiles: [],
     },
   });

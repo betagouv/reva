@@ -66,7 +66,7 @@ const PaymentRequestUniFvaeUploadPage = () => {
     handleSubmit,
   } = useForm<PaymentRequestUniFvaeUploadFormData>({
     resolver: standardSchemaResolver(paymentRequestUniFvaeUploadSchema),
-    defaultValues: { contractorInvoiceFiles: [{}] },
+    defaultValues: { contractorInvoiceFiles: [{ 0: undefined }] },
   });
 
   const {
@@ -117,7 +117,7 @@ const PaymentRequestUniFvaeUploadPage = () => {
   );
 
   const handleReset = useCallback(() => {
-    reset({ contractorInvoiceFiles: [{}] });
+    reset({ contractorInvoiceFiles: [{ 0: undefined }] });
   }, [reset]);
 
   useEffect(() => {

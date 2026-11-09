@@ -51,7 +51,7 @@ export const DossierDeValidationTab = (props: Props) => {
   } = useForm<DossierDeValidationFormData>({
     resolver: standardSchemaResolver(dossierDeValidationSchema),
     shouldUnregister: true,
-    defaultValues: { dossierDeValidationOtherFiles: [{}] },
+    defaultValues: { dossierDeValidationOtherFiles: [{ 0: undefined }] },
   });
 
   const {
@@ -68,7 +68,7 @@ export const DossierDeValidationTab = (props: Props) => {
     dossierDeValidationOtherFilesFields.length >= maxAdditionalFiles;
 
   const handleReset = useCallback(() => {
-    reset({ dossierDeValidationOtherFiles: [{}] });
+    reset({ dossierDeValidationOtherFiles: [{ 0: undefined }] });
   }, [reset]);
 
   const handleFormSubmit = handleSubmit(onFormSubmit);

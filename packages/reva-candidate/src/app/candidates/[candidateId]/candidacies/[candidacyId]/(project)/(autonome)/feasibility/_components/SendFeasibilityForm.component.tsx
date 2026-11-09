@@ -101,10 +101,10 @@ export const SendFeasibilityForm = (): React.ReactNode => {
     resolver: standardSchemaResolver(schema),
     defaultValues: {
       certificationAuthorityId: certificationAuthoritySelectedId,
-      feasibilityFile: {},
-      idFile: {},
-      documentaryProofFile: {},
-      certificateOfAttendanceFile: {},
+      feasibilityFile: { 0: undefined },
+      idFile: { 0: undefined },
+      documentaryProofFile: { 0: undefined },
+      certificateOfAttendanceFile: { 0: undefined },
       requirements: [
         {
           id: "0",
