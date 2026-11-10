@@ -204,7 +204,7 @@ export const AutocompleteAddress = ({
         data-testid="autocomplete-input"
         iconId="fr-icon-map-pin-2-fill"
       />
-      {isLoading && (
+      {isLoading && displayOptions && searchText && (
         <div
           data-testid="autocomplete-options"
           className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
