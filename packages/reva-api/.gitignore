@@ -1,6 +1,7 @@
-./dist
-./coverage
-./modules/generated-graphql-schema.graphql
-./modules/graphql/generated
-./prisma/seed/referentials/private
-./prisma/*.tar
+/dist
+/coverage
+/modules/generated-graphql-schema.graphql
+/modules/graphql/generated
+/prisma/seed/referentials/private
+/prisma/*.tar
+/scripts/exports/
