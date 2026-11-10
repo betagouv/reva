@@ -20,17 +20,28 @@ export async function PrivateHeader() {
 
   // Comme getActiveFeatures, on tolère l'échec de cet appel : le header est rendu
   // sur toutes les pages privées, pas seulement celles d'un commanditaire.
-  let canViewStatistiques = false;
+  let canViewCommanditaireStatistiques = false;
   try {
-    canViewStatistiques = await hasPermission({
-      permission: "VOIR_STATISTIQUES",
+    canViewCommanditaireStatistiques = await hasPermission({
+      permission: "VOIR_STATISTIQUES_COMMANDITAIRE",
     });
   } catch (error) {
     console.error("Failed to fetch user permissions:", error);
   }
 
-  const showMetabaseDashboard =
-    isMetabaseDashboardActive && canViewStatistiques;
+  let canViewSousCompteStatistiques = false;
+  try {
+    canViewSousCompteStatistiques = await hasPermission({
+      permission: "VOIR_STATISTIQUES_SOUS_COMPTE",
+    });
+  } catch (error) {
+    console.error("Failed to fetch user permissions:", error);
+  }
+
+  const showCommanditaireDashboard =
+    isMetabaseDashboardActive && canViewCommanditaireStatistiques;
+  const showSousCompteDashboard =
+    isMetabaseDashboardActive && canViewSousCompteStatistiques;
 
   // Comme getActiveFeatures, on tolère l'échec de cet appel : le header est rendu
   // sur toutes les pages privées, pas seulement celles d'un commanditaire.
@@ -50,7 +61,8 @@ export async function PrivateHeader() {
 
   return (
     <PrivateHeaderClient
-      showMetabaseDashboard={showMetabaseDashboard}
+      showCommanditaireDashboard={showCommanditaireDashboard}
+      showSousCompteDashboard={showSousCompteDashboard}
       showAccountsPage={showAccountsPage}
       showParametersPage={showParametersPage}
     />

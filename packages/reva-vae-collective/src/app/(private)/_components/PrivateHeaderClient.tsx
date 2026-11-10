@@ -7,7 +7,8 @@ import { useKeycloakContext } from "@/components/auth/keycloakContext";
 
 const PATHS = {
   COHORTES: "/cohortes",
-  DASHBOARD: "/dashboard",
+  DASHBOARD_COMMANDITAIRE: "/dashboard-commanditaire",
+  DASHBOARD_SOUS_COMPTE: "/dashboard-souscompte",
   ACCOUNTS: "/comptes-utilisateur",
   PARAMETERS: "/parametres",
 } as const;
@@ -36,11 +37,13 @@ const createTab = ({
 });
 
 export const PrivateHeaderClient = ({
-  showMetabaseDashboard,
+  showCommanditaireDashboard,
+  showSousCompteDashboard,
   showAccountsPage,
   showParametersPage,
 }: {
-  showMetabaseDashboard: boolean;
+  showCommanditaireDashboard: boolean;
+  showSousCompteDashboard: boolean;
   showAccountsPage: boolean;
   showParametersPage: boolean;
 }) => {
@@ -54,7 +57,10 @@ export const PrivateHeaderClient = ({
 
   const showTabs =
     authenticated &&
-    (showMetabaseDashboard || showAccountsPage || showParametersPage) &&
+    (showCommanditaireDashboard ||
+      showSousCompteDashboard ||
+      showAccountsPage ||
+      showParametersPage) &&
     isCommanditairePath;
 
   const navigation = showTabs
@@ -64,12 +70,23 @@ export const PrivateHeaderClient = ({
           href: `/commanditaires/${commanditaireId}${PATHS.COHORTES}`,
           isActive: currentPathname.includes(PATHS.COHORTES),
         }),
-        ...(showMetabaseDashboard
+        ...(showCommanditaireDashboard
           ? [
               createTab({
                 text: LABELS.DASHBOARD,
-                href: `/commanditaires/${commanditaireId}${PATHS.DASHBOARD}`,
-                isActive: currentPathname.includes(PATHS.DASHBOARD),
+                href: `/commanditaires/${commanditaireId}${PATHS.DASHBOARD_COMMANDITAIRE}`,
+                isActive: currentPathname.includes(
+                  PATHS.DASHBOARD_COMMANDITAIRE,
+                ),
+              }),
+            ]
+          : []),
+        ...(showSousCompteDashboard
+          ? [
+              createTab({
+                text: LABELS.DASHBOARD,
+                href: `/commanditaires/${commanditaireId}${PATHS.DASHBOARD_SOUS_COMPTE}`,
+                isActive: currentPathname.includes(PATHS.DASHBOARD_SOUS_COMPTE),
               }),
             ]
           : []),

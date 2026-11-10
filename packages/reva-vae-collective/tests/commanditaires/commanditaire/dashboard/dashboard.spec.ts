@@ -37,30 +37,40 @@ const mockCommanditaireVaeCollectiveForCohortesPage = () =>
   });
 
 test.describe("Pilotage navigation tab", () => {
-  test.describe("when the user has the VOIR_STATISTIQUES permission", () => {
+  test.describe("when the user has the VOIR_STATISTIQUES_COMMANDITAIRE permission", () => {
     test.use({
       mswHandlers: [
         [
           mockCommanditaireVaeCollectiveForCohortesPage(),
           mockQueryActiveFeatures(["SHOW_METABASE_DASHBOARD_VAE_COLLECTIVE"]),
-          mockQueryGetUserPermissions(["VOIR_STATISTIQUES"]),
+          mockQueryGetUserPermissions(["VOIR_STATISTIQUES_COMMANDITAIRE"]),
         ],
         { scope: "test" },
       ],
     });
 
-    test("the Pilotage tab should be visible", async ({ page }) => {
+    test("the Pilotage tab should link to the commanditaire dashboard", async ({
+      page,
+    }) => {
       await login({ page, role: "gestionnaireVaeCollective" });
 
       await page.goto(
         "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes",
       );
 
-      await expect(page.getByRole("link", { name: "Pilotage" })).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Pilotage" }),
+      ).toHaveAttribute(
+        "href",
+        "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/dashboard-commanditaire",
+      );
+      await expect(page.locator("a[href*='dashboard-souscompte']")).toHaveCount(
+        0,
+      );
     });
   });
 
-  test.describe("when the user lacks the VOIR_STATISTIQUES permission", () => {
+  test.describe("when the user lacks the VOIR_STATISTIQUES_COMMANDITAIRE permission", () => {
     test.use({
       mswHandlers: [
         [
@@ -84,6 +94,39 @@ test.describe("Pilotage navigation tab", () => {
       ).toBeVisible();
 
       await expect(page.getByRole("link", { name: "Pilotage" })).toHaveCount(0);
+    });
+  });
+
+  test.describe("when the user is a sous compte with the VOIR_STATISTIQUES_SOUS_COMPTE permission", () => {
+    test.use({
+      mswHandlers: [
+        [
+          mockCommanditaireVaeCollectiveForCohortesPage(),
+          mockQueryActiveFeatures(["SHOW_METABASE_DASHBOARD_VAE_COLLECTIVE"]),
+          mockQueryGetUserPermissions(["VOIR_STATISTIQUES_SOUS_COMPTE"]),
+        ],
+        { scope: "test" },
+      ],
+    });
+
+    test("the Pilotage tab should link to the sous-compte dashboard", async ({
+      page,
+    }) => {
+      await login({ page, role: "sousCompteVaeCollective" });
+
+      await page.goto(
+        "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/cohortes",
+      );
+
+      await expect(
+        page.getByRole("link", { name: "Pilotage" }),
+      ).toHaveAttribute(
+        "href",
+        "/vae-collective/commanditaires/115c2693-b625-491b-8b91-c7b3875d86a0/dashboard-souscompte",
+      );
+      await expect(
+        page.locator("a[href*='dashboard-commanditaire']"),
+      ).toHaveCount(0);
     });
   });
 });
