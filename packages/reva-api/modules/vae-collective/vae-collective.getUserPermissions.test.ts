@@ -46,7 +46,7 @@ describe("get user permissions vae collective", () => {
         "SUPPRIMER_COHORTE",
         "VOIR_LISTE_COHORTES",
         "VOIR_COHORTE",
-        "VOIR_STATISTIQUES",
+        "VOIR_STATISTIQUES_COMMANDITAIRE",
         "CREER_SOUS_COMPTE",
         "MODIFIER_SOUS_COMPTE",
         "SUPPRIMER_SOUS_COMPTE",

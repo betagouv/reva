@@ -409,7 +409,9 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
     canCreateCohorteVaeCollective: isAnyone,
     // Uniquement accessible via CommanditaireVaeCollective.sousComptes, déjà protégé ci-dessous.
     rolesSpecificToCohorte: isAnyone,
-    metabaseDashboardIframeUrl: hasVaeCollectivePermission("VOIR_STATISTIQUES"),
+    metabaseDashboardIframeUrl: hasVaeCollectivePermission(
+      "VOIR_STATISTIQUES_SOUS_COMPTE",
+    ),
   },
   Candidacy: {
     // Champ d'une candidature déjà protégée par la policy de son parent.
@@ -417,7 +419,9 @@ export const vaeCollectiveResolvers = withPolicies(unsafeResolvers, {
   },
   CommanditaireVaeCollective: {
     cohorteVaeCollectives: hasVaeCollectivePermission("VOIR_LISTE_COHORTES"),
-    metabaseDashboardIframeUrl: hasVaeCollectivePermission("VOIR_STATISTIQUES"),
+    metabaseDashboardIframeUrl: hasVaeCollectivePermission(
+      "VOIR_STATISTIQUES_COMMANDITAIRE",
+    ),
     sousComptes: hasVaeCollectivePermission("VOIR_LISTE_SOUS_COMPTES"),
   },
   Query: {
