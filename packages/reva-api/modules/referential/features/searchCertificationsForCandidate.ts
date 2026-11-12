@@ -88,20 +88,7 @@ export const searchCertificationsForCandidate = async ({
               certificationsFromCohorteVaeCollectiveIds,
             )})`
           : Prisma.empty
-      }
-      -- On inclus uniquement les certifications qui sont soit : 
-      --  - Sans parcours
-      --  - Avec au moins un parcours et au moins une autorité de certification associée à un parcours
-      and (
-        not exists (select 1 from parcours_certification pc where pc.certification_id = c.id)
-        or
-        exists (
-          select 1
-          from parcours_certification pc
-          join certification_authority_on_certification_on_parcours_certification caocopc on caocopc.parcours_certification_id = pc.id
-          where pc.certification_id = c.id
-        )
-      )`;
+      }`;
 
   const allCertificationsQuery = Prisma.sql`
       from certification c
@@ -117,20 +104,7 @@ export const searchCertificationsForCandidate = async ({
               certificationsFromCohorteVaeCollectiveIds,
             )})`
           : Prisma.empty
-      }
-      -- On inclus uniquement les certifications qui sont soit : 
-      --  - Sans parcours
-      --  - Avec au moins un parcours et au moins une autorité de certification associée à un parcours
-      and (
-        not exists (select 1 from parcours_certification pc where pc.certification_id = c.id)
-        or
-        exists (
-          select 1
-          from parcours_certification pc
-          join certification_authority_on_certification_on_parcours_certification caocopc on caocopc.parcours_certification_id = pc.id
-          where pc.certification_id = c.id
-        )
-      )`;
+      }`;
 
   const commonQuery = organismId ? organismQuery : allCertificationsQuery;
 

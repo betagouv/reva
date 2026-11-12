@@ -15,6 +15,8 @@ import { getGraphQLClient } from "@/test/test-graphql-client";
 
 import { graphql } from "../graphql/generated";
 
+import { updateCertificationsVisibility } from "./features/updateCertificationsVisibility";
+
 const createCertifications = async () => {
   for (const cert of particulierEmployeurCertifications) {
     await createCertificationHelper({
@@ -238,13 +240,19 @@ describe("Parcours certification", () => {
     ]);
   });
 
-  test("ne doit pas renvoyer une certification si elle a des parcours mais aucune autorité de certification rattachée", async () => {
+  test("should not return a certification whose parcours have no certification authority linked", async () => {
     const certification = await createCertificationHelper({
       label: "Certif without authority",
     });
     await createParcoursCertificationHelper({
       certificationId: certification.id,
     });
+    await createCertificationAuthorityHelper({
+      certificationAuthorityOnCertification: {
+        create: { certificationId: certification.id },
+      },
+    });
+    await updateCertificationsVisibility([certification.id], prismaClient);
 
     const resp = await searchCertificationsForCandidate({
       searchText: "Certif without authority",
@@ -253,7 +261,7 @@ describe("Parcours certification", () => {
     expect(obj.data.searchCertificationsForCandidate.info.totalRows).toBe(0);
   });
 
-  test("doit renvoyer une certification si elle a des parcours et qu'une autorité de certification est rattachée à au moins un parcours", async () => {
+  test("should return a certification with at least one parcours linked to a certification authority", async () => {
     const certificationWithAuthority = await createCertificationHelper({
       label: "Certif with authority and parcours",
     });
@@ -273,6 +281,10 @@ describe("Parcours certification", () => {
         },
       },
     });
+    await updateCertificationsVisibility(
+      [certificationWithAuthority.id],
+      prismaClient,
+    );
 
     const resp = await searchCertificationsForCandidate({
       searchText: "Certif with authority and parcours",
