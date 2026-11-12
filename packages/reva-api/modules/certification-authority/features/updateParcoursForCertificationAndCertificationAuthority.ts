@@ -1,3 +1,4 @@
+import { updateCertificationsVisibility } from "@/modules/referential/features/updateCertificationsVisibility";
 import { prismaClient } from "@/prisma/client";
 
 export const updateParcoursForCertificationAndCertificationAuthority = async ({
@@ -41,6 +42,7 @@ export const updateParcoursForCertificationAndCertificationAuthority = async ({
         })),
       },
     );
+    await updateCertificationsVisibility([certificationId], tx);
   });
 
   return true;

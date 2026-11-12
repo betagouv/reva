@@ -800,5 +800,39 @@ describe("certification authority certification parcours", () => {
         );
       expect(receivedParcoursIds).toEqual([newParcoursCertification.id]);
     });
+
+    test("should update the certification visibility according to its parcours linked to a certification authority", async () => {
+      const certification = await createCertificationHelper();
+      const parcoursCertification = await createParcoursCertificationHelper({
+        certificationId: certification.id,
+      });
+      const certificationAuthority = await createCertificationAuthorityHelper({
+        certificationAuthorityOnCertification: {
+          create: { certificationId: certification.id },
+        },
+      });
+      const updateParcours = (parcoursCertificationIds: string[]) =>
+        graphqlUpdateParcoursForCertificationAndCertificationAuthority({
+          role: "manage_certification_authority_local_account",
+          account: {
+            keycloakId: certificationAuthority.account.keycloakId,
+          },
+          certificationId: certification.id,
+          certificationAuthorityId: certificationAuthority.id,
+          parcoursCertificationIds,
+        });
+      const getVisible = async () =>
+        (
+          await prismaClient.certification.findUniqueOrThrow({
+            where: { id: certification.id },
+          })
+        ).visible;
+
+      await updateParcours([]);
+      expect(await getVisible()).toBe(false);
+
+      await updateParcours([parcoursCertification.id]);
+      expect(await getVisible()).toBe(true);
+    });
   });
 });
