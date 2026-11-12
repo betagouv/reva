@@ -4,6 +4,7 @@ import { addDays, startOfToday, subDays } from "date-fns";
 import { prismaClient } from "@/prisma/client";
 import { createCertificationAuthorityHelper } from "@/test/helpers/entities/create-certification-authority-helper";
 import { createCertificationHelper } from "@/test/helpers/entities/create-certification-helper";
+import { createParcoursCertificationHelper } from "@/test/helpers/entities/create-parcours-certification-helper";
 
 import { updateCertificationsVisibility } from "./updateCertificationsVisibility";
 
@@ -12,14 +13,23 @@ const createCertificationWithAuthority = async (
 ) => {
   const certification = await createCertificationHelper(args);
   const certificationAuthority = await createCertificationAuthorityHelper();
-  await prismaClient.certificationAuthorityOnCertification.create({
-    data: {
-      certificationId: certification.id,
-      certificationAuthorityId: certificationAuthority.id,
-    },
-  });
-  return certification;
+  const certificationAuthorityOnCertification =
+    await prismaClient.certificationAuthorityOnCertification.create({
+      data: {
+        certificationId: certification.id,
+        certificationAuthorityId: certificationAuthority.id,
+      },
+    });
+  return { ...certification, certificationAuthorityOnCertification };
 };
+
+const createEligibleCertificationWithAuthority = () =>
+  createCertificationWithAuthority({
+    status: CertificationStatus.VALIDE_PAR_CERTIFICATEUR,
+    availableAt: subDays(new Date(), 1),
+    rncpExpiresAt: addDays(new Date(), 1),
+    visible: false,
+  });
 
 const getVisible = async (certificationId: string) =>
   (
@@ -154,6 +164,40 @@ describe("updateCertificationsVisibility", () => {
 
     expect(await getVisible(includedCertification.id)).toBe(true);
     expect(await getVisible(excludedCertification.id)).toBe(false);
+  });
+
+  test("keeps invisible an otherwise eligible certification whose parcours have no certification authority linked", async () => {
+    const certification = await createEligibleCertificationWithAuthority();
+    await createParcoursCertificationHelper({
+      certificationId: certification.id,
+    });
+
+    await updateCertificationsVisibility([certification.id], prismaClient);
+
+    expect(await getVisible(certification.id)).toBe(false);
+  });
+
+  test("makes visible an eligible certification with at least one parcours linked to a certification authority", async () => {
+    const certification = await createEligibleCertificationWithAuthority();
+    const linkedParcours = await createParcoursCertificationHelper({
+      certificationId: certification.id,
+    });
+    await createParcoursCertificationHelper({
+      certificationId: certification.id,
+    });
+    await prismaClient.certificationAuthorityOnCertificationOnParcoursCertification.create(
+      {
+        data: {
+          certificationAuthorityOnCertificationId:
+            certification.certificationAuthorityOnCertification.id,
+          parcoursCertificationId: linkedParcours.id,
+        },
+      },
+    );
+
+    await updateCertificationsVisibility([certification.id], prismaClient);
+
+    expect(await getVisible(certification.id)).toBe(true);
   });
 
   test("does nothing when given an empty list of ids", async () => {

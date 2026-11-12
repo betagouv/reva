@@ -1,7 +1,7 @@
-import { startOfToday } from "date-fns";
-
 import { logger } from "@/modules/shared/logger/logger";
 import { prismaClient } from "@/prisma/client";
+
+import { certificationVisibilityWhereClause } from "../utils/certificationVisibilityWhereClause";
 
 import { updateCertificationWithRncpExpiresAt } from "./updateCertificationWithRncpExpiresAt";
 
@@ -24,12 +24,7 @@ export const setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate =
     await prismaClient.$transaction([
       prismaClient.certification.updateMany({ data: { visible: false } }),
       prismaClient.certification.updateMany({
-        where: {
-          status: "VALIDE_PAR_CERTIFICATEUR",
-          availableAt: { lte: startOfToday() },
-          rncpExpiresAt: { gte: startOfToday() },
-          certificationAuthorityOnCertification: { some: {} },
-        },
+        where: certificationVisibilityWhereClause(),
         data: { visible: true },
       }),
     ]);

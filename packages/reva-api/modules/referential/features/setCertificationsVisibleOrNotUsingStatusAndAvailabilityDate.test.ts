@@ -4,6 +4,7 @@ import { addDays, subDays } from "date-fns";
 import { prismaClient } from "@/prisma/client";
 import { createCertificationAuthorityHelper } from "@/test/helpers/entities/create-certification-authority-helper";
 import { createCertificationHelper } from "@/test/helpers/entities/create-certification-helper";
+import { createParcoursCertificationHelper } from "@/test/helpers/entities/create-parcours-certification-helper";
 
 import { setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate } from "./setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate";
 
@@ -46,6 +47,22 @@ describe("setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate", () => {
 
   it("keeps an otherwise eligible certification invisible when no certification authority is assigned", async () => {
     const certification = await createEligibleCertification();
+
+    await setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate();
+
+    const updatedCertification = await prismaClient.certification.findUnique({
+      where: { id: certification.id },
+    });
+
+    expect(updatedCertification?.visible).toBe(false);
+  });
+
+  it("keeps an otherwise eligible certification invisible when its parcours have no certification authority linked", async () => {
+    const certification = await createEligibleCertification();
+    await assignCertificationAuthority(certification.id);
+    await createParcoursCertificationHelper({
+      certificationId: certification.id,
+    });
 
     await setCertificationsVisibleOrNotUsingStatusAndAvailabilityDate();
 

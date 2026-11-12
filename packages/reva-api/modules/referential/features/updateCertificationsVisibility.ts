@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { startOfToday } from "date-fns";
+
+import { certificationVisibilityWhereClause } from "../utils/certificationVisibilityWhereClause";
 
 type PrismaTransactionClient = PrismaClient | Prisma.TransactionClient;
 
@@ -19,10 +20,7 @@ export const updateCertificationsVisibility = async (
   await prismaTransactionClient.certification.updateMany({
     where: {
       id: { in: certificationIds },
-      status: "VALIDE_PAR_CERTIFICATEUR",
-      availableAt: { lte: startOfToday() },
-      rncpExpiresAt: { gte: startOfToday() },
-      certificationAuthorityOnCertification: { some: {} },
+      ...certificationVisibilityWhereClause(),
     },
     data: { visible: true },
   });
