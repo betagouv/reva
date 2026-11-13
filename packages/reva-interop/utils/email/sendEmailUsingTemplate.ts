@@ -3,7 +3,7 @@ import { BrevoClient, BrevoError } from "@getbrevo/brevo";
 import { logger } from "../logger.js";
 
 const brevo = new BrevoClient({
-  apiKey: process.env.BREVO_API_KEY || "",
+  apiKey: process.env.SENDINBLUE_API_KEY || "",
   maxRetries: 3,
 });
 
