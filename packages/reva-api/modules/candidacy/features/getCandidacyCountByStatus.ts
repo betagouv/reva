@@ -13,13 +13,11 @@ export const getCandidacyCountByStatus = async ({
   IAMId,
   searchFilter,
   maisonMereAAPId,
-  cohorteVaeCollectiveId,
 }: {
   hasRole(role: string): boolean;
   IAMId: string;
   searchFilter?: string;
   maisonMereAAPId?: string;
-  cohorteVaeCollectiveId?: string;
 }) => {
   //get a count of candidacy by each status of candidacyCountByStatus in the select clause
   //no need to escape query parameters since they are not user inputs
@@ -57,11 +55,6 @@ export const getCandidacyCountByStatus = async ({
 
   //left join on payment request as paymentRequestUnifvae
   fromClause = Prisma.sql`${fromClause} left join payment_request_unifvae paymentRequestUnifvae on candidacy.id = paymentRequestUnifvae.candidacy_id`;
-
-  //filter on cohorteVaeCollectiveId if provided
-  if (cohorteVaeCollectiveId) {
-    whereClause = Prisma.sql`${whereClause} and candidacy.cohorte_vae_collective_id = ${cohorteVaeCollectiveId}::uuid`;
-  }
 
   //access rights
   if (!hasRole("admin")) {

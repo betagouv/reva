@@ -344,7 +344,6 @@ type Query {
   candidacy_candidacyCountByStatus(
     searchFilter: String
     maisonMereAAPId: ID
-    cohorteVaeCollectiveId: ID
   ): CandidacyCountByStatus!
   candidacy_getCandidacyCcns(
     offset: Int
