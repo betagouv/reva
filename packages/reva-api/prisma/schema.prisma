@@ -1450,6 +1450,17 @@ enum DossierDeValidationStatus {
   COMPLETE
 }
 
+enum JuryResult {
+  FULL_SUCCESS_OF_FULL_CERTIFICATION
+  FULL_SUCCESS_OF_PARTIAL_CERTIFICATION
+  PARTIAL_SUCCESS_OF_FULL_CERTIFICATION
+  PARTIAL_SUCCESS_OF_PARTIAL_CERTIFICATION
+  PARTIAL_SUCCESS_PENDING_CONFIRMATION
+  FAILURE
+  CANDIDATE_EXCUSED
+  CANDIDATE_ABSENT
+}
+
 model DossierDeValidation {
   id                               String                                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   candidacy                        Candidacy                             @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
@@ -1512,7 +1523,7 @@ model Jury {
   timeSpecified                                         Boolean                           @default(false) @map("time_specified")
   addressOfSession                                      String?                           @map("address_of_session")
   informationOfSession                                  String?                           @map("information_of_session")
-  result                                                String?                           @map("result")
+  result                                                JuryResult?                       @map("result")
   dateOfResult                                          DateTime?                         @map("date_of_result") @db.Timestamptz(6)
   informationOfResult                                   String?                           @map("information_of_result")
   isResultTemporary                                     Boolean?                          @map("is_result_temporary")
