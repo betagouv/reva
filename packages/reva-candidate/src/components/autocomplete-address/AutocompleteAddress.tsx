@@ -204,68 +204,74 @@ export const AutocompleteAddress = ({
         data-testid="autocomplete-input"
         iconId="fr-icon-map-pin-2-fill"
       />
-      {isLoading && displayOptions && searchText && (
-        <div
-          data-testid="autocomplete-options"
-          className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
-        >
-          <div
-            key="empty-label"
-            className="whitespace-normal cursor-default select-none py"
-          >
-            <Loader />
-          </div>
-        </div>
-      )}
-
-      {status === "success" && displayOptions && (
-        <div
-          data-testid="autocomplete-options"
-          className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
-        >
-          {!options.length && (
+      {displayOptions && searchText.length > 2 && (
+        <>
+          {isLoading && (
             <div
-              key="empty-label"
-              className="whitespace-normal cursor-default select-none py"
+              data-testid="autocomplete-options"
+              className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
             >
-              Aucun résultat trouvé. Veuillez renseigner un code postal valide.
+              <div
+                key="empty-label"
+                className="whitespace-normal cursor-default select-none py"
+              >
+                <Loader />
+              </div>
             </div>
           )}
 
-          {options.map((option) => {
-            const isSelected = selectedOption?.id === option.id;
-            let label = option.label;
-            if (option.type === "municipality") {
-              label = `${option.label} (${option.zip})`;
-            }
-            return (
-              <div
-                key={option.id}
-                onClick={() => handleOptionSelection(option)}
-                className={`whitespace-normal cursor-pointer select-none py-2  ${
-                  isSelected ? "bg-dsfrGray-contrast" : ""
-                }`}
-                onMouseOver={() => setSelectedOption(option)}
-              >
-                {label}
-              </div>
-            );
-          })}
-        </div>
-      )}
+          {status === "success" && (
+            <div
+              data-testid="autocomplete-options"
+              className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
+            >
+              {!options.length && (
+                <div
+                  key="empty-label"
+                  className="whitespace-normal cursor-default select-none py"
+                >
+                  Aucun résultat trouvé. Veuillez renseigner un code postal
+                  valide.
+                </div>
+              )}
 
-      {status === "error" && (
-        <div
-          data-testid="autocomplete-options"
-          className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
-        >
-          <div
-            key="empty-label"
-            className="whitespace-normal cursor-default select-none py"
-          >
-            Une erreur est survenue. Veuillez renseigner un code postal valide.
-          </div>
-        </div>
+              {options.map((option) => {
+                const isSelected = selectedOption?.id === option.id;
+                let label = option.label;
+                if (option.type === "municipality") {
+                  label = `${option.label} (${option.zip})`;
+                }
+                return (
+                  <div
+                    key={option.id}
+                    onClick={() => handleOptionSelection(option)}
+                    className={`whitespace-normal cursor-pointer select-none py-2  ${
+                      isSelected ? "bg-dsfrGray-contrast" : ""
+                    }`}
+                    onMouseOver={() => setSelectedOption(option)}
+                  >
+                    {label}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {status === "error" && (
+            <div
+              data-testid="autocomplete-options"
+              className="absolute z-10 max-h-[500px] list-none overflow-y-auto whitespace-normal w-full bg-white border-[1px] border-gray-300 px-4 py-2 shadow-[0px_2px_6px_0px_rgba(0,0,18,0.16)]"
+            >
+              <div
+                key="empty-label"
+                className="whitespace-normal cursor-default select-none py"
+              >
+                Une erreur est survenue. Veuillez renseigner un code postal
+                valide.
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
