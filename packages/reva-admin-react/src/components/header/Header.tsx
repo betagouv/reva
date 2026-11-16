@@ -50,14 +50,6 @@ const getCertificationAuthorityStructureForHeaderQuery = graphql(`
   }
 `);
 
-const getCohortesVaeCollectivesForConnectedAapQuery = graphql(`
-  query getCohortesVaeCollectivesForConnectedAapForHeaderComponent {
-    cohortesVaeCollectivesForConnectedAap {
-      id
-    }
-  }
-`);
-
 const PATHS = {
   AAP_HELP: "/help",
   AGENCIES_SETTINGS: "/agencies-settings-v3",
@@ -75,7 +67,6 @@ const PATHS = {
   STATISTIQUES: "/dashboard",
   STATISTIQUES_AAP: "/dashboard-aap",
   SUBSCRIPTIONS: "/subscriptions/pending",
-  VAE_COLLECTIVES: "/vae-collectives",
   CERTIFICATEUR_CANDIDACIES_ANNUAIRE: "/candidacies/annuaire",
 } as const;
 
@@ -94,7 +85,6 @@ const LABELS = {
   STATISTIQUES: "Statistiques",
   STRUCTURES_ACCOMPAGNATRICES: "Structures accompagnatrices",
   STRUCTURES_CERTIFICATRICES: "Structures certificatrices",
-  VAE_COLLECTIVES: "VAE collectives",
   VERIFICATIONS: "Vérifications",
 } as const;
 
@@ -123,9 +113,6 @@ const isAAPCandidaciesPath = (pathname: string) => {
   return !!pathname.match(exclusionPattern) && !pathname.match(subPathPattern);
 };
 
-const isAAPVaeCollectivesPath = (pathname: string) =>
-  !!pathname.match(/^\/vae-collectives/);
-
 const isCertificationAuthorityCandidaciesPath = (pathname: string) => {
   const mainPattern = /\/candidacies\/annuaire/;
   const subPathPattern =
@@ -146,7 +133,6 @@ const getNavigationTabs = ({
   metabaseDashboardIframeUrlForRegistryManager,
   metabaseDashboardIframeUrlForLocalAccount,
   shouldShowAapMetabaseDashboard,
-  showAAPVaeCollectivesTab,
   certificationAuthorityId,
 }: {
   currentPathname: string;
@@ -160,7 +146,6 @@ const getNavigationTabs = ({
   metabaseDashboardIframeUrlForRegistryManager?: string | null;
   metabaseDashboardIframeUrlForLocalAccount?: string | null;
   shouldShowAapMetabaseDashboard?: boolean;
-  showAAPVaeCollectivesTab: boolean;
   certificationAuthorityId?: string;
 }) => {
   const certificateurCandidaciesPath = PATHS.CERTIFICATEUR_CANDIDACIES_ANNUAIRE;
@@ -237,15 +222,6 @@ const getNavigationTabs = ({
       href: PATHS.CANDIDACIES,
       isActive: isAAPCandidaciesPath(currentPathname),
     }),
-    ...(showAAPVaeCollectivesTab
-      ? [
-          createTab({
-            text: LABELS.VAE_COLLECTIVES,
-            href: PATHS.VAE_COLLECTIVES,
-            isActive: isAAPVaeCollectivesPath(currentPathname),
-          }),
-        ]
-      : []),
     ...(shouldShowAapMetabaseDashboard && isGestionnaireMaisonMereAAP
       ? [
           createTab({
@@ -432,19 +408,6 @@ export const Header = () => {
       ?.account_getAccountForConnectedUser?.certificationAuthorityLocalAccount
       ?.certificationAuthority?.id;
 
-  const { data: getCohortesVaeCollectivesForConnectedAap } = useQuery({
-    queryKey: ["aap", "getCohortesVaeCollectivesForConnectedAap"],
-    queryFn: () =>
-      graphqlClient.request(getCohortesVaeCollectivesForConnectedAapQuery),
-    enabled: isOrganism && !isAdmin,
-  });
-
-  const showAAPVaeCollectivesTab =
-    isOrganism &&
-    !isAdmin &&
-    !!getCohortesVaeCollectivesForConnectedAap
-      ?.cohortesVaeCollectivesForConnectedAap?.length;
-
   const navigation = getNavigationTabs({
     currentPathname,
     isAdmin,
@@ -457,7 +420,6 @@ export const Header = () => {
     metabaseDashboardIframeUrlForRegistryManager,
     metabaseDashboardIframeUrlForLocalAccount,
     shouldShowAapMetabaseDashboard,
-    showAAPVaeCollectivesTab,
     certificationAuthorityId,
   });
 
