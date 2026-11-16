@@ -2,6 +2,7 @@ import {
   CandidacyStatusStep,
   DossierDeValidationStatus,
   FeasibilityStatus,
+  JuryResult,
   Prisma,
 } from "@prisma/client";
 
@@ -495,7 +496,7 @@ const buildJuryResultClause = (
   if (actualResults.length > 0) {
     clauses.push({
       jury: {
-        result: { in: actualResults },
+        result: { in: actualResults as JuryResult[] },
       },
     });
   }
