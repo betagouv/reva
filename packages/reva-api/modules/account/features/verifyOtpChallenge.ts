@@ -4,6 +4,7 @@ import {
   COMPTE_NON_TROUVE,
   SESSION_VERIFICATION_EXPIREE_VEUILLEZ_VOUS_RECONNECTER,
 } from "@/modules/shared/errors/messages";
+import { prismaClient } from "@/prisma/client";
 
 import { getAccountByKeycloakId } from "./getAccountByKeycloakId";
 import { verifyEmailOtp } from "./verifyEmailOtp";
@@ -57,6 +58,11 @@ export const verifyOtpChallenge = async ({
       totp: otp,
     });
   }
+
+  await prismaClient.account.update({
+    where: { id: account.id },
+    data: { lastLoginAt: new Date() },
+  });
 
   return { tokens, account };
 };
