@@ -51,15 +51,22 @@ function createCertificationResponse({
   certificationLabel,
   structureLabel,
   reducedRequirementsState,
+  certificationHasParcours = reducedRequirementsState === true,
 }: {
   certificationLabel: string;
   structureLabel: string | null;
   reducedRequirementsState: ReducedRequirementsState;
+  certificationHasParcours?: boolean;
 }) {
   return {
     data: {
       getCertification: {
         ...chaudronnier,
+        parcours: {
+          info: {
+            totalRows: certificationHasParcours ? 1 : 0,
+          },
+        },
         parcoursByCertificationAuthorities: reducedRequirementsState
           ? [
               {
@@ -259,4 +266,42 @@ test("shows available parcours", async ({ page, msw }) => {
   await expect(
     page.getByText("Certification Authority Without Parcours"),
   ).toHaveCount(0);
+});
+
+test("shows certification authorities without parcours when the certification has none", async ({
+  page,
+  msw,
+}) => {
+  msw.use(
+    fvae.query("getCertificationForCertificationPage", () => {
+      return HttpResponse.json(
+        createCertificationResponse({
+          certificationLabel: "Certification SUP",
+          structureLabel: "Structure SUP",
+          reducedRequirementsState: true,
+          certificationHasParcours: false,
+        }),
+      );
+    }),
+  );
+
+  await page.goto(certificationPath);
+  await expect(async () => {
+    await page.getByRole("tab", { name: "Établissements" }).click();
+    await expect(
+      page.getByText(
+        "Établissements proposant ce diplôme sur la plateforme France VAE",
+      ),
+    ).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await expect(
+    page.getByRole("link", { name: "Certification Authority", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Parcours 1")).toBeVisible();
+  await expect(
+    page.getByRole("link", {
+      name: "Certification Authority Without Parcours",
+      exact: true,
+    }),
+  ).toBeVisible();
 });

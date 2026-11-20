@@ -64,16 +64,27 @@ export function createCertificationForReducedRequirementsScenario({
   structureLabel,
   reducedRequirementsState,
   idPrefix,
+  certificationHasParcours = reducedRequirementsState === true,
 }: {
   certificationLabel: string;
   structureLabel: string | null;
   reducedRequirementsState: ReducedRequirementsState;
   idPrefix: string;
+  certificationHasParcours?: boolean;
 }) {
   return createCertificationEntity({
     id: `${idPrefix}-${certificationLabel}`,
     label: certificationLabel,
     codeRncp: "RNCP9999",
+    parcours: {
+      rows: [],
+      info: {
+        currentPage: 1,
+        pageLength: 10,
+        totalPages: 1,
+        totalRows: certificationHasParcours ? 1 : 0,
+      },
+    },
     parcoursByCertificationAuthorities: reducedRequirementsState
       ? [
           {

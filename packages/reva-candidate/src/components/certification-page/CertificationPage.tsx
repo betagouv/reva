@@ -62,6 +62,11 @@ export const CertificationPage = async ({
         label: string;
       }[];
     }[];
+    parcours?: {
+      info?: {
+        totalRows: number;
+      } | null;
+    } | null;
     parcoursByCertificationAuthorities?:
       | {
           certificationAuthority: {
@@ -107,6 +112,9 @@ export const CertificationPage = async ({
             label: "Établissements",
             content: (
               <ParcoursTab
+                certificationHasParcours={
+                  (certification.parcours?.info?.totalRows ?? 0) > 0
+                }
                 parcoursByCertificationAuthorities={
                   certification.parcoursByCertificationAuthorities
                 }

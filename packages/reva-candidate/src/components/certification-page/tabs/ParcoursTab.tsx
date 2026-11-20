@@ -1,8 +1,10 @@
 import { Tooltip } from "@codegouvfr/react-dsfr/Tooltip";
 
 export const ParcoursTab = ({
+  certificationHasParcours,
   parcoursByCertificationAuthorities,
 }: {
+  certificationHasParcours: boolean;
   parcoursByCertificationAuthorities?:
     | {
         certificationAuthority: {
@@ -35,7 +37,9 @@ export const ParcoursTab = ({
       {parcoursByCertificationAuthorities &&
       parcoursByCertificationAuthorities.length > 0 ? (
         parcoursByCertificationAuthorities
-          .filter((pba) => pba.parcours.length > 0)
+          .filter((pba) =>
+            certificationHasParcours ? pba.parcours.length > 0 : true,
+          )
           .map((pba) => (
             <div
               key={pba.certificationAuthority.label}

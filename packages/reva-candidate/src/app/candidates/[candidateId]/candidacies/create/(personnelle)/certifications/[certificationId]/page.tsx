@@ -57,6 +57,11 @@ const GET_CERTIFICATION = graphql(`
           label
         }
       }
+      parcours {
+        info {
+          totalRows
+        }
+      }
       parcoursByCertificationAuthorities {
         certificationAuthority {
           label
