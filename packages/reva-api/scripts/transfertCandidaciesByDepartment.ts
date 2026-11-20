@@ -55,7 +55,6 @@ type TargetTransfer = {
   label: string;
   candidacyIds: string[];
   counts: AuthorityCounts;
-  moves: Map<string, AuthorityCounts>;
 };
 
 type LocalAccountLink = {
@@ -68,12 +67,6 @@ type RoutedByLocalAccount = {
   candidacyId: string;
   targetLabel: string;
   localAccounts: string;
-  previousTargetLabel?: string;
-};
-
-type PlacedCandidacy = {
-  candidacy: SkippedCandidacy;
-  target: TargetTransfer;
 };
 
 type SkippedCandidacy = {
@@ -204,7 +197,6 @@ const buildTransfers = (
     label: target.label,
     candidacyIds: [],
     counts: emptyCounts(),
-    moves: new Map(),
   }));
   const transferById = new Map(
     transfers.map((transfer) => [transfer.id, transfer]),
@@ -242,13 +234,7 @@ const loadCandidacyIdsOnSource = async (
   sourceId: string,
 ): Promise<string[]> => {
   const where = { certificationAuthorityId: sourceId };
-  const [
-    candidacies,
-    feasibilities,
-    dossiers,
-    juries,
-    localAccountCandidacies,
-  ] = await Promise.all([
+  const [candidacies, feasibilities, dossiers, juries] = await Promise.all([
     prismaClient.candidacy.findMany({
       where,
       select: { id: true },
@@ -268,15 +254,6 @@ const loadCandidacyIdsOnSource = async (
       select: { candidacyId: true },
       distinct: ["candidacyId"],
     }),
-    prismaClient.certificationAuthorityLocalAccountOnCandidacy.findMany({
-      where: {
-        certificationAuthorityLocalAccount: {
-          certificationAuthorityId: sourceId,
-        },
-      },
-      select: { candidacyId: true },
-      distinct: ["candidacyId"],
-    }),
   ]);
 
   return [
@@ -285,7 +262,6 @@ const loadCandidacyIdsOnSource = async (
       ...feasibilities.map((feasibility) => feasibility.candidacyId),
       ...dossiers.map((dossier) => dossier.candidacyId),
       ...juries.map((jury) => jury.candidacyId),
-      ...localAccountCandidacies.map((link) => link.candidacyId),
     ]),
   ].sort();
 };
@@ -294,7 +270,6 @@ const partitionCandidacies = async (
   sourceId: string,
   departmentToTarget: Map<string, TargetTransfer>,
 ): Promise<{
-  placedByDepartment: PlacedCandidacy[];
   missingDepartment: SkippedCandidacy[];
   uncoveredDepartment: SkippedCandidacy[];
 }> => {
@@ -326,7 +301,6 @@ const partitionCandidacies = async (
     )
   ).flat();
 
-  const placedByDepartment: PlacedCandidacy[] = [];
   const missingDepartment: SkippedCandidacy[] = [];
   const uncoveredDepartment: SkippedCandidacy[] = [];
 
@@ -361,109 +335,70 @@ const partitionCandidacies = async (
       continue;
     }
 
-    const placed: SkippedCandidacy = {
-      candidacyId: candidacy.id,
-      departmentCode: department?.code ?? null,
-      departmentLabel: department?.label ?? null,
-      localAccounts: [],
-      ...counts,
-    };
     target.candidacyIds.push(candidacy.id);
-    placedByDepartment.push({ candidacy: placed, target });
   }
 
-  return { placedByDepartment, missingDepartment, uncoveredDepartment };
+  return { missingDepartment, uncoveredDepartment };
 };
 
-const addMove = (
-  transfer: TargetTransfer,
-  fromId: string,
-  key: CountKey,
-  count: number,
-) => {
-  const current = transfer.moves.get(fromId) ?? emptyCounts();
-  current[key] += count;
-  transfer.moves.set(fromId, current);
-  transfer.counts[key] += count;
-};
-
-const accumulateMoves = async (
-  transfer: TargetTransfer,
-  key: CountKey,
+const countByCandidacyIds = async (
   candidacyIds: string[],
-  countChunk: (ids: string[]) => Promise<
-    Array<{
-      certificationAuthorityId: string | null;
-      _count: { _all: number };
-    }>
-  >,
-) => {
+  countChunk: (ids: string[]) => Promise<number>,
+): Promise<number> => {
+  let total = 0;
   for (const ids of chunk(candidacyIds, CHUNK_SIZE)) {
-    const rows = await countChunk(ids);
-    for (const row of rows) {
-      if (!row.certificationAuthorityId) {
-        continue;
-      }
-      addMove(transfer, row.certificationAuthorityId, key, row._count._all);
-    }
+    total += await countChunk(ids);
   }
+  return total;
 };
 
 const fillTransferCounts = async (
   sourceId: string,
   transfers: TargetTransfer[],
 ) => {
-  const originIds = [sourceId, ...transfers.map((transfer) => transfer.id)];
-
   for (const transfer of transfers) {
-    transfer.counts = emptyCounts();
-    transfer.moves = new Map();
-    const origins = originIds.filter((id) => id !== transfer.id);
-    if (transfer.candidacyIds.length === 0 || origins.length === 0) {
+    transfer.counts.candidacies = 0;
+    if (transfer.candidacyIds.length === 0) {
       continue;
     }
 
-    const whereAuthority = { certificationAuthorityId: { in: origins } };
-    await accumulateMoves(
-      transfer,
-      "candidacies",
-      transfer.candidacyIds,
-      (ids) =>
-        prismaClient.candidacy.groupBy({
-          by: ["certificationAuthorityId"],
-          where: { id: { in: ids }, ...whereAuthority },
-          _count: { _all: true },
-        }),
-    );
-    await accumulateMoves(
-      transfer,
-      "feasibilities",
-      transfer.candidacyIds,
-      (ids) =>
-        prismaClient.feasibility.groupBy({
-          by: ["certificationAuthorityId"],
-          where: { candidacyId: { in: ids }, ...whereAuthority },
-          _count: { _all: true },
-        }),
-    );
-    await accumulateMoves(
-      transfer,
-      "dossiersDeValidation",
-      transfer.candidacyIds,
-      (ids) =>
-        prismaClient.dossierDeValidation.groupBy({
-          by: ["certificationAuthorityId"],
-          where: { candidacyId: { in: ids }, ...whereAuthority },
-          _count: { _all: true },
-        }),
-    );
-    await accumulateMoves(transfer, "juries", transfer.candidacyIds, (ids) =>
-      prismaClient.jury.groupBy({
-        by: ["certificationAuthorityId"],
-        where: { candidacyId: { in: ids }, ...whereAuthority },
-        _count: { _all: true },
-      }),
-    );
+    const [candidacies, feasibilities, dossiersDeValidation, juries] =
+      await Promise.all([
+        countByCandidacyIds(transfer.candidacyIds, (ids) =>
+          prismaClient.candidacy.count({
+            where: { id: { in: ids }, certificationAuthorityId: sourceId },
+          }),
+        ),
+        countByCandidacyIds(transfer.candidacyIds, (ids) =>
+          prismaClient.feasibility.count({
+            where: {
+              candidacyId: { in: ids },
+              certificationAuthorityId: sourceId,
+            },
+          }),
+        ),
+        countByCandidacyIds(transfer.candidacyIds, (ids) =>
+          prismaClient.dossierDeValidation.count({
+            where: {
+              candidacyId: { in: ids },
+              certificationAuthorityId: sourceId,
+            },
+          }),
+        ),
+        countByCandidacyIds(transfer.candidacyIds, (ids) =>
+          prismaClient.jury.count({
+            where: {
+              candidacyId: { in: ids },
+              certificationAuthorityId: sourceId,
+            },
+          }),
+        ),
+      ]);
+
+    transfer.counts.candidacies = candidacies;
+    transfer.counts.feasibilities = feasibilities;
+    transfer.counts.dossiersDeValidation = dossiersDeValidation;
+    transfer.counts.juries = juries;
   }
 };
 
@@ -542,17 +477,9 @@ const forecastCounts = (
     if (!target) {
       throw new ScriptError(`Compteurs introuvables pour ${transfer.label}.`);
     }
-    for (const [fromId, counts] of transfer.moves) {
-      const from = after.get(fromId);
-      if (!from) {
-        throw new ScriptError(
-          `Compteurs introuvables pour le certificateur ${fromId}.`,
-        );
-      }
-      for (const key of COUNT_KEYS) {
-        from[key] -= counts[key];
-        target[key] += counts[key];
-      }
+    for (const key of COUNT_KEYS) {
+      source[key] -= transfer.counts[key];
+      target[key] += transfer.counts[key];
     }
   }
 
@@ -779,52 +706,12 @@ const targetForLocalAccounts = (
   };
 };
 
-const moveCandidacy = (
-  candidacyId: string,
-  from: TargetTransfer | undefined,
-  to: TargetTransfer,
-) => {
-  if (from?.id === to.id) {
-    return;
-  }
-  if (from) {
-    const index = from.candidacyIds.indexOf(candidacyId);
-    if (index >= 0) {
-      from.candidacyIds.splice(index, 1);
-    }
-  }
-  to.candidacyIds.push(candidacyId);
-};
-
-const reassignCandidaciesWithLocalAccount = (
-  placedByDepartment: PlacedCandidacy[],
+const reassignSkippedCandidaciesWithLocalAccount = (
   missingDepartment: SkippedCandidacy[],
   uncoveredDepartment: SkippedCandidacy[],
   departmentToTarget: Map<string, TargetTransfer>,
 ): RoutedByLocalAccount[] => {
   const routed: RoutedByLocalAccount[] = [];
-
-  for (const placed of placedByDepartment) {
-    const { candidacy, target: departmentTarget } = placed;
-    if (candidacy.localAccounts.length === 0) {
-      continue;
-    }
-    const { target } = targetForLocalAccounts(
-      candidacy.localAccounts,
-      departmentToTarget,
-    );
-    if (!target) {
-      continue;
-    }
-    moveCandidacy(candidacy.candidacyId, departmentTarget, target);
-    routed.push({
-      candidacyId: candidacy.candidacyId,
-      targetLabel: target.label,
-      localAccounts: formatLocalAccounts(candidacy),
-      previousTargetLabel:
-        target.id === departmentTarget.id ? undefined : departmentTarget.label,
-    });
-  }
 
   for (const skipped of [missingDepartment, uncoveredDepartment]) {
     const remaining: SkippedCandidacy[] = [];
@@ -955,11 +842,11 @@ const printSummary = (
   console.log(
     `\nTransférées via un compte local: ${routedByLocalAccount.length}`,
   );
-  // for (const candidacy of routedByLocalAccount) {
-  //   console.log(
-  //     `- ${candidacy.candidacyId} -> ${candidacy.targetLabel} | compte local=${candidacy.localAccounts}${candidacy.previousTargetLabel ? ` | à la place de ${candidacy.previousTargetLabel}` : ""}`,
-  //   );
-  // }
+  for (const candidacy of routedByLocalAccount) {
+    console.log(
+      `- ${candidacy.candidacyId} -> ${candidacy.targetLabel} | compte local=${candidacy.localAccounts}`,
+    );
+  }
 
   console.log(
     `\nTransférées vers le premier compte cible${firstTarget ? ` (${firstTarget.label})` : ""}: ${routedToFirstTarget.length}`,
@@ -1007,22 +894,17 @@ const printSummary = (
 const updateCertificationAuthority = async (
   tx: Prisma.TransactionClient,
   table: TableName,
+  sourceId: string,
   targetId: string,
   candidacyIds: string[],
-  originIds: string[],
 ): Promise<number> => {
-  const origins = originIds.filter((id) => id !== targetId);
-  if (origins.length === 0) {
-    return 0;
-  }
-
   const { table: tableName, column } = TABLES[table];
   let updated = 0;
   for (const ids of chunk(candidacyIds, CHUNK_SIZE)) {
     updated += await tx.$executeRaw`
       UPDATE ${Prisma.raw(tableName)}
       SET certification_authority_id = ${targetId}::uuid
-      WHERE certification_authority_id::text IN (${Prisma.join(origins)})
+      WHERE certification_authority_id = ${sourceId}::uuid
         AND ${Prisma.raw(column)}::text IN (${Prisma.join(ids)})
     `;
   }
@@ -1054,7 +936,6 @@ const applyTransfers = async (
     return;
   }
 
-  const originIds = [sourceId, ...transfers.map((transfer) => transfer.id)];
   console.log("\nÉcriture du transfert.");
   await prismaClient.$transaction(
     async (tx) => {
@@ -1065,9 +946,9 @@ const applyTransfers = async (
         const candidacies = await updateCertificationAuthority(
           tx,
           "candidacy",
+          sourceId,
           transfer.id,
           transfer.candidacyIds,
-          originIds,
         );
         assertAffected(
           "candidatures",
@@ -1079,9 +960,9 @@ const applyTransfers = async (
         const feasibilities = await updateCertificationAuthority(
           tx,
           "feasibility",
+          sourceId,
           transfer.id,
           transfer.candidacyIds,
-          originIds,
         );
         assertAffected(
           "faisabilités",
@@ -1093,9 +974,9 @@ const applyTransfers = async (
         const dossiers = await updateCertificationAuthority(
           tx,
           "dossier_de_validation",
+          sourceId,
           transfer.id,
           transfer.candidacyIds,
-          originIds,
         );
         assertAffected(
           "dossiers de validation",
@@ -1107,9 +988,9 @@ const applyTransfers = async (
         const juries = await updateCertificationAuthority(
           tx,
           "jury",
+          sourceId,
           transfer.id,
           transfer.candidacyIds,
-          originIds,
         );
         assertAffected("jurys", transfer, juries, transfer.counts.juries);
       }
@@ -1152,15 +1033,15 @@ const run = async () => {
   const { source, targets } = await loadAuthorities(sourceId, targetIds);
   await printSourceLocalAccounts(sourceId);
   const { transfers, departmentToTarget } = buildTransfers(targets);
-  const { placedByDepartment, missingDepartment, uncoveredDepartment } =
-    await partitionCandidacies(sourceId, departmentToTarget);
+  const { missingDepartment, uncoveredDepartment } = await partitionCandidacies(
+    sourceId,
+    departmentToTarget,
+  );
   await attachSourceLocalAccounts(sourceId, [
-    ...placedByDepartment.map((placed) => placed.candidacy),
     ...missingDepartment,
     ...uncoveredDepartment,
   ]);
-  const routedByLocalAccount = reassignCandidaciesWithLocalAccount(
-    placedByDepartment,
+  const routedByLocalAccount = reassignSkippedCandidaciesWithLocalAccount(
     missingDepartment,
     uncoveredDepartment,
     departmentToTarget,
