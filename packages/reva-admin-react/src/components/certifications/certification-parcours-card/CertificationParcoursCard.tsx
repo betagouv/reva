@@ -1,8 +1,10 @@
 import { EnhancedSectionCard } from "@/components/card/enhanced-section-card/EnhancedSectionCard";
 
 export const CertificationParcoursCard = ({
+  certificationHasParcours,
   parcoursByCertificationAuthorities,
 }: {
+  certificationHasParcours: boolean;
   parcoursByCertificationAuthorities: {
     certificationAuthority: {
       id: string;
@@ -24,7 +26,9 @@ export const CertificationParcoursCard = ({
     >
       {parcoursByCertificationAuthorities.length > 0 ? (
         parcoursByCertificationAuthorities
-          .filter((pba) => pba.parcours.length > 0)
+          .filter((pba) =>
+            certificationHasParcours ? pba.parcours.length > 0 : true,
+          )
           .map((pba) => (
             <div
               key={pba.certificationAuthority.id}

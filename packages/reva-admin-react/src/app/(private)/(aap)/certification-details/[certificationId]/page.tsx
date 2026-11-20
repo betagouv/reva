@@ -103,6 +103,9 @@ const PageContent = ({
         {hasReducedRequirements &&
           certification.parcoursByCertificationAuthorities && (
             <CertificationParcoursCard
+              certificationHasParcours={
+                (certification.parcours?.info?.totalRows ?? 0) > 0
+              }
               parcoursByCertificationAuthorities={
                 certification.parcoursByCertificationAuthorities
               }

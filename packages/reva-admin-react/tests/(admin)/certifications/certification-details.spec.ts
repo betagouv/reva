@@ -19,9 +19,11 @@ type ReducedRequirementsState = true | false | null;
 function createCertificationDetailsHandlers({
   certificationLabel,
   reducedRequirementsState,
+  certificationHasParcours = reducedRequirementsState === true,
 }: {
   certificationLabel: string;
   reducedRequirementsState: ReducedRequirementsState;
+  certificationHasParcours?: boolean;
 }) {
   return [
     fvae.query(
@@ -64,6 +66,11 @@ function createCertificationDetailsHandlers({
           competenceBlocs: [],
           prerequisites: [{ id: "prereq-1", label: "A prerequisite" }],
           certificationAuthorities: [],
+          parcours: {
+            info: {
+              totalRows: certificationHasParcours ? 1 : 0,
+            },
+          },
           parcoursByCertificationAuthorities:
             reducedRequirementsState === true
               ? [
@@ -189,14 +196,51 @@ test.describe("admin certification details page", () => {
     const parcoursCard = page.getByTestId("parcours-card");
     await expect(parcoursCard).toBeVisible();
     await expect(
-      parcoursCard.getByText("Certification Authority"),
+      parcoursCard.getByRole("link", {
+        name: "Certification Authority",
+        exact: true,
+      }),
     ).toBeVisible();
     await expect(
-      parcoursCard.getByRole("link", { name: "Certification Authority" }),
+      parcoursCard.getByRole("link", {
+        name: "Certification Authority",
+        exact: true,
+      }),
     ).toHaveAttribute("href", "https://www.certification-authority.com");
     await expect(parcoursCard.getByText("Parcours 1")).toBeVisible();
     await expect(
       parcoursCard.getByText("Certification Authority Without Parcours"),
     ).toHaveCount(0);
+  });
+
+  test("shows certification authorities without parcours when the certification has none", async ({
+    page,
+    msw,
+  }) => {
+    msw.use(
+      ...createCertificationDetailsHandlers({
+        certificationLabel: "Certification SUP",
+        reducedRequirementsState: true,
+        certificationHasParcours: false,
+      }),
+      ...aapCommonHandlers,
+    );
+    await login({ role: "admin", page });
+    await page.goto(CERTIFICATION_PATH);
+    const parcoursCard = page.getByTestId("parcours-card");
+    await expect(parcoursCard).toBeVisible();
+    await expect(
+      parcoursCard.getByRole("link", {
+        name: "Certification Authority",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(parcoursCard.getByText("Parcours 1")).toBeVisible();
+    await expect(
+      parcoursCard.getByRole("link", {
+        name: "Certification Authority Without Parcours",
+        exact: true,
+      }),
+    ).toBeVisible();
   });
 });

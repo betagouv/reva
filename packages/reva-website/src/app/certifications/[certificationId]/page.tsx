@@ -110,6 +110,11 @@ const getCertificationQuery = graphql(`
           label
         }
       }
+      parcours {
+        info {
+          totalRows
+        }
+      }
       parcoursByCertificationAuthorities {
         certificationAuthority {
           label

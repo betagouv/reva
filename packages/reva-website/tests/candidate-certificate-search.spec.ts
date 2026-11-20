@@ -63,7 +63,11 @@ test.describe("with search results", () => {
     const searchInput = page.locator('[data-testid="autocomplete-input"]');
     await searchInput.fill("chaudronnier");
 
-    page.locator('[data-testid="autocomplete-options"] > div').first().click();
+    const firstOption = page
+      .locator('[data-testid="autocomplete-options"] > div')
+      .first();
+    await expect(firstOption).toBeVisible();
+    await firstOption.click();
 
     await expect(page).toHaveURL(
       "/certifications/7ad608c2-5a4b-40eb-8ef9-7a85421b40f0/",

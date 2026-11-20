@@ -108,13 +108,57 @@ test.describe("Shows available parcours", () => {
         "Établissements proposant ce diplôme sur la plateforme France VAE",
       ),
     ).toBeVisible();
-    await expect(page.getByText("Certification Authority")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Certification Authority" }),
+      page.getByRole("link", { name: "Certification Authority", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Certification Authority", exact: true }),
     ).toHaveAttribute("href", "https://www.certification-authority.com");
     await expect(page.getByText("Parcours 1")).toBeVisible();
     await expect(
       page.getByText("Certification Authority Without Parcours"),
     ).toHaveCount(0);
+  });
+
+  test("shows certification authorities without parcours when the certification has none", async ({
+    page,
+    msw,
+  }) => {
+    const certification = createCertificationForReducedRequirementsScenario({
+      certificationLabel: "Certification du SUP sans parcours",
+      structureLabel: "Structure SUP",
+      reducedRequirementsState: true,
+      certificationHasParcours: false,
+      idPrefix: "create-certification",
+    });
+
+    msw.use(
+      ...createCreateCertificationPageHandlers({
+        certification: certification,
+      }),
+    );
+
+    await loginAndWaitForCandidaciesInitialLoad(page);
+    await page.goto(
+      `candidates/${candidate.id}/candidacies/create/certifications/${certification.id}/`,
+    );
+
+    await page.getByRole("tab", { name: "Établissements" }).click();
+
+    await expect(
+      page.getByText(
+        "Établissements proposant ce diplôme sur la plateforme France VAE",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Certification Authority", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText("Parcours 1")).toBeVisible();
+    await expect(
+      page.getByRole("link", {
+        name: "Certification Authority Without Parcours",
+        exact: true,
+      }),
+    ).toBeVisible();
   });
 });
