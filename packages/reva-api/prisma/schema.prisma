@@ -608,6 +608,7 @@ model Account {
   sousComptesVaeCollectives                   SousCompteVaeCollective[]
   lastLoginAt                                 DateTime?                                    @map("last_login_at") @db.Timestamptz(6)
   certificationAuthorityOnAccount             CertificationAuthorityOnAccount?
+  createdAt                                   DateTime?                                    @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@index([email])
   @@index([keycloakId])
