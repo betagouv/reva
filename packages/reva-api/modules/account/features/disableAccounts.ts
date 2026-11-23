@@ -20,6 +20,7 @@ const toError = (error: unknown) =>
 const assertKeycloakAccountCanBeDisabled = async (
   keycloakAdmin: KeycloakAdmin,
   keycloakId: string,
+  allowAdminAccountDisabling: boolean,
 ) => {
   const keycloakAccount = await keycloakAdmin.users.findOne({
     id: keycloakId,
@@ -30,6 +31,10 @@ const assertKeycloakAccountCanBeDisabled = async (
     throw new Error(
       `Compte utilisateur keycloak pour l'id ${keycloakId} non trouvé`,
     );
+  }
+
+  if (allowAdminAccountDisabling) {
+    return;
   }
 
   const groups = await keycloakAdmin.users.listGroups({
@@ -50,6 +55,7 @@ const disableAccount = async (
   keycloakAdmin: KeycloakAdmin,
   accountId: string,
   account: Account | undefined,
+  allowAdminAccountDisabling: boolean,
 ): Promise<Account> => {
   if (!account) {
     throw new Error(`Compte utilisateur pour l'id ${accountId} non trouvé`);
@@ -61,7 +67,11 @@ const disableAccount = async (
     );
   }
 
-  await assertKeycloakAccountCanBeDisabled(keycloakAdmin, account.keycloakId);
+  await assertKeycloakAccountCanBeDisabled(
+    keycloakAdmin,
+    account.keycloakId,
+    allowAdminAccountDisabling,
+  );
 
   await keycloakAdmin.users.update(
     {
@@ -80,9 +90,14 @@ const disableAccount = async (
 /**
  * Disables the given accounts in Keycloak and in the business DB, by chunks of 20.
  * An account that cannot be disabled is logged and skipped; the others are still processed.
+ * Accounts in the keycloak "admin" group are skipped unless allowAdminAccountDisabling is true.
  */
-export const disableAccounts = async (params: {
+export const disableAccounts = async ({
+  accountIds,
+  allowAdminAccountDisabling = false,
+}: {
   accountIds: string[];
+  allowAdminAccountDisabling?: boolean;
 }): Promise<{
   disabledAccounts: Account[];
   failedAccounts: FailedAccount[];
@@ -90,7 +105,7 @@ export const disableAccounts = async (params: {
   const disabledAccounts: Account[] = [];
   const failedAccounts: FailedAccount[] = [];
 
-  for (const accountIdsChunk of chunk(uniq(params.accountIds), CHUNK_SIZE)) {
+  for (const accountIdsChunk of chunk(uniq(accountIds), CHUNK_SIZE)) {
     const accounts = await prismaClient.account.findMany({
       where: { id: { in: accountIdsChunk } },
     });
@@ -103,6 +118,7 @@ export const disableAccounts = async (params: {
             keycloakAdmin,
             accountId,
             accounts.find((a) => a.id === accountId),
+            allowAdminAccountDisabling,
           ),
         );
       } catch (e) {

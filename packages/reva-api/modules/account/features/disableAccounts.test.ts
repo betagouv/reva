@@ -179,6 +179,27 @@ describe("disableAccounts", () => {
     expect(await getDisabledAt(adminAccount.id)).toBeNull();
   });
 
+  test("disables an admin account when allowAdminAccountDisabling is true", async () => {
+    const adminAccount = await createAccountHelper();
+    const { listGroups, update } = mockKeycloakAdmin({
+      listGroups: vi.fn().mockResolvedValue([{ name: "admin" }]),
+    });
+
+    const { disabledAccounts, failedAccounts } = await disableAccounts({
+      accountIds: [adminAccount.id],
+      allowAdminAccountDisabling: true,
+    });
+
+    expect(disabledAccounts.map((a) => a.id)).toEqual([adminAccount.id]);
+    expect(failedAccounts).toEqual([]);
+    expect(await getDisabledAt(adminAccount.id)).not.toBeNull();
+    expect(listGroups).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ id: adminAccount.keycloakId }),
+      { enabled: false },
+    );
+  });
+
   test("keeps the account active in the database when the keycloak update fails", async () => {
     const account = await createAccountHelper();
     const failingAccount = await createAccountHelper();
