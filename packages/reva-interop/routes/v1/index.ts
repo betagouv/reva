@@ -281,7 +281,7 @@ const routesApiV1: FastifyPluginAsyncJsonSchemaToTs = async (fastify) => {
   </head>
   <body>
     <redoc spec-url='${process.env.BASE_URL}/interop/v1/documentation/json' download-file-name="France-VAE-API-Interop-v1.json" schema-expansion-level="1" json-sample-expand-level="3" hide-schema-titles></redoc>
-    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
+    <script type="module" src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
   </body>
 </html>`;
   });
