@@ -1,71 +1,18 @@
-import { getKeycloakAdmin } from "@/modules/shared/auth/getKeycloakAdmin";
-import { COMPTE_ADMIN_NON_MODIFIABLE } from "@/modules/shared/errors/messages";
-import { prismaClient } from "@/prisma/client";
-
 import { Account } from "../account.types";
+
+import { disableAccounts } from "./disableAccounts";
 
 export const disableAccountById = async (params: {
   accountId: string;
 }): Promise<Account> => {
-  const { accountId } = params;
+  const {
+    disabledAccounts: [account],
+    failedAccounts: [failure],
+  } = await disableAccounts({ accountIds: [params.accountId] });
 
-  // Check if account with accountId exsits
-  let account = await prismaClient.account.findUnique({
-    where: { id: accountId },
-  });
-
-  if (!account) {
-    throw new Error(`Compte utilisateur pour l'id ${accountId} non trouvé`);
+  if (failure) {
+    throw failure.error;
   }
-
-  if (account.disabledAt) {
-    throw new Error(
-      `Compte utilisateur pour l'id ${accountId} est déjà désactivé`,
-    );
-  }
-
-  const keycloakAdmin = await getKeycloakAdmin();
-
-  // Check if account with account.keycloakId exsits
-  const keycloakAccount = await keycloakAdmin.users.findOne({
-    id: account.keycloakId,
-    realm: process.env.KEYCLOAK_ADMIN_REALM_REVA,
-  });
-
-  if (!keycloakAccount) {
-    throw new Error(
-      `Compte utilisateur keycloak pour l'id ${account.keycloakId} non trouvé`,
-    );
-  }
-
-  // Check if account is an admin account. Throw an error if it is
-
-  // Get groups of account
-  const groups = await keycloakAdmin.users.listGroups({
-    id: account.keycloakId,
-    realm: process.env.KEYCLOAK_ADMIN_REALM_REVA,
-  });
-
-  // Check if account with account.keycloakId is not an admin account
-  const groupAdmin = groups.find((group) => group.name == "admin");
-  if (groupAdmin) {
-    throw new Error(COMPTE_ADMIN_NON_MODIFIABLE);
-  }
-
-  // Update Business DB
-  account = await prismaClient.account.update({
-    where: { id: account.id },
-    data: { disabledAt: new Date() },
-  });
-
-  // Update Keycloak DB
-  await keycloakAdmin.users.update(
-    {
-      id: account.keycloakId,
-      realm: process.env.KEYCLOAK_ADMIN_REALM_REVA,
-    },
-    { enabled: false },
-  );
 
   return account;
 };
