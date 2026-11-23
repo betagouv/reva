@@ -2335,3 +2335,46 @@ model RoleSpecificToSousCompteAndCohorteVaeCollective {
   @@unique([role, sousCompteVaeCollectiveId, cohorteVaeCollectiveId])
   @@map("role_specific_to_sous_compte_and_cohorte_vae_collective")
 }
+
+enum DeadLinkSource {
+  CERTIFICATION_ADDITIONAL_INFO
+  CERTIFICATION_AUTHORITY
+  ORGANISM
+  MAISON_MERE_AAP
+  MANUAL
+}
+
+enum DeadLinkResolvedReason {
+  RECOVERED
+  NO_LONGER_PRESENT
+}
+
+model ManualMonitoredLink {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  url        String    @unique
+  label      String?   @db.VarChar(255)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  disabledAt DateTime? @map("disabled_at") @db.Timestamptz(6)
+
+  @@map("manual_monitored_link")
+}
+
+model DeadLink {
+  id             String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sourceTable    DeadLinkSource          @map("source_table")
+  sourceId       String                  @map("source_id") @db.Uuid
+  // Null only for MANUAL. Stored sources require a column name.
+  // Enforced by the dead_link_source_shape check constraint.
+  fieldName      String?                 @map("field_name") @db.VarChar(100)
+  url            String
+  httpStatus     Int?                    @map("http_status")
+  errorMessage   String?                 @map("error_message")
+  detectedAt     DateTime                @default(now()) @map("detected_at") @db.Timestamptz(6)
+  lastCheckedAt  DateTime                @map("last_checked_at") @db.Timestamptz(6)
+  resolvedAt     DateTime?               @map("resolved_at") @db.Timestamptz(6)
+  resolvedReason DeadLinkResolvedReason? @map("resolved_reason")
+
+  @@index([sourceTable, sourceId])
+  @@index([resolvedAt])
+  @@map("dead_link")
+}

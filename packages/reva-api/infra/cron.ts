@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 
 import { deleteExpiredAccountEmailOtps } from "@/modules/account/features/deleteExpiredAccountEmailOtps";
 import { sendReminderToAAPForMissingSwornStatement } from "@/modules/feasibility/dematerialized-feasibility-file/features/sendReminderToAAPForMissingSwornStatement";
+import { detectAndFlagDeadLinks } from "@/scripts/detectAndFlagDeadLinks";
 import { overwriteOutscaleBackupBucket } from "@/scripts/overwriteOutscaleBackupBucket";
 import { syncOutscaleBucketToBackup } from "@/scripts/syncOutcsaleBucketToBackup";
 
@@ -30,6 +31,7 @@ const EVERY_DAY_AT_1_15_AM = "15 1 * * *";
 const EVERY_DAY_AT_2_AM = "0 2 * * *";
 const EVERY_DAY_AT_3_AM = "0 3 * * *";
 const EVERY_DAY_AT_4_AM = "0 4 * * *";
+const EVERY_SATURDAY_AT_11_PM = "0 23 * * 6";
 const EVERY_SUNDAY_AT_2_AM = "0 2 * * 0";
 const EVERY_1ST_OF_MONTH_AT_3_AM = "0 3 1 * *";
 const EVERY_5_MINUTES = "*/5 * * * *";
@@ -250,6 +252,24 @@ CronJob.from({
       batchCallback: async () => {
         logger.info("Running Outscale bucket backup sync");
         await syncOutscaleBucketToBackup();
+      },
+    }),
+  start: true,
+  timeZone: "Europe/Paris",
+});
+
+// Vérifie les liens stockés et ceux saisis dans manual_monitored_link.
+// Les incidents ouverts sont dans dead_link.
+CronJob.from({
+  cronTime:
+    process.env.BATCH_DETECT_AND_FLAG_DEAD_LINKS_CRONTIME ||
+    EVERY_SATURDAY_AT_11_PM,
+  onTick: () =>
+    runBatchIfActive({
+      batchKey: "batch.detect-and-flag-dead-links",
+      batchCallback: async () => {
+        logger.info("Running batch.detect-and-flag-dead-links");
+        await detectAndFlagDeadLinks();
       },
     }),
   start: true,
