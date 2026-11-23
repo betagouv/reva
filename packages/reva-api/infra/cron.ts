@@ -7,6 +7,7 @@ import { CronJob } from "cron";
 import dotenv from "dotenv";
 
 import { deleteExpiredAccountEmailOtps } from "@/modules/account/features/deleteExpiredAccountEmailOtps";
+import { disableInactiveAccounts } from "@/modules/account/features/disableInactiveAccounts";
 import { sendReminderToAAPForMissingSwornStatement } from "@/modules/feasibility/dematerialized-feasibility-file/features/sendReminderToAAPForMissingSwornStatement";
 import { detectAndFlagDeadLinks } from "@/scripts/detectAndFlagDeadLinks";
 import { overwriteOutscaleBackupBucket } from "@/scripts/overwriteOutscaleBackupBucket";
@@ -305,6 +306,22 @@ CronJob.from({
         const sourceBucket = process.env.OUTSCALE_BUCKET_NAME!;
         const backupBucket = process.env.OUTSCALE_BACKUP_MENSUEL_BUCKET_NAME!;
         await overwriteOutscaleBackupBucket({ sourceBucket, backupBucket });
+      },
+    }),
+  start: true,
+  timeZone: "Europe/Paris",
+});
+
+// Désactivation des comptes non API créés il y a plus de 2 ans et sans connexion depuis 2 ans
+CronJob.from({
+  cronTime:
+    process.env.BATCH_DISABLE_INACTIVE_ACCOUNTS_CRONTIME || EVERY_DAY_AT_2_AM,
+  onTick: () =>
+    runBatchIfActive({
+      batchKey: "DISABLE_INACTIVE_ACCOUNTS",
+      batchCallback: async () => {
+        logger.info("Running DISABLE_INACTIVE_ACCOUNTS batch");
+        await disableInactiveAccounts();
       },
     }),
   start: true,
