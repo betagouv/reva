@@ -609,6 +609,7 @@ model Account {
   lastLoginAt                                 DateTime?                                    @map("last_login_at") @db.Timestamptz(6)
   certificationAuthorityOnAccount             CertificationAuthorityOnAccount?
   createdAt                                   DateTime?                                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  inactivityWarnings                          AccountInactivityWarning[]
 
   @@index([email])
   @@index([keycloakId])
@@ -2262,6 +2263,23 @@ model AccountEmailOtp {
   @@unique([accountId])
   @@index([createdAt])
   @@map("account_email_otp")
+}
+
+enum TimeBeforeAccountDisabling {
+  SIX_WEEKS
+  TWO_WEEKS
+  ONE_DAY
+}
+
+model AccountInactivityWarning {
+  id                  String                     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  accountId           String                     @map("account_id") @db.Uuid
+  account             Account                    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  timeBeforeDisabling TimeBeforeAccountDisabling @map("time_before_disabling")
+  sentAt              DateTime                   @default(now()) @map("sent_at") @db.Timestamptz(6)
+
+  @@index([accountId])
+  @@map("account_inactivity_warning")
 }
 
 enum PermissionVaeCollective {
