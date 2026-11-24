@@ -3,6 +3,7 @@ import { AccountInactivityWarning } from "@prisma/client";
 import {
   getCurrentInactivityCycleWarnings,
   getLastActivityDate,
+  getScheduledDisablingDate,
 } from "./inactiveAccounts";
 
 const JAN_2024 = new Date("2024-01-15T10:00:00Z");
@@ -25,6 +26,14 @@ describe("getLastActivityDate", () => {
     expect(getLastActivityDate({ createdAt: null, lastLoginAt: null })).toEqual(
       new Date(0),
     );
+  });
+});
+
+describe("getScheduledDisablingDate", () => {
+  test("is 2 years after the last activity", () => {
+    expect(
+      getScheduledDisablingDate({ createdAt: JAN_2024, lastLoginAt: JUN_2024 }),
+    ).toEqual(new Date("2026-06-15T10:00:00Z"));
   });
 });
 

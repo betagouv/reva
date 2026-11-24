@@ -1,5 +1,5 @@
 import { AccountInactivityWarning } from "@prisma/client";
-import { max } from "date-fns";
+import { addYears, max } from "date-fns";
 
 export const INACTIVITY_PERIOD_IN_YEARS = 2;
 
@@ -16,6 +16,9 @@ export const getLastActivityDate = ({
   createdAt,
   lastLoginAt,
 }: AccountActivityDates) => max([createdAt ?? 0, lastLoginAt ?? 0]);
+
+export const getScheduledDisablingDate = (account: AccountActivityDates) =>
+  addYears(getLastActivityDate(account), INACTIVITY_PERIOD_IN_YEARS);
 
 /**
  * Warnings sent during the current inactivity cycle.

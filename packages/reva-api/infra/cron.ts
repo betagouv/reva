@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 
 import { deleteExpiredAccountEmailOtps } from "@/modules/account/features/deleteExpiredAccountEmailOtps";
 import { disableInactiveAccounts } from "@/modules/account/features/disableInactiveAccounts";
+import { sendInactiveAccountsDisablingWarningEmails } from "@/modules/account/features/sendInactiveAccountsDisablingWarningEmails";
 import { sendReminderToAAPForMissingSwornStatement } from "@/modules/feasibility/dematerialized-feasibility-file/features/sendReminderToAAPForMissingSwornStatement";
 import { detectAndFlagDeadLinks } from "@/scripts/detectAndFlagDeadLinks";
 import { overwriteOutscaleBackupBucket } from "@/scripts/overwriteOutscaleBackupBucket";
@@ -312,7 +313,28 @@ CronJob.from({
   timeZone: "Europe/Paris",
 });
 
-// Désactivation des comptes non API créés il y a plus de 2 ans et sans connexion depuis 2 ans
+// Mails d'avertissement 6 semaines, 2 semaines et 24h avant la désactivation des comptes inactifs
+CronJob.from({
+  cronTime:
+    process.env
+      .BATCH_SEND_INACTIVE_ACCOUNTS_DISABLING_WARNING_EMAILS_CRONTIME ||
+    EVERY_DAY_AT_1_AM,
+  onTick: () =>
+    runBatchIfActive({
+      batchKey: "SEND_INACTIVE_ACCOUNTS_DISABLING_WARNING_EMAILS",
+      batchCallback: async () => {
+        logger.info(
+          "Running SEND_INACTIVE_ACCOUNTS_DISABLING_WARNING_EMAILS batch",
+        );
+        await sendInactiveAccountsDisablingWarningEmails();
+      },
+    }),
+  start: true,
+  timeZone: "Europe/Paris",
+});
+
+// Désactivation des comptes non API créés il y a plus de 2 ans et sans connexion depuis 2 ans,
+// une fois le mail d'avertissement 24h envoyé depuis au moins 24h
 CronJob.from({
   cronTime:
     process.env.BATCH_DISABLE_INACTIVE_ACCOUNTS_CRONTIME || EVERY_DAY_AT_2_AM,
