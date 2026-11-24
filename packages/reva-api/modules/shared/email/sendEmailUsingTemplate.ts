@@ -11,6 +11,10 @@ const brevo = new BrevoClient({
   maxRetries: 3,
 });
 
+/**
+ * Sends a Brevo template email. Errors are logged, not thrown.
+ * Returns false when the email could not be sent, so callers can react if they need to.
+ */
 export const sendEmailUsingTemplate = async ({
   to,
   templateId,
@@ -21,7 +25,7 @@ export const sendEmailUsingTemplate = async ({
   templateId: number;
   params?: Record<string, unknown>;
   attachment?: { name: string; content: string }[];
-}): Promise<void> => {
+}): Promise<boolean> => {
   const emailAddresses = Array.isArray(to)
     ? to.map((t) => t.email).join(", ")
     : to.email;
@@ -35,24 +39,27 @@ export const sendEmailUsingTemplate = async ({
     logger.info({ params });
     logger.info("=========================");
     logger.info(`email sent to ${emailAddresses}`);
-  } else {
-    try {
-      await brevo.transactionalEmails
-        .sendTransacEmail({
-          templateId,
-          to: Array.isArray(to) ? to : [to],
-          params,
-          attachment,
-        })
-        .withRawResponse();
-      logger.info(`email sent to ${emailAddresses}`);
-    } catch (e: any) {
-      if (e instanceof BrevoError) {
-        logger.error(`Brevo API error ${e.statusCode}: ${e.message}`);
-      } else {
-        logger.error(`error sending email to ${emailAddresses}`);
-        logger.error(e);
-      }
+    return true;
+  }
+
+  try {
+    await brevo.transactionalEmails
+      .sendTransacEmail({
+        templateId,
+        to: Array.isArray(to) ? to : [to],
+        params,
+        attachment,
+      })
+      .withRawResponse();
+    logger.info(`email sent to ${emailAddresses}`);
+    return true;
+  } catch (e: any) {
+    if (e instanceof BrevoError) {
+      logger.error(`Brevo API error ${e.statusCode}: ${e.message}`);
+    } else {
+      logger.error(`error sending email to ${emailAddresses}`);
+      logger.error(e);
     }
+    return false;
   }
 };
