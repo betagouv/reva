@@ -1,4 +1,5 @@
-import { subMonths, subYears } from "date-fns";
+import { TimeBeforeAccountDisabling } from "@prisma/client";
+import { subDays, subHours, subMonths, subYears } from "date-fns";
 
 import * as getKeycloakAdminModule from "@/modules/shared/auth/getKeycloakAdmin";
 import { prismaClient } from "@/prisma/client";
@@ -23,6 +24,15 @@ const mockKeycloakAdmin = (groups: { name: string }[] = []) =>
       >,
   );
 
+const createWarning = (
+  accountId: string,
+  sentAt: Date = subDays(new Date(), 2),
+  timeBeforeDisabling: TimeBeforeAccountDisabling = "ONE_DAY",
+) =>
+  prismaClient.accountInactivityWarning.create({
+    data: { accountId, timeBeforeDisabling, sentAt },
+  });
+
 const getDisabledAt = async (accountId: string) =>
   (await prismaClient.account.findUniqueOrThrow({ where: { id: accountId } }))
     .disabledAt;
@@ -32,11 +42,12 @@ describe("disableInactiveAccounts", () => {
     mockKeycloakAdmin();
   });
 
-  test("disables an account created and last logged in more than 2 years ago", async () => {
+  test("disables an inactive account warned more than 24h ago", async () => {
     const account = await createAccountHelper({
       createdAt: THREE_YEARS_AGO,
       lastLoginAt: THREE_YEARS_AGO,
     });
+    await createWarning(account.id);
 
     const { disabledAccounts, failedAccounts } =
       await disableInactiveAccounts();
@@ -59,6 +70,9 @@ describe("disableInactiveAccounts", () => {
       createdAt: null,
       lastLoginAt: null,
     });
+    await createWarning(nullCreatedAt.id);
+    await createWarning(nullLastLoginAt.id);
+    await createWarning(bothNull.id);
 
     const { disabledAccounts } = await disableInactiveAccounts();
 
@@ -72,6 +86,7 @@ describe("disableInactiveAccounts", () => {
       createdAt: null,
       lastLoginAt: ONE_MONTH_AGO,
     });
+    await createWarning(account.id);
 
     const { disabledAccounts } = await disableInactiveAccounts();
 
@@ -84,6 +99,7 @@ describe("disableInactiveAccounts", () => {
       createdAt: ONE_MONTH_AGO,
       lastLoginAt: null,
     });
+    await createWarning(account.id);
 
     const { disabledAccounts } = await disableInactiveAccounts();
 
@@ -97,6 +113,7 @@ describe("disableInactiveAccounts", () => {
       createdAt: THREE_YEARS_AGO,
       lastLoginAt: null,
     });
+    await createWarning(account.id);
 
     const { disabledAccounts } = await disableInactiveAccounts();
 
@@ -123,11 +140,65 @@ describe("disableInactiveAccounts", () => {
       createdAt: THREE_YEARS_AGO,
       lastLoginAt: null,
     });
+    await createWarning(adminAccount.id);
 
     const { disabledAccounts, failedAccounts } =
       await disableInactiveAccounts();
 
     expect(disabledAccounts.map((a) => a.id)).toEqual([adminAccount.id]);
     expect(failedAccounts).toEqual([]);
+  });
+
+  test("keeps an inactive account that was never warned", async () => {
+    const account = await createAccountHelper({
+      createdAt: THREE_YEARS_AGO,
+      lastLoginAt: null,
+    });
+
+    const { disabledAccounts } = await disableInactiveAccounts();
+
+    expect(disabledAccounts).toEqual([]);
+    expect(await getDisabledAt(account.id)).toBeNull();
+  });
+
+  test("keeps an inactive account warned less than 24h ago", async () => {
+    const account = await createAccountHelper({
+      createdAt: THREE_YEARS_AGO,
+      lastLoginAt: null,
+    });
+    await createWarning(account.id, subHours(new Date(), 23));
+
+    const { disabledAccounts } = await disableInactiveAccounts();
+
+    expect(disabledAccounts).toEqual([]);
+    expect(await getDisabledAt(account.id)).toBeNull();
+  });
+
+  test("keeps an inactive account that only received the 6 weeks and 2 weeks warnings", async () => {
+    const account = await createAccountHelper({
+      createdAt: THREE_YEARS_AGO,
+      lastLoginAt: null,
+    });
+    await createWarning(account.id, subDays(new Date(), 30), "SIX_WEEKS");
+    await createWarning(account.id, subDays(new Date(), 10), "TWO_WEEKS");
+
+    const { disabledAccounts } = await disableInactiveAccounts();
+
+    expect(disabledAccounts).toEqual([]);
+    expect(await getDisabledAt(account.id)).toBeNull();
+  });
+
+  test("keeps an inactive account whose 24h warning belongs to a previous inactivity cycle", async () => {
+    const lastLoginAt = subMonths(new Date(), 30);
+    const account = await createAccountHelper({
+      createdAt: subYears(new Date(), 5),
+      lastLoginAt,
+    });
+    await createWarning(account.id, subDays(lastLoginAt, 1));
+
+    const { disabledAccounts } = await disableInactiveAccounts();
+
+    expect(disabledAccounts).toEqual([]);
+    expect(await getDisabledAt(account.id)).toBeNull();
   });
 });
