@@ -13,6 +13,8 @@ import {
 } from "../utils/inactiveAccounts";
 
 const FIRST_WARNING_DELAY_IN_WEEKS = 6;
+// Spreads the first wave of warnings over several runs
+const DEFAULT_MAX_EMAILS_PER_RUN = 500;
 
 // Ordered from least to most urgent
 const TIMES_BEFORE_DISABLING_BY_URGENCY: TimeBeforeAccountDisabling[] = [
@@ -46,14 +48,37 @@ const isWarningAlreadySent = (
 };
 
 /**
+ * Upcoming deadlines first (soonest first), then accounts already past their disabling date:
+ * those are only disabled once DISABLE_INACTIVE_ACCOUNTS is active, so they can wait a few days.
+ */
+const compareByDeadlineUrgency =
+  (now: Date) =>
+  (
+    a: { scheduledDisablingDate: Date },
+    b: { scheduledDisablingDate: Date },
+  ) => {
+    const aIsPastDue = a.scheduledDisablingDate < now;
+    const bIsPastDue = b.scheduledDisablingDate < now;
+    if (aIsPastDue !== bIsPastDue) {
+      return aIsPastDue ? 1 : -1;
+    }
+    return (
+      a.scheduledDisablingDate.getTime() - b.scheduledDisablingDate.getTime()
+    );
+  };
+
+/**
  * Warns inactive accounts by email 6 weeks, 2 weeks and 24h before their automatic disabling.
  * Only the most urgent applicable warning is sent: an account already past its disabling date
  * only receives the 24h warning. Each warning is sent once per inactivity cycle.
+ * At most maxEmailsPerRun emails are sent; the remaining warnings are sent on the next runs.
  */
-export const sendInactiveAccountsDisablingWarningEmails = async () => {
+export const sendInactiveAccountsDisablingWarningEmails = async ({
+  maxEmailsPerRun = DEFAULT_MAX_EMAILS_PER_RUN,
+}: { maxEmailsPerRun?: number } = {}) => {
   const now = new Date();
 
-  const accountsToWarn = await prismaClient.account.findMany({
+  const inactiveAccounts = await prismaClient.account.findMany({
     where: inactiveSinceWhereClause(
       subYears(
         addWeeks(now, FIRST_WARNING_DELAY_IN_WEEKS),
@@ -62,6 +87,31 @@ export const sendInactiveAccountsDisablingWarningEmails = async () => {
     ),
     include: { inactivityWarnings: true },
   });
+
+  const pendingWarnings = inactiveAccounts
+    .map((account) => {
+      const scheduledDisablingDate = getScheduledDisablingDate(account);
+      return {
+        account,
+        scheduledDisablingDate,
+        timeBeforeDisabling: getTimeBeforeDisablingToWarnAbout(
+          scheduledDisablingDate,
+          now,
+        ),
+      };
+    })
+    .filter(
+      ({ account, timeBeforeDisabling }) =>
+        !isWarningAlreadySent(
+          timeBeforeDisabling,
+          getCurrentInactivityCycleWarnings(account).map(
+            (w) => w.timeBeforeDisabling,
+          ),
+        ),
+    )
+    .sort(compareByDeadlineUrgency(now));
+
+  const warningsToSend = pendingWarnings.slice(0, maxEmailsPerRun);
 
   const sentCountByTimeBeforeDisabling: Record<
     TimeBeforeAccountDisabling,
@@ -73,25 +123,11 @@ export const sendInactiveAccountsDisablingWarningEmails = async () => {
   };
   let failedCount = 0;
 
-  for (const account of accountsToWarn) {
-    const scheduledDisablingDate = getScheduledDisablingDate(account);
-    const timeBeforeDisabling = getTimeBeforeDisablingToWarnAbout(
-      scheduledDisablingDate,
-      now,
-    );
-    const alreadyWarnedTimesBeforeDisabling = getCurrentInactivityCycleWarnings(
-      account,
-    ).map((w) => w.timeBeforeDisabling);
-
-    if (
-      isWarningAlreadySent(
-        timeBeforeDisabling,
-        alreadyWarnedTimesBeforeDisabling,
-      )
-    ) {
-      continue;
-    }
-
+  for (const {
+    account,
+    scheduledDisablingDate,
+    timeBeforeDisabling,
+  } of warningsToSend) {
     try {
       const emailSent = await sendInactiveAccountDisablingWarningEmail({
         email: account.email,
@@ -127,7 +163,11 @@ export const sendInactiveAccountsDisablingWarningEmails = async () => {
   }
 
   logger.info(
-    { sentCountByTimeBeforeDisabling, failedCount },
+    {
+      sentCountByTimeBeforeDisabling,
+      failedCount,
+      postponedToNextRunCount: pendingWarnings.length - warningsToSend.length,
+    },
     "Envoi des mails d'avertissement de désactivation des comptes inactifs terminé",
   );
 };

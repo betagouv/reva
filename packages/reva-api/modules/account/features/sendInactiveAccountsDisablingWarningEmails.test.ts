@@ -205,4 +205,40 @@ describe("sendInactiveAccountsDisablingWarningEmails", () => {
     ]);
     expect(sendEmailSpy).toHaveBeenCalledTimes(2);
   });
+
+  describe("max emails per run", () => {
+    test("sends at most maxEmailsPerRun emails and sends the rest on the next run", async () => {
+      await createAccountDisabledAt(addDays(new Date(), 10));
+      await createAccountDisabledAt(addDays(new Date(), 20));
+      await createAccountDisabledAt(addDays(new Date(), 30));
+
+      await sendInactiveAccountsDisablingWarningEmails({ maxEmailsPerRun: 2 });
+      expect(sendEmailSpy).toHaveBeenCalledTimes(2);
+
+      await sendInactiveAccountsDisablingWarningEmails({ maxEmailsPerRun: 2 });
+      expect(sendEmailSpy).toHaveBeenCalledTimes(3);
+      expect(await prismaClient.accountInactivityWarning.count()).toBe(3);
+    });
+
+    test("warns upcoming deadlines first, soonest first, before accounts already past their disabling date", async () => {
+      const pastDue = await createAccountHelper({
+        createdAt: subYears(new Date(), 3),
+        lastLoginAt: null,
+      });
+      const inThirtyDays = await createAccountDisabledAt(
+        addDays(new Date(), 30),
+      );
+      const inTenDays = await createAccountDisabledAt(addDays(new Date(), 10));
+
+      await sendInactiveAccountsDisablingWarningEmails({ maxEmailsPerRun: 2 });
+
+      expect(
+        sendEmailSpy.mock.calls.map(
+          ([{ to }]: Parameters<typeof EmailModule.sendEmailUsingTemplate>) =>
+            Array.isArray(to) ? undefined : to.email,
+        ),
+      ).toEqual([inTenDays.email, inThirtyDays.email]);
+      expect(await getWarnedTimesBeforeDisabling(pastDue.id)).toEqual([]);
+    });
+  });
 });
