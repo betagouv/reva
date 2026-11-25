@@ -14,6 +14,8 @@ export async function PrivateHeader() {
     "SHOW_METABASE_DASHBOARD_VAE_COLLECTIVE",
   );
 
+  const isAdmin = await isUserInRole("admin");
+
   const isVaeCollectiveAccountsFeatureActive = isFeatureActive(
     "VAE_COLLECTIVE_ACCOUNTS",
   );
@@ -41,7 +43,7 @@ export async function PrivateHeader() {
   const showCommanditaireDashboard =
     isMetabaseDashboardActive && canViewCommanditaireStatistiques;
   const showSousCompteDashboard =
-    isMetabaseDashboardActive && canViewSousCompteStatistiques;
+    isMetabaseDashboardActive && canViewSousCompteStatistiques && !isAdmin;
 
   // Comme getActiveFeatures, on tolère l'échec de cet appel : le header est rendu
   // sur toutes les pages privées, pas seulement celles d'un commanditaire.
