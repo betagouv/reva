@@ -2,12 +2,15 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 import { useRouter } from "next/navigation";
 
+import { useFeatureflipping } from "@/components/feature-flipping/featureFlipping";
+
 import { HistoryResultatView } from "./HistoryResultatView";
 import { useJuryAAP } from "./jury-aap.hook";
 import { ResultatCard } from "./ResultatCard";
 
 export const ResultatTab = () => {
   const router = useRouter();
+  const { isFeatureActive } = useFeatureflipping();
 
   const { candidacy } = useJuryAAP();
 
@@ -79,7 +82,11 @@ export const ResultatTab = () => {
                 children: "Accéder au dossier de validation",
                 onClick: () => {
                   router.push(
-                    `/candidacies/${candidacy.id}/dossier-de-validation-aap/`,
+                    `/candidacies/${candidacy.id}/${
+                      isFeatureActive("NEW_DV_PAGE")
+                        ? "dossier-de-validation-aap-v2"
+                        : "dossier-de-validation-aap/"
+                    }`,
                   );
                 },
               }}

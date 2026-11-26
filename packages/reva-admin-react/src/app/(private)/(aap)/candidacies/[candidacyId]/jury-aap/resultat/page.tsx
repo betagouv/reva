@@ -4,6 +4,8 @@ import { CallOut } from "@codegouvfr/react-dsfr/CallOut";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { useFeatureflipping } from "@/components/feature-flipping/featureFlipping";
+
 import {
   FeasibilityCompetenceBlocksModal,
   feasibilityCompetenceBlocksModal,
@@ -15,6 +17,7 @@ import { useJuryAAP } from "./jury-aap.hook";
 
 export default function ResultatPage() {
   const router = useRouter();
+  const { isFeatureActive } = useFeatureflipping();
 
   const { candidacy } = useJuryAAP();
 
@@ -128,7 +131,11 @@ export default function ResultatPage() {
                 children: "Accéder au dossier de validation",
                 onClick: () => {
                   router.push(
-                    `/candidacies/${candidacy.id}/dossier-de-validation-aap/`,
+                    `/candidacies/${candidacy.id}/${
+                      isFeatureActive("NEW_DV_PAGE")
+                        ? "dossier-de-validation-aap-v2"
+                        : "dossier-de-validation-aap/"
+                    }`,
                   );
                 },
               }}

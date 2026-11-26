@@ -8,6 +8,7 @@ import { ReactNode } from "react";
 import { CandidacyModalities } from "@/components/aap-candidacy-layout/CandidacyModalities";
 import { Skeleton } from "@/components/aap-candidacy-layout/Skeleton";
 import { useCanAccessCandidacy } from "@/components/can-access-candidacy/canAccessCandidacy";
+import { useFeatureflipping } from "@/components/feature-flipping/featureFlipping";
 import { useGraphQlClient } from "@/components/graphql/graphql-client/GraphqlClient";
 import { NotAuthorized } from "@/components/not-authorized";
 
@@ -55,6 +56,8 @@ export const AapCandidacyLayout = ({ children }: { children: ReactNode }) => {
     candidacyId: string;
   }>();
   const { graphqlClient } = useGraphQlClient();
+  const { isFeatureActive } = useFeatureflipping();
+  const isNewDvPageEnabled = isFeatureActive("NEW_DV_PAGE");
 
   const { data: getCandidacyMenuResponse, isLoading: isLoadingMenu } = useQuery(
     {
@@ -81,14 +84,37 @@ export const AapCandidacyLayout = ({ children }: { children: ReactNode }) => {
     return <div className="w-full">{children}</div>;
   }
 
+  const toDossierDeValidationUrl = (url: string) =>
+    isNewDvPageEnabled
+      ? url.replace(
+          /\/dossier-de-validation-aap\/?$/,
+          "/dossier-de-validation-aap-v2",
+        )
+      : url;
+
   const menuHeaderEntries =
-    getCandidacyMenuResponse?.candidacyMenu_getCandidacyMenu?.menuHeader;
+    getCandidacyMenuResponse?.candidacyMenu_getCandidacyMenu?.menuHeader?.map(
+      (entry) => ({
+        ...entry,
+        url: toDossierDeValidationUrl(entry.url),
+      }),
+    );
 
   const mainMenuEntries =
-    getCandidacyMenuResponse?.candidacyMenu_getCandidacyMenu?.mainMenu;
+    getCandidacyMenuResponse?.candidacyMenu_getCandidacyMenu?.mainMenu?.map(
+      (entry) => ({
+        ...entry,
+        url: toDossierDeValidationUrl(entry.url),
+      }),
+    );
 
   const menuFooterEntries =
-    getCandidacyMenuResponse?.candidacyMenu_getCandidacyMenu?.menuFooter;
+    getCandidacyMenuResponse?.candidacyMenu_getCandidacyMenu?.menuFooter?.map(
+      (entry) => ({
+        ...entry,
+        url: toDossierDeValidationUrl(entry.url),
+      }),
+    );
 
   const candidacy = getCandidacyMenuResponse?.getCandidacyById;
 
