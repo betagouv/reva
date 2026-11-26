@@ -56,12 +56,21 @@ export const certificationAuthorityLoaders = {
       return certificationIds.map((id) =>
         certificationAuthorityOnCertification
           .filter((c) => c.certificationId === id)
+          .sort((a, b) =>
+            a.certificationAuthority.label.localeCompare(
+              b.certificationAuthority.label,
+            ),
+          )
           .map((c) => ({
             certificationAuthority: c.certificationAuthority,
             parcours:
-              c.certificationAuthorityOnCertificationOnParcoursCertifications.map(
-                (pc) => pc.parcoursCertification,
-              ),
+              c.certificationAuthorityOnCertificationOnParcoursCertifications
+                .sort((a, b) =>
+                  a.parcoursCertification.label.localeCompare(
+                    b.parcoursCertification.label,
+                  ),
+                )
+                .map((pc) => pc.parcoursCertification),
           })),
       );
     },
