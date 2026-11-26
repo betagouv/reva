@@ -21,7 +21,7 @@ export const DepotDvIntroScreen = ({
         <div className="flex-1 flex-col grow basis-9/12">
           <div className="flex flex-col gap-6">
             <p className="font-bold mb-0">
-              Quels documents doivent être préparer pour faire mon dépot ?
+              Quels documents doivent être préparer pour déposer le dossier ?
             </p>
             <ul>
               <li>Le dossier de validation complété et relu</li>
@@ -43,13 +43,13 @@ export const DepotDvIntroScreen = ({
                 ]}
               />
               <p className="font-bold mb-0">
-                Pour faire votre demande, préparez également les documents
+                Pour faire votre demande, préparez également les éléments
                 suivants :
               </p>
               <ul>
                 <li>
-                  La description de l’aménagement spécifique pour le passage
-                  devant le jury
+                  La description de l’aménagement souhaité, à renseigner sur la
+                  plateforme
                 </li>
                 <li>Le justificatif médical au format numérique</li>
               </ul>
@@ -60,10 +60,10 @@ export const DepotDvIntroScreen = ({
                   className="fr-icon-warning-fill fr-icon--sm mr-1"
                   aria-hidden="true"
                 />
-                Cette demande ne peux pas être enregistrée en cours d’édition
-                mais vous pouvez l’annuler tant que vous n’avez pas finalisé la
-                démarche. Faites votre demande dès maintenant : vous ne pourrez
-                plus la faire une fois votre dossier de validation envoyé.
+                Vous ne pourrez pas enregistrer la démarche en cours de saisie.
+                Préparez tous les documents avant de commencer. Toute demande
+                d’aménagement doit être déposée en même temps que le dossier de
+                validation.
               </p>
             </div>
           </div>
