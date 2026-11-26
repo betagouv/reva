@@ -1981,5 +1981,75 @@ describe("candidacy_getCandidaciesForAAP", () => {
         ).toEqual([enCoursCandidacy.id, termineCandidacy.id].sort());
       });
     });
+
+    describe("Admin", () => {
+      test("should exclude AUTONOME candidacies when filtering by accompagnement EN_COURS", async () => {
+        const organism = await createOrganismHelper();
+
+        const accompagneCandidacy = await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            typeAccompagnement: "ACCOMPAGNE",
+            endAccompagnementStatus: EndAccompagnementStatus.NOT_REQUESTED,
+          },
+        });
+
+        await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            typeAccompagnement: "AUTONOME",
+            endAccompagnementStatus: EndAccompagnementStatus.NOT_REQUESTED,
+          },
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId: "1b0e7046-ca61-4259-b716-785f36ab79b2",
+          userRole: "admin",
+          input: {
+            accompagnementStatuses: [AccompagnementStatusFilter.EN_COURS],
+            maisonMereAAPId: organism.maisonMereAAPId || undefined,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(1);
+        expect(resp.candidacy_getCandidaciesForAAP.rows[0].id).toBe(
+          accompagneCandidacy.id,
+        );
+      });
+
+      test("should exclude AUTONOME candidacies when filtering by accompagnement TERMINE", async () => {
+        const organism = await createOrganismHelper();
+
+        const accompagneCandidacy = await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            typeAccompagnement: "ACCOMPAGNE",
+            endAccompagnementStatus: EndAccompagnementStatus.CONFIRMED_BY_ADMIN,
+          },
+        });
+
+        await createCandidacyHelper({
+          candidacyArgs: {
+            organismId: organism.id,
+            typeAccompagnement: "AUTONOME",
+            endAccompagnementStatus: EndAccompagnementStatus.CONFIRMED_BY_ADMIN,
+          },
+        });
+
+        const resp = await getCandidaciesForAAP({
+          userKeycloakId: "1b0e7046-ca61-4259-b716-785f36ab79b2",
+          userRole: "admin",
+          input: {
+            accompagnementStatuses: [AccompagnementStatusFilter.TERMINE],
+            maisonMereAAPId: organism.maisonMereAAPId || undefined,
+          },
+        });
+
+        expect(resp.candidacy_getCandidaciesForAAP.rows).toHaveLength(1);
+        expect(resp.candidacy_getCandidaciesForAAP.rows[0].id).toBe(
+          accompagneCandidacy.id,
+        );
+      });
+    });
   });
 });

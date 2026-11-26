@@ -1,5 +1,6 @@
 import {
   CandidacyStatusStep,
+  CandidacyTypeAccompagnement,
   DossierDeValidationStatus,
   EndAccompagnementStatus,
   FeasibilityStatus,
@@ -564,6 +565,7 @@ export const getCandidaciesForAAP = async ({
     if (accompagnementStatuses.includes(AccompagnementStatusFilter.EN_COURS)) {
       accompagnementStatusesWhereInput.push({
         candidacy: {
+          typeAccompagnement: CandidacyTypeAccompagnement.ACCOMPAGNE,
           endAccompagnementStatus: {
             in: [
               EndAccompagnementStatus.NOT_REQUESTED,
@@ -577,6 +579,7 @@ export const getCandidaciesForAAP = async ({
     if (accompagnementStatuses.includes(AccompagnementStatusFilter.TERMINE)) {
       accompagnementStatusesWhereInput.push({
         candidacy: {
+          typeAccompagnement: CandidacyTypeAccompagnement.ACCOMPAGNE,
           endAccompagnementStatus: {
             in: [
               EndAccompagnementStatus.CONFIRMED_BY_CANDIDATE,
