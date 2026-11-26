@@ -1,7 +1,12 @@
 "use client";
 import Breadcrumb from "@codegouvfr/react-dsfr/Breadcrumb";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { graphqlErrorToast, successToast } from "@/components/toast/toast";
 
@@ -25,6 +30,8 @@ const failedJuryResults: JuryResult[] = [
 
 export default function DepotDvPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { candidacyId } = useParams<{ candidacyId: string }>();
   const {
     certification,
@@ -38,6 +45,19 @@ export default function DepotDvPage() {
   const [needsAmenagement, setNeedsAmenagement] = useState<boolean | null>(
     null,
   );
+
+  useEffect(() => {
+    if (needsAmenagement !== null || !searchParams.has("hideMenu")) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("hideMenu");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, {
+      scroll: false,
+    });
+  }, [needsAmenagement, pathname, router, searchParams]);
 
   if (queryStatus === "pending") {
     return <div>Chargement...</div>;

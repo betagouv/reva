@@ -193,6 +193,11 @@ async function startDepotWithAmenagement(page: Page) {
     page.getByRole("checkbox", { name: AMENAGEMENT_CHECKBOX_LABEL }),
   ).toBeChecked();
   await page.getByRole("button", { name: "Commencer" }).click();
+  await expect(page.locator(".fr-stepper__title")).toBeVisible();
+  await expect(page).toHaveURL(/hideMenu=true/);
+  await expect(
+    page.getByRole("navigation", { name: "Menu latéral" }),
+  ).toHaveCount(0);
 }
 
 test.describe("Dossier de validation AAP v2", () => {
@@ -443,6 +448,10 @@ test.describe("Dossier de validation AAP v2", () => {
       await expect(page.locator(".fr-stepper__details")).toContainText(
         "Vérification, validation et envoi",
       );
+      await expect(page).toHaveURL(/hideMenu=true/);
+      await expect(
+        page.getByRole("navigation", { name: "Menu latéral" }),
+      ).toHaveCount(0);
     });
 
     test("shows an error on each step when required fields are missing", async ({

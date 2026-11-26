@@ -2,7 +2,7 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
 
 import { CandidacyModalities } from "@/components/aap-candidacy-layout/CandidacyModalities";
@@ -71,17 +71,14 @@ export const AapCandidacyLayout = ({ children }: { children: ReactNode }) => {
 
   const { canAccess } = useCanAccessCandidacy(candidacyId);
   const currentPathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const shouldHideSideMenu = PATHS_WITH_HIDDEN_SIDE_MENU.some((path) =>
-    path.test(currentPathname),
-  );
+  const shouldHideSideMenu =
+    searchParams.get("hideMenu") === "true" ||
+    PATHS_WITH_HIDDEN_SIDE_MENU.some((path) => path.test(currentPathname));
 
   if (canAccess === false) {
     return <NotAuthorized />;
-  }
-
-  if (shouldHideSideMenu) {
-    return <div className="w-full">{children}</div>;
   }
 
   const toDossierDeValidationUrl = (url: string) =>
@@ -121,44 +118,53 @@ export const AapCandidacyLayout = ({ children }: { children: ReactNode }) => {
   const candidate = candidacy?.candidate;
 
   return (
-    <div className="flex flex-col md:flex-row w-full">
-      <CandidacyLayoutSideMenu isLoading={isLoadingMenu}>
-        <div className="flex text-xl font-bold mt-2 md:mt-0 mb-2">
-          <span className="fr-icon--xl fr-icon-user-fill mr-2" />
-          <span>
-            {candidate?.givenName ? candidate.givenName : candidate?.lastname}{" "}
-            {candidate?.firstname}
-          </span>
-        </div>
-        <CandidacyModalities
-          fundable={candidacy?.financeModule !== "hors_plateforme"}
-          modaliteAccompagnement={candidacy?.organism?.modaliteAccompagnement}
-        />
+    <div
+      className={
+        shouldHideSideMenu ? "w-full" : "flex flex-col md:flex-row w-full"
+      }
+    >
+      {shouldHideSideMenu ? (
+        // Keeps the page in the same tree position, so hiding the menu does not reset its state.
+        <div hidden />
+      ) : (
+        <CandidacyLayoutSideMenu isLoading={isLoadingMenu}>
+          <div className="flex text-xl font-bold mt-2 md:mt-0 mb-2">
+            <span className="fr-icon--xl fr-icon-user-fill mr-2" />
+            <span>
+              {candidate?.givenName ? candidate.givenName : candidate?.lastname}{" "}
+              {candidate?.firstname}
+            </span>
+          </div>
+          <CandidacyModalities
+            fundable={candidacy?.financeModule !== "hors_plateforme"}
+            modaliteAccompagnement={candidacy?.organism?.modaliteAccompagnement}
+          />
 
-        <ul className="mb-6">
-          {menuHeaderEntries?.map((e) => (
-            <MenuEntry key={e.label} menuEntry={e} />
-          ))}
-        </ul>
-        <h2 className="mt-0.5 flex items-end text-xl font-semibold">
-          Toutes les étapes
-        </h2>
-        <ul>
-          {mainMenuEntries?.map((e) => (
-            <MenuEntry key={e.label} menuEntry={e} />
-          ))}
-        </ul>
-        {!!menuFooterEntries?.length && (
-          <>
-            <div className="border-t-[1px] -ml-4 mr-4 mt-8 mb-7" />
-            <ul>
-              {menuFooterEntries?.map((e) => (
-                <MenuEntry key={e.label} menuEntry={e} />
-              ))}
-            </ul>
-          </>
-        )}
-      </CandidacyLayoutSideMenu>
+          <ul className="mb-6">
+            {menuHeaderEntries?.map((e) => (
+              <MenuEntry key={e.label} menuEntry={e} />
+            ))}
+          </ul>
+          <h2 className="mt-0.5 flex items-end text-xl font-semibold">
+            Toutes les étapes
+          </h2>
+          <ul>
+            {mainMenuEntries?.map((e) => (
+              <MenuEntry key={e.label} menuEntry={e} />
+            ))}
+          </ul>
+          {!!menuFooterEntries?.length && (
+            <>
+              <div className="border-t-[1px] -ml-4 mr-4 mt-8 mb-7" />
+              <ul>
+                {menuFooterEntries?.map((e) => (
+                  <MenuEntry key={e.label} menuEntry={e} />
+                ))}
+              </ul>
+            </>
+          )}
+        </CandidacyLayoutSideMenu>
+      )}
       <div className="w-full">{children}</div>
     </div>
   );

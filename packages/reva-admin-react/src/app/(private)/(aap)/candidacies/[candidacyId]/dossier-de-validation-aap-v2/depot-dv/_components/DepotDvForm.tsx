@@ -4,8 +4,13 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Stepper from "@codegouvfr/react-dsfr/Stepper";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import z from "zod";
 
@@ -155,6 +160,8 @@ export const DepotDvForm = ({
   } | null;
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { candidacyId } = useParams<{ candidacyId: string }>();
   const dossierDeValidationHref = `/candidacies/${candidacyId}/dossier-de-validation-aap-v2`;
   const {
@@ -187,6 +194,31 @@ export const DepotDvForm = ({
     ).filter((step) => step !== null);
   }, [needsAmenagement]);
   const currentStep = steps[currentStepIndex];
+
+  useEffect(() => {
+    const shouldHideMenu =
+      currentStep === "dossier-de-validation" ||
+      currentStep === "special-needs" ||
+      currentStep === "confirmation";
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (shouldHideMenu) {
+      if (params.get("hideMenu") === "true") {
+        return;
+      }
+      params.set("hideMenu", "true");
+    } else if (params.has("hideMenu")) {
+      params.delete("hideMenu");
+    } else {
+      return;
+    }
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, {
+      scroll: false,
+    });
+  }, [currentStep, pathname, router, searchParams]);
 
   const {
     fields: dossierDeValidationOtherFilesFields,
