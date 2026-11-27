@@ -93,12 +93,14 @@ function createCertificationSummaryHandlers({
   withJuryData,
   withPrerequisites,
   status,
+  dossierDeValidationTemplateMimeType = "application/pdf",
 }: {
   hasReducedRequirements: boolean;
   withAdditionalInfo: boolean;
   withJuryData: boolean;
   withPrerequisites: boolean;
   status: CertificationStatus;
+  dossierDeValidationTemplateMimeType?: string;
 }) {
   return [
     fvae.query(
@@ -130,6 +132,7 @@ function createCertificationSummaryHandlers({
                 dossierDeValidationTemplate: {
                   name: "Template de dossier de validation",
                   previewUrl: "https://www.google.fr",
+                  mimeType: dossierDeValidationTemplateMimeType,
                 },
                 additionalDocuments: [],
               }
@@ -378,6 +381,72 @@ test.describe("certificateur certification summary page", () => {
         .getByTestId("additional-info-summary-card")
         .getByTestId("no-additional-info-message"),
     ).not.toBeVisible();
+  });
+
+  test("displays a preview of a pdf dossier de validation template", async ({
+    page,
+    msw,
+  }) => {
+    msw.use(
+      ...createCertificationSummaryHandlers({
+        hasReducedRequirements: false,
+        withAdditionalInfo: true,
+        withJuryData: false,
+        withPrerequisites: false,
+        status: "A_VALIDER_PAR_CERTIFICATEUR",
+      }),
+      ...certificateurSettingsCommonHandlers,
+    );
+
+    await openSummaryPage({ page, role: "admin" });
+
+    const additionalInfoContent = page
+      .getByTestId("additional-info-summary-card")
+      .getByTestId("additional-info-content");
+    await expect(
+      additionalInfoContent.getByTestId(
+        "feasibility-files-preview-Trame du dossier de validation",
+      ),
+    ).toBeVisible();
+    await expect(
+      additionalInfoContent.getByTestId(
+        "dossier-de-validation-template-download-link",
+      ),
+    ).toHaveCount(0);
+  });
+
+  test("displays a download link instead of a preview for an odt dossier de validation template", async ({
+    page,
+    msw,
+  }) => {
+    msw.use(
+      ...createCertificationSummaryHandlers({
+        hasReducedRequirements: false,
+        withAdditionalInfo: true,
+        withJuryData: false,
+        withPrerequisites: false,
+        status: "A_VALIDER_PAR_CERTIFICATEUR",
+        dossierDeValidationTemplateMimeType:
+          "application/vnd.oasis.opendocument.text",
+      }),
+      ...certificateurSettingsCommonHandlers,
+    );
+
+    await openSummaryPage({ page, role: "admin" });
+
+    const additionalInfoContent = page
+      .getByTestId("additional-info-summary-card")
+      .getByTestId("additional-info-content");
+    await expect(
+      additionalInfoContent.getByTestId(
+        "dossier-de-validation-template-download-link",
+      ),
+    ).toHaveAttribute("href", "https://www.google.fr");
+    await expect(
+      additionalInfoContent.getByTestId(
+        "feasibility-files-preview-Trame du dossier de validation",
+      ),
+    ).toHaveCount(0);
   });
 
   test("navigates to the additional info page from the summary card", async ({

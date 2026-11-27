@@ -20,10 +20,9 @@ const CERTIFICATION_AUTHORITY_ID = "certification-authority-id";
 const {
   certificateurSettingsAdminCommonWait,
   certificateurSettingsCommonHandlers,
-} =
-  getCertificateurSettingsCommonHandlers({
-    certificationAuthorityId: CERTIFICATION_AUTHORITY_ID,
-  });
+} = getCertificateurSettingsCommonHandlers({
+  certificationAuthorityId: CERTIFICATION_AUTHORITY_ID,
+});
 
 function createCertificationAdditionalInfoHandlers({
   hasReducedRequirements,
@@ -129,7 +128,10 @@ test.describe("certificateur certification additional info page", () => {
       .getByLabel("Remarques à destination des AAP et candidats (optionnel) :")
       .fill("Remarque test");
 
-    const updateMutation = waitGraphQL(page, "updateCertificationAdditionalInfo");
+    const updateMutation = waitGraphQL(
+      page,
+      "updateCertificationAdditionalInfo",
+    );
     await page.getByRole("button", { name: "Enregistrer" }).click();
     const mutationResponse = await updateMutation;
     const mutationPayload = mutationResponse.request().postDataJSON();
@@ -231,6 +233,75 @@ test.describe("certificateur certification additional info page", () => {
       .getByTestId("referential-link-input")
       .locator("input")
       .fill("https://www.google.com");
+
+    const updateMutation = waitGraphQL(
+      page,
+      "updateCertificationAdditionalInfo",
+    );
+    await Promise.all([
+      page.waitForURL(
+        "/admin2/responsable-certifications/certifications/certification-id/",
+      ),
+      page.getByRole("button", { name: "Enregistrer" }).click(),
+    ]);
+    await updateMutation;
+  });
+
+  test("shows a preview when a pdf dossier de validation template is uploaded", async ({
+    page,
+    msw,
+  }) => {
+    msw.use(
+      ...createCertificationAdditionalInfoHandlers({
+        hasReducedRequirements: false,
+      }),
+      ...certificateurSettingsCommonHandlers,
+    );
+
+    await openAdditionalInfoPage(page);
+
+    const templateUpload = page.getByTestId(
+      "dossier-de-validation-template-upload",
+    );
+    await templateUpload.locator('input[type="file"]').setInputFiles({
+      name: "trame.pdf",
+      mimeType: "application/pdf",
+      buffer: Buffer.from("test-file"),
+    });
+
+    await expect(templateUpload.locator("iframe")).toBeVisible();
+  });
+
+  test("accepts an odt dossier de validation template without preview and submits the form", async ({
+    page,
+    msw,
+  }) => {
+    msw.use(
+      ...createCertificationAdditionalInfoHandlers({
+        hasReducedRequirements: false,
+      }),
+      createUpdateAdditionalInfoMutationHandler(),
+      ...certificateurSettingsCommonHandlers,
+    );
+
+    await openAdditionalInfoPage(page);
+
+    const templateUpload = page.getByTestId(
+      "dossier-de-validation-template-upload",
+    );
+    const templateInput = templateUpload.locator('input[type="file"]');
+    await expect(templateInput).toHaveAttribute("accept", /\.odt/);
+    await expect(templateUpload).toContainText(
+      "Formats supportés : jpg, png, pdf, odt",
+    );
+
+    await templateInput.setInputFiles({
+      name: "trame.odt",
+      mimeType: "application/vnd.oasis.opendocument.text",
+      buffer: Buffer.from("test-file"),
+    });
+
+    await expect(templateUpload.locator("iframe")).toHaveCount(0);
 
     const updateMutation = waitGraphQL(
       page,

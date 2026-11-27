@@ -49,6 +49,7 @@ const getCertificationQuery = graphql(`
         dossierDeValidationTemplate {
           name
           previewUrl
+          mimeType
         }
         dossierDeValidationLink
         linkToJuryGuide

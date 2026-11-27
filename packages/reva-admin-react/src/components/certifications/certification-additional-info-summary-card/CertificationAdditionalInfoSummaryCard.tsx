@@ -1,7 +1,10 @@
 import Link from "next/link";
 
 import { EnhancedSectionCard } from "@/components/card/enhanced-section-card/EnhancedSectionCard";
-import { FancyPreview } from "@/components/fancy-preview/FancyPreview";
+import {
+  FancyPreview,
+  isPreviewableMimeType,
+} from "@/components/fancy-preview/FancyPreview";
 import { SmallNotice } from "@/components/small-notice/SmallNotice";
 
 export const CertificationAdditionalInfoSummaryCard = ({
@@ -25,6 +28,7 @@ export const CertificationAdditionalInfoSummaryCard = ({
     dossierDeValidationTemplate?: {
       name: string;
       previewUrl?: string | null;
+      mimeType: string;
     } | null;
     dossierDeValidationLink?: string | null;
     additionalDocuments: {
@@ -51,16 +55,18 @@ export const CertificationAdditionalInfoSummaryCard = ({
             <h3 className="mb-0">Documents essentiels :</h3>
             {certificationAdditionalInfo.dossierDeValidationTemplate
               ?.previewUrl && (
-              <FancyPreview
-                src={
-                  certificationAdditionalInfo.dossierDeValidationTemplate
-                    .previewUrl
-                }
-                title={"Trame du dossier de validation"}
+              <DossierDeValidationTemplate
                 name={
                   certificationAdditionalInfo.dossierDeValidationTemplate.name
                 }
-                defaultDisplay={false}
+                previewUrl={
+                  certificationAdditionalInfo.dossierDeValidationTemplate
+                    .previewUrl
+                }
+                mimeType={
+                  certificationAdditionalInfo.dossierDeValidationTemplate
+                    .mimeType
+                }
               />
             )}
             {certificationAdditionalInfo.dossierDeValidationLink && (
@@ -157,3 +163,31 @@ export const CertificationAdditionalInfoSummaryCard = ({
     ) : null}
   </EnhancedSectionCard>
 );
+
+const DossierDeValidationTemplate = ({
+  name,
+  previewUrl,
+  mimeType,
+}: {
+  name: string;
+  previewUrl: string;
+  mimeType: string;
+}) =>
+  isPreviewableMimeType(mimeType) ? (
+    <FancyPreview
+      src={previewUrl}
+      title="Trame du dossier de validation"
+      name={name}
+      defaultDisplay={false}
+    />
+  ) : (
+    <a
+      data-testid="dossier-de-validation-template-download-link"
+      className="fr-link fr-link--download mr-auto"
+      href={previewUrl}
+      download={name}
+    >
+      Trame du dossier de validation
+      <span className="fr-link__detail">{name}</span>
+    </a>
+  );

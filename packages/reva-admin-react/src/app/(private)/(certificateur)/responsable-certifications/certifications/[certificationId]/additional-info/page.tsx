@@ -270,12 +270,13 @@ const AdditionalInfoForm = ({
         <FancyUpload
           dataTest="dossier-de-validation-template-upload"
           title={"Importer un fichier de trame de dossier de validation"}
-          hint="Formats supportés : jpg, png, pdf avec un poids maximum de 15Mo"
+          hint="Formats supportés : jpg, png, pdf, odt avec un poids maximum de 15Mo"
           state={errors.dossierDeValidationTemplate?.[0] ? "error" : "default"}
           stateRelatedMessage={errors.dossierDeValidationTemplate?.[0]?.message}
           nativeInputProps={{
             disabled: !!watchedDossierDeValidationLink,
-            accept: "image/jpeg,image/png,application/pdf",
+            accept:
+              "image/jpeg,image/png,application/pdf,.odt,application/vnd.oasis.opendocument.text",
             ...register("dossierDeValidationTemplate"),
           }}
           defaultFile={defaultDossierDeValidationTemplate}
