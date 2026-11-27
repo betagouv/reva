@@ -12,7 +12,10 @@ import {
 } from "react";
 import { v4 } from "uuid";
 
-import { FancyPreview } from "../fancy-preview/FancyPreview";
+import {
+  FancyPreview,
+  isPreviewableMimeType,
+} from "../fancy-preview/FancyPreview";
 
 export const FancyUpload = ({
   title,
@@ -164,7 +167,7 @@ export const FancyUpload = ({
         stateRelatedMessage={stateRelatedMessage}
       />
 
-      {filePreview && urlPreview && (
+      {filePreview && urlPreview && isPreviewableMimeType(filePreview.type) && (
         <FancyPreview title={title} name={filePreview.name} src={urlPreview} />
       )}
     </div>

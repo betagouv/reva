@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+export const isPreviewableMimeType = (mimeType?: string | null) =>
+  mimeType === "application/pdf" || !!mimeType?.startsWith("image/");
+
 interface Props {
   title: string;
   name: string;
