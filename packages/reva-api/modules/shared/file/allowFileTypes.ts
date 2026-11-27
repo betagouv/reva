@@ -1,6 +1,7 @@
 export const allowedFileTypesMap = {
   image: ["image/png", "image/jpeg", "image/jpg"],
   pdf: ["application/pdf"],
+  odt: ["application/vnd.oasis.opendocument.text"],
 };
 
 export const allowFileTypeByDocumentType = {
@@ -40,5 +41,6 @@ export const allowFileTypeByDocumentType = {
   dossierDeValidationTemplate: [
     ...allowedFileTypesMap.pdf,
     ...allowedFileTypesMap.image,
+    ...allowedFileTypesMap.odt,
   ],
 };

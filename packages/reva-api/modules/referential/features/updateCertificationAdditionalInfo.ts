@@ -52,7 +52,7 @@ export const updateCertificationAdditionalInfo = async ({
 
   if (hasDossierDeValidationLink && hasDossierDeValidationTemplate) {
     throw new Error(
-      "La trame du dossier de validation est requise et doit être transmise soit par PDF, soit sous forme de lien.",
+      "La trame du dossier de validation est requise et doit être transmise soit par fichier PDF ou ODT, soit sous forme de lien.",
     );
   }
 
@@ -62,7 +62,7 @@ export const updateCertificationAdditionalInfo = async ({
     !hasDossierDeValidationTemplate
   ) {
     throw new Error(
-      "La trame du dossier de validation est requise et doit être transmise soit par PDF, soit sous forme de lien.",
+      "La trame du dossier de validation est requise et doit être transmise soit par fichier PDF ou ODT, soit sous forme de lien.",
     );
   }
 
