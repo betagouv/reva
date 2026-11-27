@@ -1,3 +1,8 @@
+const ODT_MIME_TYPE = "application/vnd.oasis.opendocument.text";
+
+const getFileTypeLabel = (mimeType: string) =>
+  mimeType === ODT_MIME_TYPE ? "ODT" : mimeType.split("/").pop()?.toUpperCase();
+
 export const DownloadTile = ({
   name,
   description,
@@ -28,7 +33,7 @@ export const DownloadTile = ({
 
           <div className="fr-card__end">
             <p className="fr-tile__detail">
-              {mimeType.split("/").pop()?.toUpperCase()}
+              {getFileTypeLabel(mimeType)}
               {fileSizeInBytes &&
                 ` - ${
                   fileSizeInBytes > 1024 * 1024
